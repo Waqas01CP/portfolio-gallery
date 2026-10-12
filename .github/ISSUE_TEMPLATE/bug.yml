@@ -1,0 +1,28 @@
+name: Bug
+description: Something in the engine, a design or the gallery does not work as documented.
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a security problem, do not open an issue: report it privately as
+        SECURITY.md says.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: The design, the page or file, the browser and its version, the screen width.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: A link to your site or the gallery page, or the commit you built from.

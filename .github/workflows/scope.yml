@@ -1,0 +1,42 @@
+# The scope check (ADR-0006, layer 1): a pull request from outside may add
+# or change one design folder and nothing else.
+#
+# It runs on pull_request_target, so GitHub takes this file from the
+# default branch, never from the pull request, and a pull request cannot
+# change how it is checked. The checkout below has no `ref`, so it checks
+# out the default branch too. Nothing from the pull request is checked out
+# or run: tools/scope_check.py reads only the list of changed file names,
+# through GitHub's API, with this job's read-only token.
+#
+# NEVER add `ref:` to the checkout, `repository:` pointing at the fork, or
+# any step that fetches the pull request's code. That turns this workflow
+# into the "pwn request" GitHub Security Lab warns about.
+#
+# GitHub blocks pull_request_target in public repositories by default from
+# 2026-11-02; the repository's Actions policy allows it for this file
+# (docs/setup-on-github.md).
+name: Scope
+
+on:
+  pull_request_target:
+    # edited: so adding the test marker to a description runs it again.
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the default branch, not the pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read the pull request's changed files and check their scope
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 tools/scope_check.py --pr "$PR_NUMBER"

@@ -1,0 +1,17 @@
+# Who reviews what (ADR-0006, layer 4). The last matching pattern wins.
+#
+# The maintainer owns everything, so GitHub asks him to review every pull
+# request that touches the engine, the checks, the workflows or this file.
+*                   @Waqas01CP
+
+# Contributed designs have no code owner: each is reviewed against
+# CONTRIBUTING.md, and the scope check keeps such a pull request to one
+# design folder.
+/designs/
+
+# The designs the project maintains stay his.
+/designs/default/   @Waqas01CP
+/designs/plain/     @Waqas01CP
+
+# GitHub's advice: own the folder that holds this file and the workflows.
+/.github/           @Waqas01CP

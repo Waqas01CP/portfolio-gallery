@@ -1,0 +1,36 @@
+name: Design proposal
+description: Propose a design for the gallery before or while you build it.
+title: "Design: "
+labels: ["design"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A design is one folder of CSS, fonts and images on the page every
+        design styles. Read CONTRIBUTING.md and docs/reference/design-contract.md
+        first. This form is optional; you may open a pull request directly.
+  - type: input
+    id: name
+    attributes:
+      label: Design name
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What it looks like and who it is for
+      description: A few lines. A sketch or a link to an example helps.
+    validations:
+      required: true
+  - type: textarea
+    id: assets
+    attributes:
+      label: Fonts and images
+      description: Each one you plan to ship, where it comes from, and its licence.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Rules
+      options:
+        - label: I understand a design is CSS, fonts and images only, with no script or SVG.
+          required: true

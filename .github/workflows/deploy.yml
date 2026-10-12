@@ -1,0 +1,138 @@
+# Build and publish with GitHub Pages, on every push to main.
+#
+# What is built: the gallery when the repository variable
+# PORTFOLIO_GALLERY is "true" (set only in the project's own repository),
+# and otherwise the site, in the design content/config.json names. A copy
+# of this repository therefore publishes its owner's site with no change
+# here (docs/how-to/use-this-template.md).
+#
+# Four jobs, each with the least it needs (ADR-0006, ADR-0010):
+#   build     builds and checks the files; read-only; no browser
+#   shots     the gallery only: takes each design's preview in headless
+#             Chrome; read-only; publishes nothing but its own artifact
+#   assemble  takes only WebP previews from shots, checks them and the
+#             site, and packages the site for Pages; read-only
+#   deploy    publishes the package; the only job that can
+# Chrome parses contributed fonts and images, so it never runs in a job
+# whose output is published without being checked.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Gallery or site
+        id: mode
+        env:
+          GALLERY: ${{ vars.PORTFOLIO_GALLERY }}
+        run: |
+          if [ "$GALLERY" = "true" ]; then echo "mode=gallery" >> "$GITHUB_OUTPUT"; else echo "mode=site" >> "$GITHUB_OUTPUT"; fi
+      - name: Create the environment; pip checks every file's hash
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Build and check
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: .venv/bin/python tools/ci.py build --mode "$MODE" --out _site
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: site
+          path: _site
+          retention-days: 1
+          if-no-files-found: error
+
+  shots:
+    needs: build
+    if: needs.build.outputs.mode == 'gallery'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PG_CHROME_NO_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: site
+          path: _site
+      - name: Take each design's preview
+        run: python3 tools/screenshots.py _site
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shots
+          path: _site/designs/*/preview.webp
+          retention-days: 1
+          if-no-files-found: error
+
+  assemble:
+    needs: [build, shots]
+    if: always() && needs.build.result == 'success' && (needs.shots.result == 'success' || needs.shots.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: site
+          path: _site
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: needs.build.outputs.mode == 'gallery'
+        with:
+          name: shots
+          path: _shots
+      - name: Take only checked previews, and check the site again
+        env:
+          MODE: ${{ needs.build.outputs.mode }}
+        run: |
+          if [ "$MODE" = "gallery" ]; then
+            python3 tools/ci.py assemble --site _site --shots _shots
+          else
+            python3 tools/check_built.py _site
+          fi
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: assemble
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check that Pages is set to publish from GitHub Actions
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

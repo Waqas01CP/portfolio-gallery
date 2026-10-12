@@ -1,0 +1,36 @@
+# The content checks (ADR-0006, layer 2): every design, two builds each of
+# the site and the gallery compared byte for byte, the built files, the
+# content trace and the browser checks on every design.
+#
+# On a pull request from a fork, GitHub runs this with a read-only token and
+# no secrets, from the pull request's own copy of this file and of the
+# checks. A pull request that changes them fails the scope check, which
+# runs from the default branch (scope.yml), and cannot merge.
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      # Ubuntu 24.04 restricts the user namespaces Chrome's sandbox uses.
+      # This job holds no write token and no secret (ADR-0010).
+      PG_CHROME_NO_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Create the environment; pip checks every file's hash
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Run every check
+        run: .venv/bin/python tools/ci.py checks
