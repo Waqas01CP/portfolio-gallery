@@ -1,0 +1,133 @@
+[
+  {
+    "id": "tide-tracker",
+    "lane": "builds",
+    "title": "Tide Tracker: tide tables for small sailing clubs",
+    "start": "2026-01",
+    "end": "present",
+    "source": "Projects / Tide Tracker: tide tables for small sailing clubs",
+    "tier": 1,
+    "stack": ["Python", "SQLite", "Jinja2"],
+    "status": "In use at 40 example sailing clubs since March 2026.",
+    "layer2": "A tide table that loads in one request and reads well on a phone.",
+    "layer1": "Wrote 212 automated tests, 48 of them for tide edge cases.",
+    "detail": "In use at 40 example sailing clubs.",
+    "bullets": [
+      "Built a tide table page that loads in <strong>one request</strong> and passes an automated accessibility check with <strong>0 violations</strong>.",
+      "Wrote <strong>212 automated tests</strong>, 48 of them for tide edge cases, which run on each change in 40 seconds.",
+      "Cut the page's largest paint from 3.1 s to <strong>1.4 s</strong> on a throttled phone profile by removing two web fonts."
+    ],
+    "proof": [
+      {"label": "Live app", "url": "https://example.com/tide-tracker"},
+      {"label": "Code", "url": "https://example.com/tide-tracker/code"}
+    ]
+  },
+  {
+    "id": "booking-form",
+    "lane": "builds",
+    "title": "Booking Form: an accessible club booking form",
+    "start": "2025-09",
+    "end": "2026-02",
+    "source": "Projects / Booking Form: an accessible club booking form",
+    "tier": 2,
+    "stack": ["HTML", "CSS", "JavaScript"],
+    "status": "Finished.",
+    "layer1": "Rebuilt a club booking form so it works by keyboard alone.",
+    "detail": "Works by keyboard alone, tested with a screen reader.",
+    "bullets": [
+      "Rebuilt a club booking form so it works by keyboard alone, tested with a screen reader on 12 tasks.",
+      "Replaced a date picker with plain date fields, which cut form errors from 9 to 2 in a test with 10 example members."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/booking-form"}
+    ]
+  },
+  {
+    "id": "reading-list",
+    "lane": "builds",
+    "title": "Reading List: a static reading log",
+    "start": "2025-06",
+    "end": "2025-07",
+    "date_style": "full",
+    "source": "Projects / Reading List: a static reading log",
+    "tier": 3,
+    "stack": ["Python"],
+    "layer2": "A static site generator for a personal reading log,",
+    "layer1": "with 64 entries and no database.",
+    "bullets": [
+      "A static site generator for a personal reading log, with 64 entries and no database."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/reading-list"}
+    ]
+  },
+  {
+    "id": "junior-developer",
+    "lane": "work",
+    "title": "Junior Developer",
+    "org": "Sample Systems Ltd",
+    "org_short": "Sample Systems",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / Junior Developer, Sample Systems Ltd",
+    "detail": "Maintain 3 internal web forms, each checked with an automated accessibility test.",
+    "bullets": [
+      "Maintain 3 internal web forms, each checked with an automated accessibility test before release.",
+      "Wrote the team's guide to accessible error messages, now used in 5 example projects."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "web-intern",
+    "lane": "work",
+    "title": "Web Intern",
+    "org": "Placeholder Studio",
+    "location": "Remote",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / Web Intern, Placeholder Studio",
+    "bullets": [
+      "Fixed 27 accessibility issues across 4 example client sites."
+    ],
+    "no_proof": "Client work under an agreement that keeps it private."
+  },
+  {
+    "id": "bsc-computer-science",
+    "lane": "band",
+    "title": "BSc Computer Science",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Computer Science, Example University",
+    "grade": "3.6 / 4.0 CGPA",
+    "coursework": ["Algorithms", "Databases", "Human-Computer Interaction", "Software Testing"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-web-accessibility",
+    "lane": "certifications",
+    "title": "Example Certificate in Web Accessibility",
+    "org": "Example Academy",
+    "start": "2025-03",
+    "end": "2025-03",
+    "source": "Certifications / Example Certificate in Web Accessibility",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/web-accessibility"}
+    ]
+  },
+  {
+    "id": "cert-python-testing",
+    "lane": "certifications",
+    "title": "Example Certificate in Python Testing",
+    "org": "Example Academy",
+    "start": "2024-11",
+    "end": "2024-11",
+    "source": "Certifications / Example Certificate in Python Testing",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/python-testing"}
+    ]
+  }
+]

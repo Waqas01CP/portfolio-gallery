@@ -1,0 +1,67 @@
+/* The engine's own rules. Every page loads this after its design's
+   stylesheet, so on equal terms these win. Each rule here is one a screen
+   reader, a keyboard user or a reader who turned motion off depends on,
+   whatever the design (ADR-0006). A design styles everything else.
+
+   The checks in tools/check_browser.py run against every design with this
+   file in place, so a design that works around a rule here fails a check,
+   not only the review. */
+
+/* Hidden means hidden, however a design sets display. */
+[hidden] { display: none !important; }
+
+/* Visually hidden, still read. `pre`, not `nowrap`: it also never wraps,
+   and it keeps a space at either end, which m.sp() in
+   src/templates/macros.html.j2 relies on: without that space a screen
+   reader runs two separately laid-out words together. */
+.vh {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: pre !important;
+  border: 0 !important;
+}
+
+/* The timeline's lane filters: site.js lists the lanes switched off in
+   data-hide, and their entries leave the page, in any design. */
+.tl[data-hide~="builds"] .lane-builds.tl-entry,
+.tl[data-hide~="work"] .lane-work.tl-entry,
+.tl[data-hide~="certifications"] .lane-certifications.tl-entry { display: none !important; }
+
+/* The skip link: out of sight until a keyboard reaches it. */
+.skip { position: absolute; left: 12px; top: -80px; z-index: 100; }
+.skip:focus { top: 12px; }
+
+/* Off-screen sections skip their layout until they near the viewport, which
+   keeps the page fast to respond on a phone. On the site this engine was
+   copied from, Lighthouse's default mobile run measured Total Blocking Time
+   at 29 and 41 ms with this rule and 164 to 250 ms without it
+   (docs/reference/provenance.md). It holds on one condition: in full
+   accessibility mode, the one screen readers switch on, the tree at load
+   matches the page without the rule. That needs everything hidden inside
+   the sections to carry aria-hidden too (setShown in site.js), and
+   tools/check_browser.py checks it for every design. The size is an
+   estimate, replaced by the real one once a section has been shown. */
+.page > .sec { content-visibility: auto; contain-intrinsic-size: auto 1400px; }
+/* An anchor in the address bar, from a link on the page or one shared,
+   lays every section out first, so the jump lands exactly where it should
+   rather than where the estimated sizes put it. Pure CSS, so it holds
+   without a script too. */
+html:has(:target) .page > .sec { content-visibility: visible; }
+
+/* Reduced motion: nothing moves, in any design. site.js also stops the
+   knot, the strip, the tilt and the scroll effects, and requests no
+   animation frame. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

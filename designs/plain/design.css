@@ -1,0 +1,251 @@
+/* Plain: high contrast, the system's own fonts, no motion and no effects,
+   and a printout that carries every word. Black on white, or white on
+   black when the device or the switch asks for dark. Nothing to download
+   but this file.
+
+   It styles the engine's fixed HTML (docs/reference/design-contract.md)
+   in one column at every width, so it is also a short worked example of
+   what a design must cover. */
+
+:root {
+  --bg: #FFFFFF;
+  --ink: #000000;
+  --muted: #2B2B2B;
+  --line: #000000;
+  --soft: #F1F1F1;
+  --link: #0037A6;
+  --focus: #0037A6;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  /* The engine's effects: all off. The theme switch stays. */
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  --pg-theme: 1;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --ink: #FFFFFF;
+  --muted: #E2E2E2;
+  --line: #FFFFFF;
+  --soft: #1A1A1A;
+  --link: #A8C8FF;
+  --focus: #FFD84D;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --ink: #FFFFFF;
+    --muted: #E2E2E2;
+    --line: #FFFFFF;
+    --soft: #1A1A1A;
+    --link: #A8C8FF;
+    --focus: #FFD84D;
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.6;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+.mono, time { font-family: var(--mono); font-size: 0.92em; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.25em; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 32px); }
+.skip { padding: 10px 16px; background: var(--ink); color: var(--bg); font-weight: 700; }
+.skip:focus { color: var(--bg); }
+
+/* Decoration the default design draws; none of it here. */
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .avail-dot, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause { display: none; }
+
+/* Buttons and chips. */
+.btn, .depth-toggle, .tl-filter, .theme-switch, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: var(--soft); color: var(--ink); }
+.btn-acc { background: var(--ink); color: var(--bg); }
+.btn-acc:hover { background: var(--ink); color: var(--bg); text-decoration: underline; }
+.depth-toggle::after { content: "+" / ""; font-family: var(--mono); }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { padding: 2px 8px; border: 1px solid var(--line); border-radius: 4px; font-size: 16px; }
+
+/* The menu: one list of links at the top, at every width. */
+.dnav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 12px clamp(16px, 4vw, 32px);
+  border-bottom: 2px solid var(--line);
+}
+.dnav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.dnav-list a { color: var(--ink); font-weight: 600; }
+.dnav-list a[aria-current] { text-decoration-thickness: 3px; }
+.theme-switch { margin-left: auto; min-height: 36px; font-size: 15px; }
+.theme-switch .track { display: none; }
+.theme-switch[aria-checked="true"] { background: var(--ink); color: var(--bg); }
+
+/* Sections. */
+.sec { padding: 40px 0 8px; }
+.sec-last { padding-bottom: 48px; }
+.sec-head { margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+.sec-title { display: flex; align-items: baseline; gap: 12px; }
+.sec-n { font-family: var(--mono); font-size: 16px; }
+.sec-title h2 { font-size: 32px; line-height: 1.15; }
+
+/* Intro. */
+.intro { padding: 40px 0 0; }
+.avail { display: inline-block; margin-bottom: 16px; padding: 2px 10px; border: 2px solid var(--ink); font-weight: 700; }
+.intro-name { font-size: clamp(40px, 8vw, 64px); line-height: 1.05; }
+.intro-name span { display: block; }
+.headline { margin-top: 12px; font-size: 22px; font-weight: 600; }
+.sep { color: var(--muted); }
+.intro-grid { display: grid; gap: 24px; margin-top: 24px; }
+.facts { list-style: none; margin: 0; padding: 0; color: var(--muted); }
+.facts li { display: flex; gap: 8px; }
+.arrow { font-family: var(--mono); }
+.lede { margin-top: 16px; max-width: 68ch; }
+.cta { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.results { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.result { padding: 14px 16px; border: 2px solid var(--line); }
+.result-label { font-size: 15px; font-weight: 700; }
+.result-fig { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.result-num, .result-word { font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1.1; }
+.result-suffix { font-size: 0.6em; }
+.strip { margin-top: 24px; padding: 10px 0; border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); }
+.strip-static { display: flex; flex-wrap: wrap; gap: 4px 20px; font-weight: 600; }
+
+/* Projects. */
+.feature { margin-bottom: 20px; padding: 16px; border: 2px solid var(--line); display: grid; gap: 6px; }
+.feature-label { font-weight: 700; }
+.feature-num { font-family: var(--mono); font-size: 44px; font-weight: 700; line-height: 1.1; }
+.feature-text { font-size: 24px; font-weight: 600; }
+.feature-pairs { list-style: none; margin: 4px 0 0; padding: 0; }
+.feature-pairs .num { font-family: var(--mono); font-weight: 700; }
+.proj-grid { display: grid; gap: 16px; }
+.proj, .depth, .job, .degree, .tl-card, .route, .cert, .skill { border: 2px solid var(--line); border-radius: 4px; }
+.proj { padding: 16px 18px; }
+.proj.is-open { border-width: 4px; }
+.proj-dates, .job-dates, .cert-top { color: var(--muted); }
+.proj h3 { margin-top: 4px; font-size: 26px; line-height: 1.2; }
+.proj-sub { font-weight: 600; }
+.proj-summary { margin-top: 8px; }
+.proj-side { margin-top: 10px; display: grid; gap: 10px; }
+.proj-fact { font-weight: 700; }
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { padding: 16px 18px; background: var(--soft); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.depth-head h3 { font-size: 22px; }
+/* Lists carry no markers of their own: a list marker enters the
+   accessibility tree only once its section is laid out, so a screen reader
+   at load would meet a different page (tools/check_browser.py, tree). The
+   engine's own item numbers, already hidden from screen readers, stand in. */
+.depth-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr); margin-top: 8px; }
+.depth-n { font-family: var(--mono); font-weight: 700; }
+
+/* Timeline: a plain list, newest first, at every width. */
+.tl-lanes { margin-bottom: 12px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-filter[aria-pressed="false"] { border-style: dashed; }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-filter .shape { display: none; }
+.tl-empty { margin: 12px 0; font-weight: 700; }
+.tl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 8px 0; border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); }
+.tl-entry { order: 2; }
+.tl-band-label { font-weight: 700; display: flex; flex-wrap: wrap; gap: 0 10px; }
+.tl-band-label a { color: var(--ink); }
+.tl-card summary { display: flex; flex-direction: column; padding: 10px 14px; cursor: pointer; }
+.tl-meta { display: flex; justify-content: space-between; font-size: 15px; color: var(--muted); }
+.tl-sign::before { content: "+" / ""; font-family: var(--mono); }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-title { font-weight: 700; }
+.tl-org { color: var(--muted); }
+.tl-pop { padding: 0 14px 12px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 6px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-weight: 600; }
+
+/* Work and Education. */
+.jobs { display: grid; gap: 16px; }
+.job, .degree { padding: 16px 18px; }
+.job h3, .degree h3 { margin-top: 4px; font-size: 24px; line-height: 1.2; }
+.job-org, .degree-org { font-weight: 600; }
+.job-loc { color: var(--muted); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { margin-top: 6px; padding-left: 14px; border-left: 3px solid var(--line); }
+.degree-courses { margin-top: 12px; }
+.degree-courses h4 { margin-bottom: 8px; font-size: 18px; }
+
+/* Certifications. */
+.certs { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.cert { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; color: var(--ink); text-decoration: none; }
+.cert-title { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; color: var(--link); }
+.cert-org { display: block; }
+.cert-view { font-weight: 600; }
+.cert:hover .cert-title { text-decoration-thickness: 3px; }
+
+/* Skills. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.skill { padding: 12px 16px; }
+.skill h3 { margin-bottom: 8px; font-size: 20px; }
+.skill-n { display: none; }
+
+/* Contact. */
+.routes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.route { display: flex; flex-direction: column; padding: 14px 16px; color: var(--ink); text-decoration: none; }
+.route-top .i { display: none; }
+.route-label { font-size: 22px; font-weight: 700; color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+.route-addr { font-family: var(--mono); overflow-wrap: anywhere; }
+.route:hover .route-label { text-decoration-thickness: 3px; }
+
+/* Footer. */
+.foot { max-width: 860px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 32px) 48px; border-top: 2px solid var(--line); display: grid; gap: 6px; }
+.foot-name { font-size: 22px; font-weight: 700; }
+.foot-link { font-weight: 700; }
+
+/* Print: every word on paper. Panels and timeline details open, the menu
+   and the controls gone, and each link's address written after it. */
+@media print {
+  :root { --bg: #FFFFFF; --ink: #000000; --muted: #000000; --link: #000000; --soft: #FFFFFF; }
+  body { font-size: 12pt; }
+  .dnav, .skip, .cta, .tl-filters, .depth-toggle, [data-depth-close], .theme-switch, .strip { display: none !important; }
+  .depth[hidden] { display: block !important; }
+  details::details-content { content-visibility: visible; display: block; }
+  .proj, .depth, .job, .degree, .route, .cert, .skill, .tl-card { break-inside: avoid; }
+  .depth-list a[href^="http"]::after, .job-list a[href^="http"]::after,
+  .proj-actions a[href^="http"]::after { content: " (" attr(href) ")"; }
+}

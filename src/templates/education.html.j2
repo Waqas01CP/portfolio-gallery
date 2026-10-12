@@ -1,0 +1,31 @@
+{# Education: the degree, its grade where given and its coursework. #}
+{% import "macros.html.j2" as m %}
+<section id="education" class="sec" aria-labelledby="h-education" data-section>
+<div class="wrap">
+{{ m.head(section.education) }}
+<article id="{{ degree.id }}" class="degree" aria-labelledby="h-{{ degree.id }}">
+<div class="degree-glow" aria-hidden="true"></div>
+<div class="degree-head">
+<p class="job-top"><span class="tile" aria-hidden="true">{{ m.icon("cap", 22) }}</span><span class="job-dates">{{ m.when(degree.when) }}</span></p>
+<h3 id="h-{{ degree.id }}">{{ degree.title }}</h3>
+<p class="degree-org">{{ degree.org }}</p>
+{% if degree.grade %}
+<p class="degree-cgpa"><span class="mono">{{ degree.grade }}</span></p>
+{% endif %}
+{% if degree.proof %}
+<p class="job-links">{% for link in degree.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ degree.title }}</span>{{ m.icon("out") }}</a> {% endfor %}</p>
+{% endif %}
+</div>
+{% if degree.coursework %}
+<div class="degree-courses">
+<h4>Relevant coursework</h4>
+<ul class="chips chips-soft">
+{% for c in degree.coursework %}
+<li>{{ c }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+</article>
+</div>
+</section>

@@ -1,0 +1,21 @@
+{# Skills: the groups, labels and items exactly as written. No level of any
+   kind: a bar or a percentage claims a measurement nobody made. #}
+{% import "macros.html.j2" as m %}
+<section id="skills" class="sec" aria-labelledby="h-skills" data-section>
+<div class="wrap">
+{{ m.head(section.skills) }}
+<ul class="skills">
+{% for g in site.skills %}
+<li class="skill" data-tilt>
+<span class="glare" aria-hidden="true"></span>
+<h3><span class="skill-n" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span> {{ g.label }}</h3>
+<ul class="chips chips-soft">
+{% for item in g["items"] %}
+<li>{{ item }}</li>
+{% endfor %}
+</ul>
+</li>
+{% endfor %}
+</ul>
+</div>
+</section>

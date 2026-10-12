@@ -1,0 +1,26 @@
+{# Contact: each route from site.json, in its order, as a card that is one
+   link, and no form (scope floor line 2). A route is an email address or a
+   web address; no brand mark is shipped, so each card names its route in
+   words. Cards carry route-<n> classes by position, and route-mail on an
+   email address, for a design to style. #}
+{% import "macros.html.j2" as m %}
+<section id="contact" class="sec sec-last" aria-labelledby="h-contact" data-section>
+<div class="wrap">
+{{ m.head(section.contact) }}
+<ul class="routes">
+{% for route in site.contact %}
+<li><a class="route route-{{ loop.index }}{% if route.mail %} route-mail{% endif %}" href="{{ route.url }}" data-tilt>
+<span class="glare" aria-hidden="true"></span>
+<div class="route-top"><span class="route-icon" aria-hidden="true">{{ m.icon("mail" if route.mail else "link", 28) }}</span>{{ m.icon("out", 22) }}</div>
+<div class="route-body">
+<p class="route-label">{{ route.label }}</p>
+{% if route.line %}
+<p class="route-line">{{ route.line }}</p>
+{% endif %}
+<p class="route-addr">{{ route.text }}</p>
+</div>
+</a></li>
+{% endfor %}
+</ul>
+</div>
+</section>

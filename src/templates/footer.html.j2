@@ -1,0 +1,18 @@
+{# The footer. The CV link renders only when config.json names a PDF that
+   exists. The credit line is on by default and config.json may turn it
+   off (ADR-0002). A gallery demo says which design it shows and links back
+   to the gallery. #}
+<footer class="foot">
+<p class="foot-name serif">{{ site.name }}</p>
+<p class="foot-loc">{{ site.location }}</p>
+{% if cv %}
+<p><a class="foot-link" href="{{ cv }}" download>Download CV (PDF)</a></p>
+{% endif %}
+<p><a class="foot-link" href="#intro">Back to top <span aria-hidden="true">&uarr;</span></a></p>
+{% if demo %}
+<p class="foot-demo">The {{ design.name }} design, by <a href="{{ design.author_url }}">{{ design.author }}</a>, on sample content. <a href="{{ root }}index.html">Back to the gallery</a></p>
+{% endif %}
+{% if credit %}
+<p class="foot-credit">Built with <a href="{{ project_url }}">{{ project_name }}</a></p>
+{% endif %}
+</footer>

@@ -1,0 +1,59 @@
+{# The Intro. The knot is a canvas the script draws on after the content is
+   visible, in designs that show it; it carries no words. The results are
+   cuts of their sources, checked by the build. The first contact route is
+   the accented button. #}
+{% import "macros.html.j2" as m %}
+<section id="intro" class="intro dark" aria-label="{{ section.intro.label }}" data-section>
+<div class="intro-glow" aria-hidden="true"></div>
+<canvas class="knot" aria-hidden="true" data-knot></canvas>
+<div class="wrap">
+{% if site.availability %}
+<p class="avail"><span class="avail-dot" aria-hidden="true"></span>{{ site.availability }}</p>
+{% endif %}
+<h1 class="intro-name"><span>{{ site.first_name }}</span>{% if site.last_name %}{{ m.sp() }} <span class="serif">{{ site.last_name }}</span>{% endif %}</h1>
+<p class="headline">{% for part in site.headline %}{% if not loop.first %}<span class="sep"> | </span>{% endif %}{{ part }}{% endfor %}</p>
+<div class="intro-grid">
+<div class="intro-main">
+<ul class="facts">
+<li><span class="arrow" aria-hidden="true">&rarr;</span> <span>{{ site.location }}</span></li>
+{% if degree %}
+{# The degree line, rendered from the degree's own fields. #}
+<li><span class="arrow" aria-hidden="true">&rarr;</span> <span><span>{{ degree.title }}, {{ degree.org_short }},</span> <span>{{ degree.when_text }}</span>{% if degree.grade %}<span>,</span> <span>{{ degree.grade }}</span>{% endif %}</span></li>
+{% endif %}
+</ul>
+<p class="lede">{{ site.summary }}</p>
+{% if site.intro %}
+<p class="lede">{{ site.intro }}</p>
+{% endif %}
+<ul class="cta">
+{% for route in site.contact %}
+<li><a class="btn{% if loop.first %} btn-acc{% endif %}" href="{{ route.url }}">{% if loop.first %}{{ m.icon("mail" if route.mail else "link", 18) }}{% endif %}{{ route.cta or route.label }}{% if not loop.first %}{{ m.icon("out", 14) }}{% endif %}</a></li>
+{% endfor %}
+{% if cv %}
+<li><a class="btn" href="{{ cv }}" download>Download CV (PDF)</a></li>
+{% endif %}
+</ul>
+</div>
+{% if site.highlights %}
+<ul class="results" aria-label="Results">
+{% for h in site.highlights %}
+<li class="result" data-tilt>
+<span class="glare" aria-hidden="true"></span>
+<p class="result-label">{{ h.label }}</p>
+<p class="result-fig">
+{%- if h.before %}<span class="result-text">{{ h.before }}</span>{{ m.sp() }} {% endif -%}
+{%- if h.figure_parts.number %}<span class="result-num">{{ h.figure_parts.number }}<span class="result-suffix">{{ h.figure_parts.suffix }}</span></span>{% else %}<span class="result-word">{{ h.figure_parts.word }}</span>{% endif %}{{ m.sp() }} <span class="result-text">{{ h.text }}</span></p>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+</div>
+</div>
+{# The availability strip. Without a script it is a static line; the script
+   sets it moving after load, with a pause control, in designs that allow
+   it, and never under reduced motion. #}
+<div class="strip" data-strip>
+<p class="strip-static wrap">{% if site.availability %}<span>{{ site.availability }}</span>{{ m.sp() }} <span class="sq" aria-hidden="true"></span> {% endif %}<span>{{ site.location }}</span></p>
+<button type="button" class="strip-pause" data-strip-pause hidden aria-hidden="true">{{ m.icon("pause") }}<span data-strip-label>Pause</span><span class="vh"> the moving strip</span></button>
+</div>
+</section>

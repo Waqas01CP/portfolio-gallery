@@ -1,0 +1,19 @@
+{# Certifications, in the content file's order. Each card is its credential
+   link; the default design's colour flood and "View credential" respond to
+   hover and to keyboard focus alike, by the stylesheet alone. #}
+{% import "macros.html.j2" as m %}
+<section id="certifications" class="sec" aria-labelledby="h-certifications" data-section>
+<div class="wrap">
+{{ m.head(section.certifications) }}
+<ul class="certs">
+{% for c in certifications %}
+<li><a id="{{ c.id }}" class="cert {{ 'cert-acc' if loop.index is odd else 'cert-ink' }}" href="{{ c.proof[0].url }}">
+<span class="cert-flood" aria-hidden="true"></span>
+<span class="cert-top"><span>{{ m.when(c.when) }}</span><span class="cert-sq" aria-hidden="true"></span></span>{{ m.sp() }}
+<span class="cert-name"><span class="cert-title">{{ c.title }}</span>{% if c.org %}{{ m.sp() }} <span class="cert-org">{{ c.org }}</span>{% endif %}</span>{{ m.sp() }}
+<span class="cert-view">View credential{{ m.icon("out") }}</span>
+</a></li>
+{% endfor %}
+</ul>
+</div>
+</section>

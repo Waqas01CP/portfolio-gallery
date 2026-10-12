@@ -1,0 +1,81 @@
+{# The timeline. The ordered list is the content, newest first, and so also
+   the text equivalent and the crawler's copy; the visual is drawn on it by
+   the design.
+
+   Each entry's position is computed by build.grid_position and written to
+   static/layout.css as custom properties on the entry's id (tl-<item id>):
+   --row and --span on a grid of four rows per month, row 1 the as-of month;
+   --x and --w, the share of the lane an entry takes when entries in one
+   lane overlap; --gl and --gr, its gutters. Projects sit left of the
+   spine, work and certifications right of it, and the degree is a band
+   behind them all that runs past the bottom edge. A design may draw it to
+   scale, as default does on a wide screen, or as a plain list. The axis
+   marks are decoration, hidden from assistive technology: each entry states
+   its own dates.
+
+   Each entry's detail is a native disclosure, so it opens without a script.
+   What starts hidden is also aria-hidden: see setShown in site.js. #}
+{% import "macros.html.j2" as m %}
+{% set t = timeline %}
+<section id="timeline" class="sec" aria-labelledby="h-timeline" data-section>
+<div class="wrap">
+{{ m.head(section.timeline) }}
+<div class="tl" id="tlx-grid" data-tl data-top="{{ as_of }}" data-months="{{ t.months }}">
+<div class="tl-lanes">
+{% for lane in t.lanes %}
+<span class="tl-head lane-{{ lane.key }}" aria-hidden="true"><span class="shape" aria-hidden="true"></span>{{ lane.label }}</span>
+{% endfor %}
+<div class="tl-filters" role="group" aria-label="Show or hide lanes" data-js hidden aria-hidden="true">
+{% for lane in t.lanes %}
+<button type="button" class="tl-filter lane-{{ lane.key }}" aria-pressed="true" data-lane="{{ lane.key }}"><span class="shape" aria-hidden="true"></span><span class="tl-filter-label">{{ lane.label }}</span></button>
+{% endfor %}
+</div>
+<span class="tl-scale" aria-hidden="true">Months<br>to scale</span>
+</div>
+<p class="tl-empty" data-tl-empty hidden aria-hidden="true">No lanes selected.</p>
+<div class="tl-body">
+<div class="tl-axis" aria-hidden="true">
+<div class="tl-spine"><span class="tl-spine-fill" data-spine-fill></span><span class="tl-chip" data-tl-chip></span></div>
+{% for mark in t.marks %}
+<span class="tl-month" id="tlx-m-{{ mark.n }}">{{ mark.label }}</span>
+{% endfor %}
+{% for y in t.years %}
+<span class="tl-year" id="tlx-y-{{ y.year }}">{{ y.year }}</span>
+{% if y.line %}
+<span class="tl-year-line" id="tlx-yl-{{ y.year }}"></span>
+{% endif %}
+{% endfor %}
+<span class="tl-read" data-tl-read></span>
+</div>
+<span class="tl-mspine" aria-hidden="true"><span class="tl-spine-fill" data-mspine-fill></span></span>
+<ol class="tl-list" role="list" data-tl-list>
+{% for e in t.entries %}
+{% if e.lane == "band" %}
+<li class="tl-band" id="tl-{{ e.id }}">
+<span class="tl-band-bg" aria-hidden="true"></span>
+<p class="tl-band-label"><a href="#{{ e.id }}">{{ e.title }}, {{ e.org_short }}</a> <span class="sq" aria-hidden="true"></span> <span>{{ m.when(e.when_compact) }}</span></p>
+<p class="tl-band-end" aria-hidden="true"><span>&darr;</span> {{ t.band_start_text }}</p>
+</li>
+{% else %}
+{% set name = e.name if e.lane == "builds" else e.title %}
+<li class="tl-entry lane-{{ e.lane }}{% if e.band_place %} {{ e.band_place }}{% endif %}" id="tl-{{ e.id }}" data-lane="{{ e.lane }}" data-year="{{ e.year }}"{% if e.year_mark %} data-year-mark{% endif %}>
+<span class="tl-yr" aria-hidden="true">{{ e.year }}</span>
+<span class="tl-mark" aria-hidden="true"></span>
+<details class="tl-card" name="tl" data-tl-card>
+<summary><span class="tl-meta"><span class="tl-lane">{{ e.lane_label }}</span> <span class="tl-sign" aria-hidden="true"></span></span>{{ m.sp() }} <span class="tl-dates">{{ m.when(e.when_compact) }}</span>{{ m.sp() }} <span class="tl-title">{{ name }}</span>{% if e.lane != "builds" and e.org_short %}{{ m.sp() }} <span class="tl-org">{{ e.org_short }}</span>{% endif %}</summary>
+<div class="tl-pop">
+<button type="button" class="tl-close" aria-label="Close: {{ name }}" data-tl-close data-js hidden aria-hidden="true">&times;</button>
+{% if e.detail %}
+<p class="tl-detail">{{ e.detail }}</p>
+{% endif %}
+<p class="tl-links">{% if e.lane == "certifications" and e.proof %}<a href="{{ e.proof[0].url }}">{{ e.proof[0].label }}<span class="vh">: {{ name }}</span> <span aria-hidden="true">&#8599;</span></a> {% endif %}<a href="#{{ e.id }}" data-tl-go>Go to full entry<span class="vh">: {{ name }}</span> <span aria-hidden="true">&darr;</span></a></p>
+</div>
+</details>
+</li>
+{% endif %}
+{% endfor %}
+</ol>
+</div>
+</div>
+</div>
+</section>

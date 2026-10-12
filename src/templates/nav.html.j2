@@ -1,0 +1,41 @@
+{# The section menu that stays in view. Two forms, one shown per width by
+   the design: a bar of links at the top on a wide screen, and a floating
+   bar at the bottom on a phone whose menu is a native disclosure, so it
+   opens without a script. Each is a plain list of anchors, so the menu
+   works without a script; the script adds the active state, the progress
+   marker and the theme switch. Both forms start with the class "dark",
+   because the page opens on the Intro, which a design may set dark. Only
+   one form is displayed at a width, so only one Sections landmark is ever
+   exposed, and on a phone the theme switch sits inside it. #}
+{% import "macros.html.j2" as m %}
+<nav class="dnav dark" aria-label="Sections" data-nav-box>
+<ol class="dnav-list">
+{% for s in sections %}
+<li><a href="#{{ s.id }}" data-nav-link="{{ s.id }}"{% if loop.first %} aria-current="location"{% endif %}>{{ s.label }}</a></li>
+{% endfor %}
+</ol>
+<button type="button" class="theme-switch" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 15) }}<span>Dark<span class="vh"> theme</span></span><span class="track" aria-hidden="true"><span class="knob"></span></span></button>
+</nav>
+<div class="rail dark" aria-hidden="true" data-nav-box data-rail data-js hidden>
+<span class="rail-pct" data-pct></span>
+<div class="rail-bar"><div class="rail-fill" data-rail-fill></div>
+{% for s in sections %}
+<span class="rail-tick" data-tick="{{ s.id }}"></span>
+{% endfor %}
+</div>
+</div>
+<nav class="mbar dark" aria-label="Sections" data-nav-box>
+<div class="mbar-pill" data-mbar-pill>
+<details class="mnav" data-mnav>
+<summary><span class="mnav-n" data-active-n>{{ sections[0].n }}</span>{{ m.sp() }} <span class="mnav-label" data-active-label>{{ sections[0].label }}</span>{{ m.sp() }} <span class="mnav-pct" aria-hidden="true" data-pct></span> <span class="vh">Sections menu</span>{{ m.icon("menu", 18) }}</summary>
+<div class="mnav-panel">
+<ol>
+{% for s in sections %}
+<li><a href="#{{ s.id }}" data-nav-link="{{ s.id }}"{% if loop.first %} aria-current="location"{% endif %}><span class="mnav-num" aria-hidden="true">{{ s.n }}</span> {{ s.label }}</a></li>
+{% endfor %}
+</ol>
+</div>
+</details>
+<button type="button" class="theme-btn" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 17) }}<span class="vh">Dark theme</span></button>
+</div>
+</nav>

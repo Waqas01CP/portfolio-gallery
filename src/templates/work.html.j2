@@ -1,0 +1,30 @@
+{# Work, in the content file's order. Each entry's bullets are shown in
+   full, with no disclosure. #}
+{% import "macros.html.j2" as m %}
+<section id="work" class="sec" aria-labelledby="h-work" data-section>
+<div class="wrap">
+{{ m.head(section.work) }}
+<div class="jobs">
+{% for w in work %}
+<article id="{{ w.id }}" class="job" aria-labelledby="h-{{ w.id }}" data-tilt>
+<span class="glare" aria-hidden="true"></span>
+<div class="job-head">
+<p class="job-top"><span class="tile{% if loop.first %} tile-acc{% endif %}" aria-hidden="true">{{ m.icon("case", 22) }}</span><span class="job-dates">{{ m.when(w.when) }}</span></p>
+<h3 id="h-{{ w.id }}">{{ w.title }}</h3>
+<p class="job-org">{{ w.org }}</p>
+<p class="job-loc">{{ w.location }}</p>
+{% if w.proof %}
+<p class="job-links">{% for link in w.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ w.title }}</span>{{ m.icon("out") }}</a> {% endfor %}</p>
+{% endif %}
+</div>
+<ul class="job-list">
+{% for b in w.bullets %}
+{# |safe: see projects.html.j2. #}
+<li>{{ b|safe }}</li>
+{% endfor %}
+</ul>
+</article>
+{% endfor %}
+</div>
+</div>
+</section>

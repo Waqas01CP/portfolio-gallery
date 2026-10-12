@@ -1,0 +1,8 @@
+{
+  "design": "default",
+  "cv_pdf": "content/Alex_Example_CV.pdf",
+  "cv_source": "content/cv.md",
+  "content_trace": true,
+  "credit": true,
+  "timeline_start": ""
+}

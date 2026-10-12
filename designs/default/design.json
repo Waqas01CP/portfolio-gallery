@@ -1,0 +1,31 @@
+{
+  "name": "Default",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "description": "A dark first screen with a lime accent and a turning 3D knot, then a page that follows the device's light or dark setting; the timeline drawn to scale on a wide screen.",
+  "preload": [
+    "fonts/manrope-normal.woff2",
+    "fonts/jetbrains-mono-normal.woff2",
+    "fonts/instrument-serif-italic.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/manrope-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/Manrope-OFL.txt",
+      "source": "https://github.com/googlefonts/manrope"
+    },
+    {
+      "file": "fonts/jetbrains-mono-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/JetBrainsMono-OFL.txt",
+      "source": "https://github.com/JetBrains/JetBrainsMono"
+    },
+    {
+      "file": "fonts/instrument-serif-italic.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/InstrumentSerif-OFL.txt",
+      "source": "https://github.com/Instrument/instrument-serif"
+    }
+  ]
+}

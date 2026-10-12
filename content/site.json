@@ -1,0 +1,53 @@
+{
+  "name": "Alex Example",
+  "headline": ["Junior software engineer", "Accessible web", "Data tools"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to junior software roles",
+  "summary": "Junior software engineer who builds small, careful tools for the web. Ships pages that work by keyboard and screen reader, tests what they claim, and keeps every number on this page checkable.",
+  "intro": "This is a sample portfolio. Alex Example is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "tide-tracker",
+      "from": "tide-tracker/bullets/1",
+      "before": "Automated accessibility check,",
+      "figure": "0",
+      "text": "violations"
+    },
+    {
+      "item": "tide-tracker",
+      "from": "tide-tracker/bullets/3",
+      "before": "Largest paint",
+      "figure": "1.4 s",
+      "text": "on a throttled phone"
+    },
+    {
+      "item": "booking-form",
+      "from": "booking-form/bullets/2",
+      "before": "Cut form errors from",
+      "figure": "9 to 2",
+      "text": "in a test with 10 example members"
+    }
+  ],
+  "feature": {
+    "item": "tide-tracker",
+    "from": "tide-tracker/bullets/2",
+    "label": "Tests",
+    "figure": "212",
+    "text": "automated tests",
+    "note": "which run on each change in 40 seconds.",
+    "pairs": [
+      {"figure": "48", "text": "of them for tide edge cases"},
+      {"figure": "40", "text": "seconds"}
+    ]
+  },
+  "skills": [
+    {"label": "Languages", "items": ["Python", "JavaScript", "SQL"]},
+    {"label": "Web", "items": ["HTML", "CSS", "Accessibility testing"]},
+    {"label": "Tools", "items": ["Git", "SQLite", "GitHub Actions"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:alex@example.com", "text": "alex@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Notes and longer write-ups."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Public repositories and project code."}
+  ]
+}

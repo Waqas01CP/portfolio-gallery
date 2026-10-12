@@ -1,0 +1,91 @@
+{# Projects in the content file's order, which is tier order and is never
+   labelled. Each card carries layer 1, the fact, and layer 2, the summary;
+   layer 3, every bullet, follows the card as its own full-width panel
+   named for the item.
+
+   Without a script every panel is open, under its card. The script closes
+   them and shows each card's "In depth" control, and the grid then places
+   an open panel under its card's row. A control that starts hidden is also
+   aria-hidden, as is a closed panel: see setShown in site.js. A project
+   with one bullet has no panel: its two layers already carry the whole
+   bullet, which the build checks. #}
+{% import "macros.html.j2" as m %}
+<section id="projects" class="sec" aria-labelledby="h-projects" data-section>
+<div class="wrap">
+{{ m.head(section.projects) }}
+{% if site.feature %}
+{% set f = site.feature %}
+<div class="feature dark">
+<div class="feature-glow" aria-hidden="true"></div>
+<p class="feature-label">{{ f.name }} <span aria-hidden="true">&middot;</span> {{ f.label }}</p>
+<p class="feature-main"><span class="feature-num">{{ f.figure }}</span>{{ m.sp() }} <span class="feature-text serif">{{ f.text }}</span></p>
+{% if f.pairs %}
+<ul class="feature-pairs">
+{% for p in f.pairs %}
+<li><span class="num">{{ p.figure }}</span>{{ m.sp() }} <span>{{ p.text }}</span></li>
+{% endfor %}
+</ul>
+{% endif %}
+<p class="feature-note">{{ f.note }}</p>
+</div>
+{% endif %}
+<div class="proj-grid">
+{% for p in projects %}
+<article id="{{ p.id }}" class="proj{% if p.tier == 1 %} proj-lead{% endif %}" aria-labelledby="h-{{ p.id }}" data-tilt>
+<span class="glare" aria-hidden="true"></span>
+<div class="proj-body">
+<div class="proj-head">
+<p class="proj-dates">{{ m.when(p.when) }}</p>
+<h3 id="h-{{ p.id }}">{{ p.name }}</h3>
+{% if p.sub %}
+<p class="proj-sub">{{ p.sub }}</p>
+{% endif %}
+{% if p.status or p.layer2 %}
+<p class="proj-summary">{% if p.status %}<span class="dot" aria-hidden="true"></span><strong>{{ p.status }}</strong> {% endif %}{{ p.layer2 or "" }}</p>
+{% endif %}
+</div>
+<div class="proj-side">
+<p class="proj-fact">{{ p.layer1 }}</p>
+<ul class="chips chips-mono" aria-label="Stack">
+{% for s in p.stack %}
+<li>{{ s }}</li>
+{% endfor %}
+</ul>
+<div class="proj-actions">
+{% for link in p.proof %}
+<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>
+{% endfor %}
+{% if p.has_depth %}
+<button type="button" class="depth-toggle" id="toggle-{{ p.id }}" aria-expanded="false" aria-controls="depth-{{ p.id }}" data-depth-toggle data-js hidden aria-hidden="true">In depth<span class="vh">: {{ p.name }}</span><span class="sign" aria-hidden="true"></span></button>
+{% endif %}
+</div>
+</div>
+</div>
+</article>
+{% if p.has_depth %}
+<div id="depth-{{ p.id }}" class="depth" data-depth>
+<div class="depth-glow" aria-hidden="true"></div>
+<div class="depth-head">
+<h3 id="depth-h-{{ p.id }}">In depth: <span class="serif">{{ p.name }}</span></h3>
+<div class="depth-actions">
+{% for link in p.proof %}
+<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>
+{% endfor %}
+<button type="button" class="btn btn-sm" aria-label="Close in depth: {{ p.name }}" data-depth-close="{{ p.id }}" data-js hidden aria-hidden="true">Close<span class="mono" aria-hidden="true">&minus;</span></button>
+</div>
+</div>
+<ol class="depth-list">
+{% for b in p.bullets %}
+{# |safe here and in work.html.j2 only. Bullets are HTML fragments that
+   build.py has already limited to <strong> and <a href> with an http(s)
+   or mailto address, and the content is the site owner's own, with no
+   input path from visitors. #}
+<li><span class="depth-n" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span><p>{{ b|safe }}</p></li>
+{% endfor %}
+</ol>
+</div>
+{% endif %}
+{% endfor %}
+</div>
+</div>
+</section>
