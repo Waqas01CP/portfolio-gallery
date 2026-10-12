@@ -1,0 +1,11 @@
+# LF in the repository and in every checkout. With core.autocrlf on, as it
+# is on the maintainer's Windows machine, git would otherwise check files
+# out with CRLF while build.py writes LF, and byte-for-byte comparisons of
+# two builds or of a staged tree would fail on line endings alone.
+* text=auto eol=lf
+*.woff2 binary
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Gates A, B and C (ADR-0008). The logic is in tools/gates.py; this file
+# only finds the project venv's interpreter and hands over. A missing
+# interpreter or gate script refuses the commit, naming what is missing.
+# It is never a skip (gate D). Activate once per clone:
+#   git config core.hooksPath .githooks
+
+root=$(git rev-parse --show-toplevel) || {
+  echo "COMMIT REFUSED: git could not report the repository root" >&2
+  exit 1
+}
+py="$root/.venv/Scripts/python.exe"
+[ -f "$py" ] || py="$root/.venv/bin/python"
+if [ ! -f "$py" ]; then
+  echo "COMMIT REFUSED (gate D): missing tool: the project venv interpreter in .venv/." >&2
+  echo "  Create the venv as docs/reference/commands.md describes." >&2
+  exit 1
+fi
+if [ ! -f "$root/tools/gates.py" ]; then
+  echo "COMMIT REFUSED (gate D): missing tool: tools/gates.py" >&2
+  exit 1
+fi
+exec "$py" "$root/tools/gates.py" pre-commit

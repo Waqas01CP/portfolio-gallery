@@ -1,0 +1,17 @@
+# Paths gate A refuses to commit (tools/gates.py), one shell-style pattern
+# per line, matched against the whole path from the repository root. Text
+# that must never be committed, such as a name or an address, goes in
+# .git/info/never-commit instead, which is never committed itself.
+
+# Build output: the workflows build the site; it is never committed.
+_site/*
+_gallery/*
+# Local environments and secrets.
+.venv/*
+.env
+.env.*
+*.pem
+*.key
+# Browser profiles and screenshots a check may leave behind.
+pg-chrome-*
+*.png.tmp

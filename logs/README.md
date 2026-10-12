@@ -1,0 +1,46 @@
+---
+type: index
+description: The session log index. Read this first for what prior sessions did, then chain backwards through the most recent relevant log only as far as needed.
+status: current
+---
+
+# Session logs
+
+One log per session, newest at the top. This table is the navigation index
+for all session history.
+
+## How to use this file
+
+Read this table first. It tells you what prior sessions did. When you need
+detail beyond it, read the most recent relevant log; that log references
+the one before it. Chain backwards only as far as you need, and stop when
+you have enough. Do not read the directory.
+
+## How to maintain it
+
+Append your row in the same commit as your work, or in the session's last
+commit when the work went out as several. A log with no row here is
+invisible; if you find one, read it and add its row before anything else.
+Never delete or modify a row: a correction is a new row saying so. Rows
+are compressed, with no prose and no reasoning. One session, one file; a
+session that continues across rounds adds a row per round, each naming the
+same file.
+
+## Log format
+
+The session-log template in the owner's cross-project Working Method,
+which lives in his private folders and is not linked from here: a header
+with date, model, HEAD and mode; what was asked; errors this seat made;
+what was done, each claim tagged verified or believed; rejected
+alternatives; checked and found correct; not done; findings and
+recommendations.
+
+## Reorganisation
+
+When this directory passes about 80 files at its root, split by year into
+subdirectories and leave this index at the top pointing into them.
+
+## Index
+
+| Date (UTC) | Log file | Session | What was done | Outcome |
+|---|---|---|---|---|
