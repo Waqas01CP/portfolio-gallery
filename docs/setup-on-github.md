@@ -1,0 +1,326 @@
+---
+type: how-to
+description: "The owner's click-by-click steps to publish this repository: create it on GitHub, push, and set every setting the security model depends on, in order, each with what you should see; then the test pull requests that prove each workflow. For the owner, after the architecture chat has checked them."
+status: current
+---
+
+# Publishing portfolio-gallery on GitHub
+
+For the owner of the GitHub account `Waqas01CP`. Written
+2026-10-12 UTC by the implementing seat from GitHub's documentation as read
+that day; each step names the page it rests on. **Do not start until the
+portfolio architecture chat has checked these steps** (the brief's
+Addendum 1). Where a screen differs from what a step says you should see,
+stop and send what you see instead; GitHub changes its settings pages.
+
+Each step is one action. "Send back" lists what to paste to the chat.
+
+## Before you start: answers that must exist first
+
+These are yours to decide and are asked in the seat's report. Steps 1 to 3
+must not happen until the first two are settled, because a public commit
+cannot be deleted (ADR-0005).
+
+1. **The Code of Conduct's contact.** CODE_OF_CONDUCT.md says the contact
+   is not yet chosen. GitHub's private content reports reach maintainers
+   only in organisation-owned repositories (GitHub Docs, "Managing how
+   contributors report abuse in your organization's repository", read
+   2026-10-12), and your email may appear nowhere in this repository. The
+   choice and the edit come before publishing.
+2. **The pre-publish search has passed.** The seat ran its part (the
+   report); the search for your master CV's text is your site's
+   implementing seat's, through the chat.
+3. The other open questions (CSS only or templates too; the default
+   design's look; the response time; a link to your site; the commit
+   identity) may be answered later; each is a change committed and pushed
+   like any other.
+
+## Part A: on your computer
+
+### Step 1. Check the local repository
+
+Open PowerShell in the repository's folder and run:
+
+```
+git status --short
+git log --oneline
+git remote -v
+```
+
+You should see: no lines from `git status`; the session's commits from
+`git log`; and nothing from `git remote -v`, because no remote exists yet.
+
+## Part B: create the repository
+
+GitHub Docs, "Creating a new repository".
+
+### Step 2. Create an empty repository
+
+1. Go to https://github.com/new.
+2. **Owner**: Waqas01CP. **Repository name**: `portfolio-gallery`.
+3. **Description**: A free portfolio site for GitHub Pages, and a gallery
+   of accessible designs contributed by pull request. No install, no
+   tracking.
+4. **Public**.
+5. Leave **Add a README file** unticked, **.gitignore** at "None" and
+   **License** at "None": the local copy has its own, and GitHub's would
+   make the first push fail.
+6. Click **Create repository**.
+
+You should see a page titled "Quick setup", with the address
+`https://github.com/Waqas01CP/portfolio-gallery.git`.
+
+### Step 3. Push
+
+In PowerShell, in the repository's folder:
+
+```
+git remote add origin https://github.com/Waqas01CP/portfolio-gallery.git
+git push -u origin main
+```
+
+You should see gate E report "gate E passed", then git's own lines ending
+with `main -> main`. If a window asks you to sign in to GitHub, sign in as
+Waqas01CP.
+
+Then open https://github.com/Waqas01CP/portfolio-gallery and click the
+**Actions** tab. You should see two runs for the push: **Checks**, which
+should go green in about 15 to 20 minutes, and **Deploy**, which will fail
+at its last job, "deploy", because Pages is not set up yet. That failure is
+expected; step 8 runs it again.
+
+**Send back:** the result of each run (green or the failed step's name).
+
+## Part C: settings, in this order
+
+### Step 4. Actions: which actions, approvals, the token
+
+GitHub Docs, "Managing GitHub Actions settings for a repository".
+
+1. **Settings** (the repository's tab), then in the left sidebar
+   **Actions**, then **General**.
+2. Under "Actions permissions", choose **Allow Waqas01CP, and select
+   non-Waqas01CP, actions and reusable workflows**, tick **Allow actions
+   created by GitHub**, and leave the rest unticked. The workflows use only
+   actions GitHub publishes.
+3. On the same page, tick **Require actions to be pinned to a full-length
+   commit SHA**. Every action in the workflows already is, so nothing
+   breaks, and a future change that is not is refused by GitHub itself.
+   Click **Save** under this section.
+4. Under "Approval for running fork pull request workflows from
+   contributors", choose **Require approval for all external
+   contributors**, and click **Save**. Why: the two first-time options stop
+   asking once someone has had any change merged, and GitHub's page warns
+   that "A malicious user could meet this requirement by getting a simple
+   typo or other innocuous change accepted". The cost is one click per
+   contributor's run. The scope check is not held back by this: GitHub
+   runs `pull_request_target` workflows "regardless of approval settings".
+5. Under "Workflow permissions", check that **Read repository contents and
+   packages permissions** is selected and that **Allow GitHub Actions to
+   create and approve pull requests** is unticked. Both are the defaults
+   for a new repository in a personal account, by that page. Click
+   **Save** if you changed anything.
+
+**Send back:** the option now selected in each of the four sections.
+
+### Step 5. Actions: allow the scope check's trigger
+
+GitHub Docs, "Securely using pull_request_target", "About Actions
+policies" and "Governing execution of GitHub Actions workflows", read
+2026-10-12. GitHub has added a default policy that blocks the
+`pull_request_target` event in public repositories, enforced from
+2026-11-02 UTC. The scope check needs that event, and GitHub's page says
+what to do: "If the workflow must continue to use pull_request_target,
+create or update an applicable Actions event policy that explicitly allows
+pull_request_target." The scope workflow is the safe kind that page
+describes: it checks out only the default branch and runs nothing from the
+pull request.
+
+1. **Settings**, then **Actions**, then **Policies**.
+2. Create a new policy. Name: **Allow the scope check**. Enforcement:
+   **Active**.
+3. Target only the workflow `.github/workflows/scope.yml`, in this
+   repository.
+4. Under the event rules, allow **pull_request_target**.
+5. Save.
+
+You should see the policy listed as Active. **Stop and send what you see**
+if the page offers no way to target one workflow, or if allowing one event
+would block others: a policy that allows only `pull_request_target` for
+every workflow would stop the deploy (`push`) and the checks
+(`pull_request`). In that case allow `push`, `pull_request`,
+`pull_request_target` and `workflow_dispatch`, which are every event the
+three workflows use, and say so in what you send back.
+
+**Send back:** the policy's name, target and allowed events as the page
+shows them.
+
+### Step 6. Pages: publish from GitHub Actions
+
+GitHub Docs, "Configuring a publishing source for your GitHub Pages site".
+
+1. **Settings**, then **Pages**.
+2. Under "Build and deployment", **Source**: **GitHub Actions**.
+
+You should see the page say the site is built from a workflow; there is no
+branch to choose.
+
+### Step 7. The variable that makes this repository build the gallery
+
+The deploy workflow builds the gallery only where the repository variable
+`PORTFOLIO_GALLERY` is `true`; every copy of the template, which does not
+have it, builds its owner's site instead.
+
+1. **Settings**, then **Secrets and variables**, then **Actions**.
+2. The **Variables** tab, then **New repository variable**.
+3. Name `PORTFOLIO_GALLERY`, value `true`. **Add variable**.
+
+### Step 8. Publish the gallery
+
+1. **Actions** tab, then **Deploy** in the left list.
+2. **Run workflow**, branch `main`, **Run workflow**.
+
+You should see four jobs: build, shots, assemble, deploy, all green within
+about 5 minutes. Then open https://waqas01cp.github.io/portfolio-gallery/:
+the gallery, with two cards, Default and Plain, each with its screenshot,
+and a "Live demo" link that opens the design. Also open
+https://waqas01cp.github.io/portfolio-gallery (no slash at the end): it
+should arrive at the same page.
+
+**Send back:** each job's result, and whether both addresses show the
+gallery with both screenshots. If the shots job failed, send its log's
+last 30 lines: Chrome's sandbox on the runner is the one thing the seat
+could not test (ADR-0010).
+
+### Step 9. Protect main with a ruleset
+
+GitHub Docs, "Creating rulesets for a repository" and "Available rules for
+rulesets".
+
+1. **Settings**, then under "Code and automation" **Rules**, then
+   **Rulesets**, **New ruleset**, **New branch ruleset**.
+2. **Ruleset name**: `main`. **Enforcement status**: **Active**.
+3. **Bypass list**: leave empty, so the rules bind you too and every change
+   goes through a pull request and the checks.
+4. **Target branches**: **Add target**, **Include default branch**.
+5. Tick **Restrict deletions** and **Block force pushes**.
+6. Tick **Require a pull request before merging**. Set **Required
+   approvals** to **0**: you cannot approve your own pull requests, and
+   your merge is the review (ADR-0003). Leave the other options under it
+   unticked.
+7. Tick **Require status checks to pass**. Add the check **checks** and the
+   check **scope**, each with the source **GitHub Actions** if the page
+   offers a source. Leave **Require branches to be up to date before
+   merging** unticked.
+8. **Create**.
+
+You should see the ruleset `main` listed as Active.
+
+**Send back:** the rules ticked and the two status checks as listed.
+
+### Step 10. Private vulnerability reporting
+
+GitHub Docs, "Configuring private vulnerability reporting for a
+repository".
+
+1. **Settings**, then in the "Security" section of the sidebar **Advanced
+   Security** (or "Code security").
+2. To the right of **Private vulnerability reporting**, click **Enable**.
+
+You should see the **Security** tab now offer **Report a vulnerability**.
+
+### Step 11. Template repository, description, website, topics, label
+
+GitHub Docs, "Creating a template repository".
+
+1. **Settings**, **General**, tick **Template repository**. The repository
+   page now shows **Use this template**, which the README tells users to
+   click. Why a template and not forks: a copy from a template "starts
+   with a single commit" and its commits "do appear in your contribution
+   graph", where a fork's do not; and a fork's workflows stay off until its
+   owner enables them. Forks remain the way to contribute a design.
+2. On the repository's main page, the gear beside **About**:
+   - **Website**: tick **Use your GitHub Pages website**, or paste
+     `https://waqas01cp.github.io/portfolio-gallery/`.
+   - **Topics**: `portfolio-template`, `portfolio`, `portfolio-website`,
+     `github-pages`, `template`, `developer-portfolio`, `accessibility`,
+     `static-site-generator`, `python`, `jinja2`, `css`, `resume`.
+   - **Save changes**.
+3. **Issues** tab, **Labels**, **New label**: `design`. The design proposal
+   form applies it.
+
+## Part D: prove each workflow
+
+Each test is a pull request you open and then close without merging. The
+marker `[scope: as contributor]` in a pull request's description makes the
+scope check treat your pull request as an outsider's; without it, your
+own pull requests pass the scope check as the owner's.
+
+### Test 1. The scope check refuses a change outside designs/
+
+1. On the repository's main page, open `README.md`, click the pencil,
+   change one word.
+2. **Commit changes**, choose **Create a new branch** (name it
+   `test-scope`), **Propose changes**.
+3. In the pull request's description, write `[scope: as contributor]`.
+   **Create pull request**.
+
+You should see **scope** fail within a minute, its summary saying
+"README.md: outside designs/", and **checks** start and pass. The merge
+button stays blocked.
+
+4. **Close pull request**, then **Delete branch**.
+
+### Test 2. A design is in scope and passes every check
+
+1. **Add file**, **Create new file**, name
+   `designs/test-design/design.css`, with this content, the least CSS
+   that meets the rules (one menu shown, no list or disclosure markers),
+   checked by the seat on 2026-10-12 with every check:
+
+```
+.mbar, .rail, .knot { display: none; }
+ul, ol, summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
+```
+
+   **Commit changes**, **Create a new branch** `test-design`, **Propose
+   changes**.
+2. Before creating the pull request, add a second file to the same branch:
+   switch to branch `test-design`, **Add file**, **Create new file**,
+   `designs/test-design/design.json`, content:
+
+```
+{"name": "Test", "author": "Waqas01CP", "author_url": "https://github.com/Waqas01CP", "description": "A test design.", "assets": []}
+```
+
+3. Open the pull request with `[scope: as contributor]` in its
+   description.
+
+You should see **scope** pass ("In scope: 2 file(s), all in
+designs/test-design/") and **checks** pass after about 15 to 20 minutes.
+
+4. **Close pull request**, then **Delete branch**.
+
+### Test 3. main refuses a direct change
+
+1. Open `README.md` on `main`, click the pencil, change one word, and try
+   **Commit changes** with **Commit directly to the main branch**.
+
+You should see GitHub refuse, or offer only a new branch, naming the
+ruleset. Cancel.
+
+**Send back:** for each test, what each check showed and whether merging
+was possible.
+
+## What the tests prove, and what they do not
+
+- Test 1 proves the scope check runs from the default branch and refuses a
+  change outside designs/, and that a failed required check blocks a merge.
+- Test 2 proves a design passes the scope check and the full checks on
+  GitHub's runner, browser checks included.
+- Test 3 proves the ruleset binds main.
+- Step 8 proved the deploy, the screenshots and the addressing.
+- None of them is a fork from another account. The approval setting of
+  step 4 shows itself on the first real contributor's pull request, as
+  "Awaiting approval" on the checks; the scope check runs without waiting.

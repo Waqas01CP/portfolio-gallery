@@ -19,6 +19,10 @@ Decision records have no `type`; their `topic` is shown.
 | File | Type | Status | Description |
 |---|---|---|---|
 | `CLAUDE.md` | instruction | current | How to work in this repository. Reading order, authority order, the six-line scope floor, runtime, conventions and the gates. Read before touching anything. |
+| `CODE_OF_CONDUCT.md` | reference | current | The Code of Conduct, the Contributor Covenant version 2.1, under its Creative Commons Attribution 4.0 licence. The contact for reports is pending the maintainer's choice. |
+| `CONTRIBUTING.md` | reference | current | The rules for contributing to portfolio-gallery. How a design is proposed and submitted, what the checks enforce, what the review covers, how credit is shown, and what the maintainer commits to. |
+| `README.md` | reference | current | What portfolio-gallery is, the gallery link, how to make your own site in a few steps, how to contribute a design, credit and licence. The entry point for a visitor. |
+| `SECURITY.md` | reference | current | How to report a security problem in portfolio-gallery privately, what counts as one, and what happens next. |
 | `STATE.md` | state | current | What exists right now in portfolio-gallery, what is blocked and on whom, and where the proof is. Where to start, then checked against the code. |
 
 ## briefs
@@ -26,6 +30,12 @@ Decision records have no `type`; their `topic` is shown.
 | File | Type | Status | Description |
 |---|---|---|---|
 | `briefs/README.md` | reference | current | What the briefs folder is and how it behaves. Working space, not a record; briefs and reports are overwritten and never committed. The durable trace is the session log. |
+
+## docs
+
+| File | Type | Status | Description |
+|---|---|---|---|
+| `docs/setup-on-github.md` | how-to | current | The owner's click-by-click steps to publish this repository: create it on GitHub, push, and set every setting the security model depends on, in order, each with what you should see; then the test pull requests that prove each workflow. For the owner, after the architecture chat has checked them. |
 
 ## docs/decisions
 
@@ -51,6 +61,13 @@ Decision records have no `type`; their `topic` is shown.
 |---|---|---|---|
 | `docs/deferred/more-than-one-degree.md` | deferred | open | More than one degree on a site: the timeline draws one degree band, and the build refuses a second. Deferred 2026-10-12; reopen when a user needs two degrees or a design needs them. |
 | `docs/deferred/showcase-of-users-sites.md` | deferred | open | A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; reopen when users ask to be listed or the gallery has designs from several contributors. |
+
+## docs/how-to
+
+| File | Type | Status | Description |
+|---|---|---|---|
+| `docs/how-to/add-a-design.md` | how-to | current | A contributor's journey, step by step. Fork, create a design folder, build and check it locally, and open a pull request that passes the checks. Read to add a design to the gallery. |
+| `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address and the checks. Read to make your own site. |
 
 ## docs/reference
 
