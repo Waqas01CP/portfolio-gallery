@@ -53,7 +53,7 @@
 {% if e.lane == "band" %}
 <li class="tl-band" id="tl-{{ e.id }}">
 <span class="tl-band-bg" aria-hidden="true"></span>
-<p class="tl-band-label"><a href="#{{ e.id }}">{{ e.title }}, {{ e.org_short }}</a> <span class="sq" aria-hidden="true"></span> <span>{{ m.when(e.when_compact) }}</span></p>
+<p class="tl-band-label"><a href="#{{ e.id }}">{{ e.title }}, {{ e.org_short }}</a>{{ m.sp() }} <span class="sq" aria-hidden="true"></span> <span>{{ m.when(e.when_compact) }}</span></p>
 <p class="tl-band-end" aria-hidden="true"><span>&darr;</span> {{ t.band_start_text }}</p>
 </li>
 {% else %}
@@ -68,7 +68,7 @@
 {% if e.detail %}
 <p class="tl-detail">{{ e.detail }}</p>
 {% endif %}
-<p class="tl-links">{% if e.lane == "certifications" and e.proof %}<a href="{{ e.proof[0].url }}">{{ e.proof[0].label }}<span class="vh">: {{ name }}</span> <span aria-hidden="true">&#8599;</span></a> {% endif %}<a href="#{{ e.id }}" data-tl-go>Go to full entry<span class="vh">: {{ name }}</span> <span aria-hidden="true">&darr;</span></a></p>
+<p class="tl-links">{% if e.lane == "certifications" and e.proof %}<a href="{{ e.proof[0].url }}">{{ e.proof[0].label }}<span class="vh">: {{ name }}</span> <span aria-hidden="true">&#8599;</span></a>{{ m.sp() }} {% endif %}<a href="#{{ e.id }}" data-tl-go>Go to full entry<span class="vh">: {{ name }}</span> <span aria-hidden="true">&darr;</span></a></p>
 </div>
 </details>
 </li>

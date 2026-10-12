@@ -14,7 +14,7 @@
 <p class="job-org">{{ w.org }}</p>
 <p class="job-loc">{{ w.location }}</p>
 {% if w.proof %}
-<p class="job-links">{% for link in w.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ w.title }}</span>{{ m.icon("out") }}</a> {% endfor %}</p>
+<p class="job-links">{% for link in w.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ w.title }}</span>{{ m.icon("out") }}</a>{{ m.sp() }} {% endfor %}</p>
 {% endif %}
 </div>
 <ul class="job-list">

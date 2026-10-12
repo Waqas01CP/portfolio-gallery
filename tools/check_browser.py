@@ -102,8 +102,8 @@ def make_variants(root: Path, work: Path) -> dict[str, Path]:
     base = norule / "static" / "base.css"
     text = base.read_text(encoding="utf-8")
     kept = [line for line in text.splitlines() if not line.strip().startswith(RULE_LINES)]
-    if len(kept) != len(text.splitlines()) - 2:
-        raise SystemExit("base.css no longer holds the two layout-skipping lines this check "
+    if not any(line.strip().startswith(RULE_LINES[0]) for line in text.splitlines()):
+        raise SystemExit("base.css no longer holds the layout-skipping rule this check "
                          "removes; update RULE_LINES in tools/check_browser.py")
     base.write_text("\n".join(kept) + "\n", encoding="utf-8")
     variants["norule"] = norule
@@ -431,15 +431,37 @@ def check_anchors(pages, origin, report, quick) -> None:
                     page.close()
                     for target in targets:
                         report.ran("anchors")
-                        page = open_page(chrome, origin, path, width, height, reduced=True,
-                                         scripts=scripts, hash_=f"#{target}", settle=0.8)
-                        state = page.send("Runtime.evaluate", {"expression": ANCHOR_STATE % json.dumps(target),
-                                                               "returnByValue": True})["result"].get("value")
-                        if state is None or not (abs(state["top"] - state["margin"]) <= 3 or state["atEnd"]):
+                        # A fresh load with the address. A design's web fonts can
+                        # arrive after the browser has jumped, and their swap moves
+                        # the text above the target by a line or so: measured
+                        # 2026-10-12 on the default design, 1 load in 136, a
+                        # different target each run, 16 to 21 px. So a miss is
+                        # loaded once more, and fails only if it misses again; a
+                        # single miss is reported as a note. Only a miss of a line
+                        # or so, at most 32 px, gets the second load: without the
+                        # :target rule in base.css, single misses of 100 to 860 px
+                        # came right on a reload (2026-10-12), so a larger miss
+                        # fails at once.
+                        misses = []
+                        for _ in range(2):
+                            page = open_page(chrome, origin, path, width, height, reduced=True,
+                                             scripts=scripts, hash_=f"#{target}", settle=0.8)
+                            state = page.send("Runtime.evaluate", {"expression": ANCHOR_STATE % json.dumps(target),
+                                                                   "returnByValue": True})["result"].get("value")
+                            page.close()
+                            if state is not None and (abs(state["top"] - state["margin"]) <= 3 or state["atEnd"]):
+                                break
+                            misses.append(f"{state and round(state['top'])} px")
+                            if state is None or abs(state["top"] - state["margin"]) > 32:
+                                misses.append("no second load, the miss being over 32 px")
+                                break
+                        if len(misses) == 2:
                             report.fail("anchors", path, f"{cell}: #{target} by its address lands at "
-                                        f"{state and round(state['top'])} px, its margin is "
+                                        f"{'; then '.join(misses)}; its margin is "
                                         f"{state and state['margin']} px")
-                        page.close()
+                        elif misses:
+                            report.notes.append(f"anchors: {path} {cell}: #{target} by its address landed "
+                                                f"at {misses[0]} on one load and right on the next")
                     if scripts:
                         page = open_page(chrome, origin, path, width, height, reduced=True)
                         for target in targets:
@@ -569,6 +591,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--axe", type=Path, metavar="FILE", help="axe.min.js, to run axe-core")
     parser.add_argument("--only", help="comma-separated checks to run")
     parser.add_argument("--loads", type=int, default=2, help="loads per cell in the tree check")
+    # Page text can hold characters the console cannot write, as on Windows;
+    # write them escaped rather than stop the report.
+    sys.stdout.reconfigure(errors="backslashreplace")
     args = parser.parse_args(argv)
     root = Path(args.folder).resolve()
     if not (root / "index.html").is_file():

@@ -357,6 +357,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Trace the built page to your CV, and back.")
     parser.add_argument("--cv", type=Path, help="your CV; default: config.json's cv_source")
     parser.add_argument("--page", type=Path, default=PAGE, help="the built page; default _site/index.html")
+    # Page text can hold characters the console cannot write, as on Windows;
+    # write them escaped rather than stop the report.
+    sys.stdout.reconfigure(errors="backslashreplace")
     args = parser.parse_args(argv)
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     if args.cv is None:

@@ -394,6 +394,9 @@ def meta_problems(name: str, texts: dict[str, str], files: dict[str, Path]) -> l
 
 
 def main(argv: list[str]) -> int:
+    # Page text can hold characters the console cannot write, as on Windows;
+    # write them escaped rather than stop the report.
+    sys.stdout.reconfigure(errors="backslashreplace")
     if any(a.startswith("-") for a in argv):
         print(__doc__.split("\n\n")[1], file=sys.stderr)
         return 2

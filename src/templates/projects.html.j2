@@ -53,7 +53,7 @@
 </ul>
 <div class="proj-actions">
 {% for link in p.proof %}
-<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>
+<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>{{ m.sp() }}
 {% endfor %}
 {% if p.has_depth %}
 <button type="button" class="depth-toggle" id="toggle-{{ p.id }}" aria-expanded="false" aria-controls="depth-{{ p.id }}" data-depth-toggle data-js hidden aria-hidden="true">In depth<span class="vh">: {{ p.name }}</span><span class="sign" aria-hidden="true"></span></button>
@@ -69,7 +69,7 @@
 <h3 id="depth-h-{{ p.id }}">In depth: <span class="serif">{{ p.name }}</span></h3>
 <div class="depth-actions">
 {% for link in p.proof %}
-<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>
+<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ p.name }}</span>{{ m.icon("out") }}</a>{{ m.sp() }}
 {% endfor %}
 <button type="button" class="btn btn-sm" aria-label="Close in depth: {{ p.name }}" data-depth-close="{{ p.id }}" data-js hidden aria-hidden="true">Close<span class="mono" aria-hidden="true">&minus;</span></button>
 </div>

@@ -249,12 +249,21 @@ def browser_cases():
     yield ("keyboard: Close not returning focus", gallery(lambda c: edit(
         c / "src/static/site.js", "toggle.focus({ preventScroll: true });", ""), "keyboard"),
            "after Close, focus is on")
+    # Not quick: the misplacement shows with scripts off, which quick skips.
+    def anchors_full(copy):
+        edit(copy / "src/static/base.css", "html:has(:target) .page > .sec { content-visibility: visible; }", "")
+        return ["tools/check_browser.py", build_site(copy, "--gallery"), "--only", "anchors"]
+
+    yield "anchors: base.css without its :target rule", anchors_full, "[anchors]"
     yield ("joins: the hidden spaces removed", gallery(lambda c: edit(
         c / "src/templates/macros.html.j2", '{% macro sp() %}<span class="vh"> </span>{% endmacro %}',
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")
 
 
 def main(argv: list[str]) -> int:
+    # Page text can hold characters the console cannot write, as on Windows;
+    # write them escaped rather than stop the report.
+    sys.stdout.reconfigure(errors="backslashreplace")
     cases = list(file_cases())
     if "--browser" in argv:
         cases += list(browser_cases())

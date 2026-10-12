@@ -13,7 +13,7 @@
 <p class="degree-cgpa"><span class="mono">{{ degree.grade }}</span></p>
 {% endif %}
 {% if degree.proof %}
-<p class="job-links">{% for link in degree.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ degree.title }}</span>{{ m.icon("out") }}</a> {% endfor %}</p>
+<p class="job-links">{% for link in degree.proof %}<a class="btn btn-sm" href="{{ link.url }}">{{ link.label }}<span class="vh">: {{ degree.title }}</span>{{ m.icon("out") }}</a>{{ m.sp() }} {% endfor %}</p>
 {% endif %}
 </div>
 {% if degree.coursework %}

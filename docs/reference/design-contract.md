@@ -143,8 +143,12 @@ transitions.
   takes empty alternative text, `content: "+" / ""`, so it stays out of
   the tree. List markers are exempt, but see the next rule.
 - **The same page at load.** Anything a screen reader would meet only once
-  a section is laid out fails the tree check: list markers in a skipped
-  section are the known case (the plain design draws none).
+  a section is laid out fails the tree check. Two known cases, both
+  markers the browser draws: list markers, and the disclosure triangle of a
+  `<summary>`, whose text joins the summary's name. Turn both off
+  (`list-style: none` on `ul`, `ol` and `summary`, and
+  `summary::-webkit-details-marker { display: none }`) and draw your own
+  with empty alternative text if you want them.
 - **No words run together.** Pieces of one line laid out as separate boxes
   need the hidden spaces the HTML carries; a design that lays out as boxes
   pieces the HTML joins without one fails the joins check.

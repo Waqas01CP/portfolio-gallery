@@ -234,6 +234,9 @@ def check_css(path: Path, root: Path) -> list[str]:
 
 
 def main(argv: list[str]) -> int:
+    # Page text can hold characters the console cannot write, as on Windows;
+    # write them escaped rather than stop the report.
+    sys.stdout.reconfigure(errors="backslashreplace")
     previews = "--previews" in argv
     args = [a for a in argv if a != "--previews"]
     root = Path(args[0] if args else "_site").resolve()
