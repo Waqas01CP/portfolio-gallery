@@ -62,6 +62,7 @@ Decision records have no `type`; their `topic` is shown.
 | `docs/reference/cv-format.md` | reference | current | The Markdown shape the content trace reads a CV in, with what it checks in each direction. Read before writing content/cv.md or turning the trace off. |
 | `docs/reference/design-contract.md` | reference | current | What a design styles: the engine's fixed HTML, its classes and states, the custom properties the engine sets and reads, what base.css guarantees, and the rules the checks hold every design to. Read before writing or reviewing a design. |
 | `docs/reference/provenance.md` | reference | current | Where the engine came from, what was copied, what was changed and what was left out, with the source commit. Read before comparing this repository with its source or porting a fix between them. |
+| `docs/reference/standing-checks.md` | reference | current | The checks every change and every design runs, each with its pass line and the case built to defeat it, and where each runs. Read before adding, changing or trusting a check. |
 
 ## logs
 
