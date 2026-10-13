@@ -44,3 +44,4 @@ subdirectories and leave this index at the top pointing into them.
 
 | Date (UTC) | Log file | Session | What was done | Outcome |
 |---|---|---|---|---|
+| 2026-10-12 to 13 | 2026-10-12-brief-1-build.md | Brief 1 with Addendum 1; first session | Engine copied from the owner's site at 5f3b84d and generalised; sample content; default and plain designs; gallery; file and browser checks, 46 defeat cases; gates, 15 defeat cases; workflows; documents; setup steps | Stands on its own locally; not published; workflows never run; pull_request_target needs an Actions policy; 8 questions for the owner |

@@ -18,6 +18,7 @@ Decision records have no `type`; their `topic` is shown.
 
 | File | Type | Status | Description |
 |---|---|---|---|
+| `CAPABILITIES.md` | explanation | current | Everything portfolio-gallery is and does, in one file: what it does end to end, how data is stored, the stack, its engineering qualities and what enforces each, measured numbers with their dates, how it was built, and its limits. For any chat or person who will open nothing else. |
 | `CLAUDE.md` | instruction | current | How to work in this repository. Reading order, authority order, the six-line scope floor, runtime, conventions and the gates. Read before touching anything. |
 | `CODE_OF_CONDUCT.md` | reference | current | The Code of Conduct, the Contributor Covenant version 2.1, under its Creative Commons Attribution 4.0 licence. The contact for reports is pending the maintainer's choice. |
 | `CONTRIBUTING.md` | reference | current | The rules for contributing to portfolio-gallery. How a design is proposed and submitted, what the checks enforce, what the review covers, how credit is shown, and what the maintainer commits to. |
@@ -85,4 +86,5 @@ Decision records have no `type`; their `topic` is shown.
 
 | File | Type | Status | Description |
 |---|---|---|---|
+| `logs/2026-10-12-brief-1-build.md` | log | current | Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. |
 | `logs/README.md` | index | current | The session log index. Read this first for what prior sessions did, then chain backwards through the most recent relevant log only as far as needed. |
