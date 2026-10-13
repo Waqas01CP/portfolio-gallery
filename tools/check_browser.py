@@ -190,6 +190,7 @@ def lay_out_all(page) -> None:
     policy refuses an injected <style>, and must."""
     page.evaluate(f"""(() => {{
       const sheet = [...document.styleSheets].find((s) => s.href && s.href.endsWith('static/base.css'));
+      if (!sheet) return false;  // the gallery page: no sections to lay out
       sheet.insertRule({json.dumps(LAYOUT_ALL)}, sheet.cssRules.length); return true; }})()""")
 
 
@@ -432,10 +433,11 @@ def check_anchors(pages, origin, report, quick) -> None:
                     for target in targets:
                         report.ran("anchors")
                         # A fresh load with the address. A design's web fonts can
-                        # arrive after the browser has jumped, and their swap moves
-                        # the text above the target by a line or so: measured
-                        # 2026-10-12 on the default design, 1 load in 136, a
-                        # different target each run, 16 to 21 px. So a miss is
+                        # arrive after the browser has jumped, and with
+                        # font-display: swap they move the text above the target:
+                        # the default design, with swap, missed by 16 to 40 px on
+                        # about 1 load in 100 (2026-10-12 and 13); with optional,
+                        # as it now ships, none in 272. So a miss is
                         # loaded once more, and fails only if it misses again; a
                         # single miss is reported as a note. Only a miss of a line
                         # or so, at most 32 px, gets the second load: without the

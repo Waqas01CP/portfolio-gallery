@@ -86,6 +86,10 @@ of the operator's site's standing checks, run here with --axe.
 ## More Information
 
 - Until this record is accepted, the checks workflow does not run axe and
-  says so; the seat ran it locally on 2026-10-12 (session log).
+  says so. The seat ran axe-core 4.14.0 locally on 2026-10-13 UTC, from a
+  scratch folder: 36 cells, both designs and the gallery page, 0
+  violations; its defeat case (faint text and an image without alt in the
+  plain design) reported image-alt in every cell and color-contrast in the
+  light ones (session log).
 
 ## Changes

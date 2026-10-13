@@ -152,6 +152,11 @@ transitions.
 - **No words run together.** Pieces of one line laid out as separate boxes
   need the hidden spaces the HTML carries; a design that lays out as boxes
   pieces the HTML joins without one fails the joins check.
+- **Web fonts: preload them, and use `font-display: optional`.** With
+  `swap`, a font that arrives after the browser has jumped to a linked
+  section moves the text above it, and the anchors check fails now and
+  then: the default design missed by 16 to 40 px on about 1 load in 100
+  with swap, and none in 272 loads with optional (2026-10-12 and 13).
 - **Nothing moves under reduced motion**, whatever `!important` says.
 - One "Sections" menu at each width; anchors land at their target; no
   request leaves the site.

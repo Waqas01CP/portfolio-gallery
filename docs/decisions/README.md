@@ -70,6 +70,10 @@ Decisions identified but not yet concluded. Each waits on the owner.
   anyone using the template could publish a site that looks like his.
   Keep it as `default`, give `default` a look of its own and keep his
   under another name, or leave his out. Asked 2026-10-12.
+- **The default design's fonts.** `font-display: optional` is committed,
+  because with `swap`, as on his site, anchors landed a line off on about
+  1 load in 100 (logs/2026-10-12-brief-1-build.md). The look is the same
+  whenever the fonts arrive in time. His to keep or reverse.
 - **The response time promised to contributors.** CONTRIBUTING.md says
   none until he sets one.
 - **Whether the README links his portfolio site.** It credits his GitHub
