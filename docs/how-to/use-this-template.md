@@ -80,6 +80,9 @@ Commit each change with **Commit changes**.
 Open the **Actions** tab. Each commit to `main` starts a "Deploy" run:
 build, then assemble, then deploy. When all three are green, your site is
 live at the address from step 1, and the run's "deploy" job links to it.
+A fourth job, "shots", shows as skipped (a grey circle with a line
+through it): it takes the gallery's previews and runs only in this
+project's own repository.
 
 If the build fails, open the run and the failed step: it names every
 problem, such as an item missing a field, a `layer1` that is not a cut, or

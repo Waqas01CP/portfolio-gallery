@@ -35,7 +35,8 @@ the first response, no cookies, no tracking and nothing loaded from another
 site. Designs are folders of CSS, fonts and images, contributed by pull
 request, checked automatically for scope, file safety and accessibility,
 and merged only by the owner. It costs nothing to run: GitHub's free
-public-repository features only. Not yet published (ADR-0005).
+public-repository features only. Public on GitHub since 2026-10-16; the
+gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 
 ## What it does, end to end
 
@@ -97,10 +98,11 @@ public-repository features only. Not yet published (ADR-0005).
 | Quality | What enforces it |
 |---|---|
 | A design cannot run code or load from elsewhere | The design format (ADR-0006); tools/check_design.py; the scope check; the page's Content-Security-Policy |
+| A workflow job runs when it should | tools/check_workflows.py: a job after one that can be skipped must say when it runs, or GitHub skips it too and reports success |
 | A pull request cannot change how it is checked | scope.yml on `pull_request_target`, from the default branch; it fails any change outside one design folder |
 | Every word in the first response, readable without scripts | The fixed HTML; the words check compares every design with no design, scripts off |
 | Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
-| A check can fail | tools/prove_checks.py runs each on its defeat case: 38 file cases and 9 browser cases, with 8 controls |
+| A check can fail | tools/prove_checks.py runs each on its defeat case: 43 file cases and 9 browser cases, with 9 controls |
 | Claims trace to the user's CV | tools/check_content.py, page to CV and CV to page |
 | Deterministic output | Two builds compared byte for byte in CI |
 | Nothing private published | Gates A to E; the pre-publish search |
@@ -109,13 +111,13 @@ public-repository features only. Not yet published (ADR-0005).
 
 | What | Value | Date | Source |
 |---|---|---|---|
-| Source | build.py 1,019 lines; 11 tools, 3,486 lines; 13 templates, 566 lines; scripts and engine styles 871 lines; designs: default 1,521 lines of CSS, plain 251; workflows 231 lines | 2026-10-16 | `wc -l` |
+| Source | build.py 1,019 lines; 12 tools, 3,798 lines; 13 templates, 566 lines; scripts and engine styles 871 lines; designs: default 1,521 lines of CSS, plain 251; workflows 237 lines | 2026-10-16 | `wc -l` |
 | Sample site, built | index.html 39,195 bytes (6,239 gzipped); site.js 22,481 (7,219); knot.js 5,715 (2,256); base.css 3,099 (1,489); layout.css 1,947 (562); default design.css 49,498 (11,160); fonts 78,396 | 2026-10-12 | `wc -c`; Python's gzip, level 6 |
 | Gallery page | 3,778 bytes (1,485 gzipped); plain design.css 11,678 bytes | 2026-10-12 | same |
 | Builds | site in each design and the gallery: exit 0, twice each, byte-identical (default 14 files, plain 8, gallery 18), from a fresh clone | 2026-10-12 | the session log |
 | Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-12 | tools/check_content.py |
-| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures | 2026-10-12, 13 and 16 | the session log |
-| Defeat cases | 47 (38 file, 9 browser, axe's among them) fail as built, naming what failed; 8 controls pass; 934 s on a fresh clone of e794feb. Gates: 18 defeat cases refused, 4 controls passed | 2026-10-15 and 16 | tools/prove_checks.py --browser --axe; the session log |
+| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173 | 2026-10-12, 13 and 16 | the session log; GitHub's API |
+| Defeat cases | 52 (43 file, 9 browser, axe's among them) fail as built, naming what failed; 9 controls pass. 47 cases and 8 controls on a fresh clone of e794feb in 934 s; the 5 workflow cases and their control on 1f14aa7's tree. Gates: 19 defeat cases refused, 4 controls passed | 2026-10-15 and 16 | tools/prove_checks.py --browser --axe; the session log |
 | Speed, sample site | Lighthouse 13.5.0, default mobile, median of five, served uncompressed from 127.0.0.1 (GitHub Pages compresses), Chrome 154 on the seat's Windows machine. Default design with font-display: optional (as committed), 2026-10-13: LCP 2,108 ms, CLS 0, TBT 40 ms (runs 174, 37, 40, 46, 25), 197,433 bytes. The same design with swap, 2026-10-12: LCP 2,179 ms, CLS 0, TBT 195 ms (runs 195, 248, 280, 22, 64). Plain, 2026-10-12: LCP 1,389 ms, CLS 0.048, TBT 0 ms, 79,399 bytes. ADR-0009's limits: 2,500 ms, 0.1, 200 ms | 2026-10-12 and 13 | the session log |
 | Decision records | 14: 13 accepted, 1 proposed (ADR-0012, held by the owner) | 2026-10-16 | docs/decisions/ |
 
@@ -129,6 +131,7 @@ his site's implementing seat and amended by his site's architecture chat.
 |---|---|
 | 2026-10-12 | The engine copied by file from the owner's site at 5f3b84d and generalised; sample content; the default and plain designs; the gallery; the file and browser checks with their defeat cases; the gates; the workflows; the documents. Not published |
 | 2026-10-15 to 16 | The owner's answers applied: records 0006 to 0011 accepted, 0013 and 0014 written; axe-core in the checks workflow; the Code of Conduct's contact, allowed by gate A in that file alone; the Chrome launcher's start made safe. Not published |
+| 2026-10-16 | Published by the owner; the gallery live. The deploy job, skipped in every site-mode run, found by the architecture chat and fixed; the workflow check added |
 
 ## What it does not do, and its limits
 
@@ -139,9 +142,10 @@ dependency without a record; designs are CSS only (ADR-0006).
 
 **Limits, as measured or known on 2026-10-12:**
 
-- **Not yet run on GitHub.** The workflows were parsed and checked as
-  files; whether Chrome's sandbox works on the runner, and how long the
-  checks take there, is seen only after the first push.
+- **Partly proven on GitHub.** Checks (9 minutes) and Deploy in gallery
+  mode pass there, with Chrome run without its sandbox (ADR-0010). The
+  scope check and the site-mode deploy, which every copy uses, are not
+  yet proven there (setup Tests 1, 2 and 4).
 - **`pull_request_target` needs the owner's Actions policy.** GitHub blocks
   it by default in public repositories from 2026-11-02; without the policy
   the scope check stops running (docs/setup-on-github.md, step 5).

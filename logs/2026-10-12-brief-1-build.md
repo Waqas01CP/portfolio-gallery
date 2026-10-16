@@ -1,6 +1,6 @@
 ---
 type: log
-description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start."
+description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run."
 status: current
 ---
 
@@ -570,3 +570,159 @@ The extracted file is byte-identical to the one run on 2026-10-13.
 3. The Windows sharing violation on DevToolsActivePort is Windows'
    mandatory locking; the runner's Linux has none, so CI was not exposed.
    Inferred, not tested on the runner.
+
+---
+
+# Round 3, 2026-10-16 UTC: the deploy job never ran in site mode
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 6a4de5e, which the owner had pushed: the
+repository has been public since his push (first runs 2026-10-16 19:48Z),
+with origin at https://github.com/Waqas01CP/portfolio-gallery.git and main
+equal to origin/main. HEAD at end: the commit that adds this section.
+Mode: mutating. Ran from about 20:55Z; his local date (UTC+5) was
+2026-10-17.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner during setup step 8:
+the deploy job has no `if:`, so it takes the default `success()`, which is
+false when an earlier job in its chain was skipped; shots is skipped in
+site mode, so deploy is too, and every copy of the template would never
+publish (actions/runner issue 491). Fix it with an explicit condition,
+check checks.yml and scope.yml for the same pattern, add a static check
+to the file checks that refuses a job which needs a conditional job and
+has no explicit `if:`, prove it with its defeat case, commit locally and
+report the commit. The owner pushes it directly, before step 9 adds the
+ruleset; rerunning step 8 is the first real proof.
+
+Its addendum the same evening: step 8's skipped shots was the owner's
+variable, set wrongly and since corrected; Deploy run 38967233877 (21:08Z)
+went green in all four jobs and the gallery is live with both cards. The
+fault stands. Rerunning step 8 no longer proves the fix, since this
+repository now runs in gallery mode: propose how the fix is proven in
+site mode, and write the owner's steps. One way: set PORTFOLIO_GALLERY
+to false, run Deploy, check deploy goes green, set it back and rerun.
+
+## Errors this seat made
+
+1. **The fault itself**, in deploy.yml since b798834: this seat wrote a
+   chain of jobs where one is skipped by design and did not give the jobs
+   after it a condition. Report 1 called the workflows "checked as files";
+   no check read when a job runs. Cost: two Deploy runs on GitHub that
+   published nothing while showing green, and a round.
+2. **A date again**: the new check's docstring said GitHub's pages were
+   read 2026-10-17, his local date; they were read 2026-10-16 UTC. Caught
+   from a UTC timestamp before the commit.
+3. **A defeat case that did not test what it named**: the first "skip two
+   jobs back" case caught a job that needed a conditional job directly.
+   Caught on reading it; rewritten so deploy needs a job with no `if:`
+   that needs shots, and shown to be missed when the check follows needs
+   one step only.
+
+## What was done
+
+**The facts, from GitHub's public API** [VERIFIED]: the push run of
+6a4de5e (19:48Z) and the dispatch of step 8 (20:34Z) both show build and
+assemble succeeded, shots and deploy skipped, and the run green. The
+Checks run of the push passed on the runner in 9 minutes: every step
+green, the axe fetch and its SHA-512 check among them, every check with
+axe in 8 min 53 s. The gallery's address answered 404. GitHub's
+documentation, read 2026-10-16: "a failure or skip applies to all jobs in
+the dependency chain from the point of failure or skip onwards"; "a
+default status check of `success()` is applied unless you include one of
+these functions"; "a job that is skipped will report its status as
+'Success'"; and `!cancelled()` is recommended over `always()`.
+
+**Step 8's skipped shots**: this seat inferred from the job graph that
+the build had not read `PORTFOLIO_GALLERY` as `true` (the job's log needs
+a signed-in reader, and this machine has no GitHub CLI); the chat's
+addendum confirmed the variable was set wrongly and is corrected. Run
+38967233877 [VERIFIED from the API]: build, shots, assemble and deploy
+green, 21:08Z to 21:09Z. The gallery answered 200 with both cards and
+both previews, each demo and script 200, and the address without its
+slash a 301 to the one with it, which settles that open question.
+
+**The site-mode proof**: Test 4 in the setup steps, a copy made with "Use
+this template" whose Deploy must start, fail only for want of Pages, and
+then publish the sample site once its Pages source is set; the copy is
+deleted after. Preferred to the chat's toggle because it takes the path
+every copy takes, leaves the gallery up, and shows whether a copy's first
+commit runs its workflows. Its cost: a public copy, for the test's
+length, carrying the same credit lines and Code of Conduct address that
+every copy carries. The toggle stays the alternative, in the report.
+
+**Website commits and the owner's email** [VERIFIED from GitHub's
+documentation, read 2026-10-16]: unless "Keep my email addresses private"
+is on, an edit or a merge made on GitHub's website is authored with a
+verified address of his choosing, which can be personal, and gate A sees
+none of them. Test 4's copy, Part D's tests and every future merge are
+such commits. Setup step 12 sets the privacy and blocks command-line
+pushes that expose an address. No website commit existed on 2026-10-16:
+the only branch is main, its commits all no-reply.
+
+**The fix** (1f14aa7): deploy runs on `!cancelled() && needs.assemble.result
+== 'success'`; assemble moves from `always()` to `!cancelled()` with the
+same results named. checks.yml and scope.yml each have one job and no
+`needs`, so the pattern cannot arise there.
+
+**The check**, tools/check_workflows.py, standard library only: a job can
+be skipped if it has an `if:` or needs a job that can be. Every job that
+needs one must have an `if:` holding `always()`, `cancelled()` or
+`failure()`, since any other `if:` still gets `success()`, and with the
+first two must name `needs.<job>.result` for each job it needs. It refuses
+a `needs` naming no job, and reports anything it cannot read at the job
+level as unreadable. It reads the jobs, needs and conditions of all three
+workflows correctly (printed and compared by eye). ci.py checks and gate
+B run it first.
+
+**Proofs** [VERIFIED]:
+
+- The check on 6a4de5e's deploy.yml: FAIL, "job 'deploy': has no if: of
+  its own". On the fixed workflows: 3 of 3 ok.
+- The file defeat cases, 2026-10-16 21:01Z to 21:02Z: 43 failed as built
+  (38 as before, 5 new: the deploy job as published, an `if:` with no
+  status function, `!cancelled()` without the result, a skip two jobs
+  back, an alias for `needs`), and 7 controls passed, the workflow check's
+  among them. The browser defeat cases are unchanged since e794feb's run.
+- `tools/ci.py checks --axe` on the working tree that became 1f14aa7, 21:03:28Z to 21:15:40Z, 732 s, exit 0: the workflow check first, 3 of 3 ok; designs; two builds each byte-identical; built files; the trace; the browser checks 720 s, 0 failures (axe 36 runs).
+- Gates, in a scratch clone of 1f14aa7, 21:16:15Z to 21:20:11Z: 23 of 23 as expected, 19 defeat cases refused and 4 controls passed; new is "B: a deploy job with no if:".
+- The pre-publish search runs on the final commit after this section is committed; Report 3 gives its result.
+
+## Rejected alternatives
+
+- PyYAML for the check: a dependency needs a record and the owner's
+  approval (floor line 5); the workflows use a small subset of YAML, read
+  here by indentation, with anything else refused.
+- Accepting any explicit `if:`, as the chat's wording allows: GitHub still
+  adds `success()` to an `if:` with no status function, so such a job is
+  skipped the same way.
+- `always()` for deploy: GitHub's page recommends `!cancelled()`, so a
+  cancelled run stops.
+- The chat's toggle of `PORTFOLIO_GALLERY` as the proof: it does not take a
+  copy's path and takes the gallery down for a few minutes; kept in the
+  report as the alternative to Test 4.
+
+## Checked and found already correct
+
+- docs/how-to/use-this-template.md already told users their first Deploy
+  run may fail before Pages is set up; it now also says shots shows as
+  skipped.
+- Chrome runs on GitHub's runner with --no-sandbox, as the workflows set:
+  the browser checks and the previews both ran there.
+
+## Findings and recommendations
+
+1. Edits and merges on GitHub's website escape gate A, and use his
+   account's chosen address unless it is kept private: setup step 12,
+   before Test 4, Part D or any merge.
+2. Steps 4 and 5 have not been reported to this seat; step 5 must exist
+   before 2026-11-02.
+3. Another project's tests ran on this machine during this round's local
+   checks; the browser checks took 720 s against 623 s the day before.
+
+## Not done
+
+- Nothing pushed by this seat. The fix is proven on GitHub only by Test 4,
+  after the owner's push.
+- The scope check has not yet run; no pull request has been opened.
