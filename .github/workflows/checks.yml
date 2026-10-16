@@ -1,6 +1,7 @@
 # The content checks (ADR-0006, layer 2): every design, two builds each of
 # the site and the gallery compared byte for byte, the built files, the
-# content trace and the browser checks on every design.
+# content trace and the browser checks on every design, axe-core included
+# (ADR-0011).
 #
 # On a pull request from a fork, GitHub runs this with a read-only token and
 # no secrets, from the pull request's own copy of this file and of the
@@ -32,5 +33,19 @@ jobs:
         run: |
           python3 -m venv .venv
           .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
-      - name: Run every check
-        run: .venv/bin/python tools/ci.py checks
+      # axe-core at one exact version, checked against the npm registry's
+      # integrity value before anything reads it (ADR-0011). AXE_SHA512 is
+      # the registry's sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==
+      # written in hex, read 2026-10-15. Only axe.min.js is taken out.
+      - name: Fetch axe-core; sha512sum checks it
+        env:
+          AXE_VERSION: "4.14.0"
+          AXE_SHA512: f564d9c448ec67b6f5dd31fc24f99b576cfc0876e5f34ff6866dd73c41b826035d40b2bcd480515e64b11df3003a44aa41e4714ffd1dc0d0f3d863a6df3ce971
+        run: |
+          curl --fail --silent --show-error --proto '=https' --tlsv1.2 \
+            --output "$RUNNER_TEMP/axe-core.tgz" \
+            "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
+          echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
+          tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
+      - name: Run every check, axe included
+        run: .venv/bin/python tools/ci.py checks --axe "$RUNNER_TEMP/package/axe.min.js"

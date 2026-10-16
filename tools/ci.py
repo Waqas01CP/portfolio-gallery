@@ -5,7 +5,9 @@
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; and the browser checks on
-      every design's page. .github/workflows/checks.yml runs this.
+      every design's page, with axe when given axe.min.js.
+      .github/workflows/checks.yml runs this, always with --axe, after
+      fetching axe-core and checking its SHA-512 (ADR-0011).
 
   python tools/ci.py build --mode site|gallery [--out DIR]
       The deploy workflow's build: the site, or the gallery, built and its

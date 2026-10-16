@@ -8,7 +8,7 @@ status: current
 
 Every check here ran first on its defeat case, and counts as a pass only
 once that case has failed. A check whose defeat case passes is unproven.
-The proofs of 2026-10-12 are in `logs/2026-10-12-brief-1-build.md`.
+The proofs of 2026-10-12, 13 and 15 are in `logs/2026-10-12-brief-1-build.md`.
 
 | Check | Tool | Runs | Pass | Defeat case |
 |---|---|---|---|---|
@@ -24,7 +24,7 @@ The proofs of 2026-10-12 are in `logs/2026-10-12-brief-1-build.md`.
 | Words | check_browser.py | CI, gallery | Every design's words equal the page's with no design | `::before { content: "..." }`; a section hidden with display: none |
 | Requests | check_browser.py | CI | No request to another origin, no policy violation, no script error | A planted image from example.org; an injected inline style |
 | Motion | check_browser.py | CI | Under reduced motion, no animation frame and no running animation in 3 s | A design's `!important` infinite animation |
-| axe | check_browser.py --axe | locally until ADR-0011 | axe-core's default rules: 0 violations at 360 and 1366 px, light, device dark, switched dark, panels closed and open | Faint text and an image without alt |
+| axe | check_browser.py --axe | CI, axe-core 4.14.0 fetched and checked by SHA-512 (ADR-0011) | axe-core's default rules: 0 violations at 360 and 1366 px, light, device dark, switched dark, panels closed and open | Faint text and an image without alt (prove_checks.py --axe); a tarball with one byte added, refused by its SHA-512 |
 | Lighthouse | Lighthouse 13.5.0 | locally until ADR-0012 | Default mobile, median of five: LCP at most 2.5 s, CLS at most 0.1, TBT under 200 ms | A 600 ms synchronous script |
 | Gates A to E | gates.py | every commit and push | ADR-0008 | ADR-0008's Confirmation |
 

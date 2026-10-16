@@ -2,6 +2,8 @@
 
   python tools/prove_checks.py            the file checks, about a minute
   python tools/prove_checks.py --browser  also the browser checks, longer
+  python tools/prove_checks.py --browser --axe FILE
+                                          also axe, with axe.min.js
 
 A check that cannot fail is worse than no check. For each case this copies
 the repository's tracked files to a temporary folder, plants the defect,
@@ -218,7 +220,16 @@ def file_cases():
     yield "build twice: output that depends on the clock", twice, "two builds of the site differ"
 
 
-def browser_cases():
+def axe_file(argv: list[str]) -> Path | None:
+    if "--axe" not in argv:
+        return None
+    at = argv.index("--axe") + 1
+    if at >= len(argv) or not Path(argv[at]).is_file():
+        raise SystemExit("prove_checks: --axe needs the path of axe.min.js")
+    return Path(argv[at]).resolve()
+
+
+def browser_cases(axe: Path | None):
     def gallery(plant_fn, only):
         def plant(copy):
             plant_fn(copy)
@@ -259,14 +270,24 @@ def browser_cases():
         c / "src/templates/macros.html.j2", '{% macro sp() %}<span class="vh"> </span>{% endmacro %}',
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")
 
+    if axe:
+        def faint(copy):
+            edit(copy / "designs/plain/design.css", "/* Footer. */", ".lede { color: #eee; }\n/* Footer. */")
+            edit(copy / "src/templates/footer.html.j2", "</footer>",
+                 '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="10" height="10"></footer>')
+            return ["tools/check_browser.py", build_site(copy, "--gallery"), "--only", "axe", "--axe", axe]
+
+        yield "axe: faint text and an image without alt", faint, ("color-contrast", "image-alt")
+
 
 def main(argv: list[str]) -> int:
     # Page text can hold characters the console cannot write, as on Windows;
     # write them escaped rather than stop the report.
     sys.stdout.reconfigure(errors="backslashreplace")
     cases = list(file_cases())
+    axe = axe_file(argv)
     if "--browser" in argv:
-        cases += list(browser_cases())
+        cases += list(browser_cases(axe))
     work = Path(tempfile.mkdtemp(prefix="pg-prove-"))
     unproven, ran = [], 0
     try:
@@ -288,6 +309,8 @@ def main(argv: list[str]) -> int:
                     ("trace", ["tools/check_content.py", "--page", out / "index.html"])]
         if "--browser" in argv:
             controls.append(("browser", ["tools/check_browser.py", gallery_out, "--quick"]))
+            if axe:
+                controls.append(("axe", ["tools/check_browser.py", gallery_out, "--only", "axe", "--axe", axe]))
         for label, args in controls:
             code, text = run(copy, *args)
             print(f"{'ok  ' if code == 0 else 'FAIL'} control: {label} passes on the unchanged copy")
@@ -298,9 +321,11 @@ def main(argv: list[str]) -> int:
             args = plant(copy)
             code, text = run(copy, *args)
             ran += 1
-            caught = code != 0 and expected in text
+            # A case may name several texts; each must be in the output.
+            wanted = expected if isinstance(expected, tuple) else (expected,)
+            caught = code != 0 and all(piece in text for piece in wanted)
             print(f"{'ok  ' if caught else 'FAIL'} {label}: exit {code}"
-                  f"{'' if caught else f', expected {expected!r} in the output'}")
+                  f"{'' if caught else f', expected {wanted!r} in the output'}")
             if not caught:
                 unproven.append(f"{label}: exit {code}\n{text[-1200:]}")
     finally:

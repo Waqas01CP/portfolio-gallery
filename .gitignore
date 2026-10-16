@@ -17,3 +17,7 @@ __pycache__/
 _site*/
 _gallery/
 .build-*/
+
+# axe-core, fetched for the checks on your own computer
+# (docs/reference/commands.md); the checks workflow fetches its own.
+.cache/

@@ -52,7 +52,7 @@ itself a decision.
 | [0008](0008-repository-gates.md) | The repository gates | Proposed |
 | [0009](0009-quality-goals.md) | Quality goals, for every site and every design | Proposed |
 | [0010](0010-headless-chrome-from-the-standard-library.md) | Headless Chrome, driven from Python's standard library | Proposed |
-| [0011](0011-axe-core-in-ci.md) | axe-core in CI | Proposed |
+| [0011](0011-axe-core-in-ci.md) | axe-core in CI | Accepted |
 | [0012](0012-lighthouse-in-ci.md) | Lighthouse in CI | Proposed |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
@@ -84,5 +84,6 @@ Decisions identified but not yet concluded. Each waits on the owner.
 - **The commit identity for this repository.** The seat committed as
   Waqas01CP with GitHub's no-reply address; his global git identity
   carries his name and email.
-- **Records 0006 to 0012**, proposed, each awaiting acceptance; 0011 and
-  0012 add dependencies and are not built into CI until accepted.
+- **Records 0006 to 0010 and 0012**, proposed, each awaiting acceptance;
+  0012 adds a dependency and is not built into CI until accepted. ADR-0011
+  was accepted on 2026-10-15 and is built.

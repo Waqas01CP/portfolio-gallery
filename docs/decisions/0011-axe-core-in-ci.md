@@ -1,14 +1,14 @@
 ---
-status: proposed
+status: accepted
 topic: build
-description: "Proposed, awaiting the owner's approval: run axe-core in CI on every design, fetched from npm by exact version and checked against its published SHA-512. Until accepted, axe runs only locally. Read before adding axe to a workflow."
+description: "Run axe-core in CI on every design, fetched from npm by exact version and checked against its published SHA-512. Read before changing axe's version or how the checks workflow runs it."
 date: 2026-10-12
 decision-makers: Waqas01CP, the repository's owner
 # consulted:
 # informed:
 ---
 
-# ADR-0011: axe-core in CI (proposed)
+# ADR-0011: axe-core in CI
 
 ## Context and Problem Statement
 
@@ -38,14 +38,14 @@ a record and the owner's approval before it is added.
 
 ## Considered Options
 
-- axe-core in CI, fetched by version and checked by hash (proposed)
+- axe-core in CI, fetched by version and checked by hash
 - axe-core only locally, as the operator's site does
 - axe-core's file committed into the repository
 
 ## Decision Outcome
 
 Chosen option: "axe-core in CI, fetched by version and checked by hash",
-**proposed**, for the owner's approval.
+decided by the owner on 2026-10-15 UTC.
 
 We will fetch axe-core's npm tarball at one exact version in the checks
 workflow, verify its SHA-512 against the value recorded in the workflow,
@@ -93,3 +93,7 @@ of the operator's site's standing checks, run here with --axe.
   light ones (session log).
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner, and built: the checks workflow fetches axe-core 4.14.0's tarball from the npm registry, checks it with sha512sum against the registry's integrity value, written in the workflow in hex, and passes axe.min.js to tools/ci.py checks --axe. The title, the description and Decision Outcome lose "proposed"; More Information's "Until this record is accepted" is history. A1 re-read 2026-10-15: the same version, MPL-2.0, no dependencies, the same integrity value. The defeat case is in tools/prove_checks.py, run with --browser --axe FILE. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |

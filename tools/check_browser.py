@@ -34,9 +34,10 @@ docs/reference/standing-checks.md with the case built to defeat it.
               animation runs, over 3 seconds.
   axe         With --axe FILE, axe-core's default rules at 360 and 1366 px,
               light, device dark and switched dark, panels closed and open.
-              axe-core is not a dependency of this repository until its
-              record is accepted (ADR-0011); without --axe this check is not
-              run, and the report says so.
+              The checks workflow fetches axe.min.js by exact version and
+              checks its SHA-512 first (ADR-0011); locally, fetch it as
+              docs/reference/commands.md says. Without --axe this check is
+              not run, and the report says so.
 
 --quick runs one load per cell and the narrow width only where a check
 allows it, for iterating; a pass with --quick is not a pass of the
@@ -634,8 +635,8 @@ def main(argv: list[str]) -> int:
                     check_axe(sites + (["index.html"] if gallery else []), origins["built"], report,
                               args.axe.read_text(encoding="utf-8"))
                 else:
-                    report.notes.append("axe: not run. axe-core is a proposed dependency (ADR-0011); "
-                                        "pass --axe FILE to run it")
+                    report.notes.append("axe: not run; pass --axe FILE, axe.min.js fetched as "
+                                        "docs/reference/commands.md says (ADR-0011)")
         finally:
             for server in servers.values():
                 server.__exit__()

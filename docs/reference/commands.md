@@ -71,7 +71,41 @@ To prove the checks can fail, run each on the case built to defeat it:
 ```
 python tools/prove_checks.py            the file checks, about a minute
 python tools/prove_checks.py --browser  also the browser checks
+python tools/prove_checks.py --browser --axe .cache/package/axe.min.js
 ```
+
+### axe-core
+
+The checks workflow fetches axe-core itself (ADR-0011). To run axe on your
+own computer, fetch the same file into `.cache/`, which git ignores, and
+check it against `AXE_SHA512` in `.github/workflows/checks.yml` before
+using it. Each form below was run on 2026-10-15 UTC; each refused a copy
+with one byte added.
+
+In PowerShell (Windows PowerShell 5.1 needs `-UseBasicParsing`):
+
+```
+New-Item -ItemType Directory -Force .cache
+Invoke-WebRequest https://registry.npmjs.org/axe-core/-/axe-core-4.14.0.tgz -OutFile .cache\axe-core.tgz -UseBasicParsing
+$want = (Select-String -Path .github\workflows\checks.yml -Pattern 'AXE_SHA512: (\w+)').Matches[0].Groups[1].Value
+(Get-FileHash .cache\axe-core.tgz -Algorithm SHA512).Hash -eq $want
+tar -xzf .cache\axe-core.tgz -C .cache package/axe.min.js
+```
+
+The fourth line must print `True`; if it prints `False`, delete `.cache`
+and use nothing from it. In Git Bash or on Linux:
+
+```
+mkdir -p .cache
+curl --fail --proto '=https' -o .cache/axe-core.tgz https://registry.npmjs.org/axe-core/-/axe-core-4.14.0.tgz
+echo "$(sed -n 's/^ *AXE_SHA512: //p' .github/workflows/checks.yml)  .cache/axe-core.tgz" | sha512sum --check --strict
+tar -xzf .cache/axe-core.tgz -C .cache package/axe.min.js
+```
+
+The third line must print `OK`; if it prints `FAILED`, delete `.cache`
+and use nothing from it. The version in the address is `AXE_VERSION` in
+the same workflow; change both together. Then pass `--axe .cache/package/axe.min.js`
+to check_browser.py, ci.py checks or prove_checks.py.
 
 ## The CI entry point
 
@@ -85,8 +119,9 @@ python tools/ci.py assemble --site DIR --shots DIR
 
 `checks` is everything a pull request must pass: designs, two builds each
 of the site and the gallery compared byte for byte, the built files, the
-content trace and the browser checks. It stops at the first failure with
-that tool's exit code.
+content trace and the browser checks, axe among them when given
+`--axe`, as the checks workflow always gives it. It stops at the first
+failure with that tool's exit code.
 
 ## Gates
 

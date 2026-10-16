@@ -79,8 +79,10 @@ machine from .git/info/never-commit, which is never committed.
 Python 3.12, a venv at .venv/, Jinja2 and MarkupSafe pinned by hash in
 requirements.txt (ADR-0004). Nothing else at build time. The browser
 checks and the previews use Google Chrome, driven from the standard
-library by tools/cdp.py (ADR-0010). No npm package, until ADR-0011 or
-ADR-0012 is accepted.
+library by tools/cdp.py (ADR-0010). From npm, one file: the checks
+workflow fetches axe-core at one exact version and checks its SHA-512
+before running it (ADR-0011). Nothing else from npm while ADR-0012 is
+proposed.
 
 ## Conventions
 
