@@ -44,4 +44,5 @@ subdirectories and leave this index at the top pointing into them.
 
 | Date (UTC) | Log file | Session | What was done | Outcome |
 |---|---|---|---|---|
+| 2026-10-15 to 16 | 2026-10-12-brief-1-build.md | Brief 1, Round 2: the owner's answers to Report 1 | Records 0006 to 0011 accepted, 0013 and 0014 written; axe-core in the checks workflow; the Code of Conduct's contact, with gate A's allowed-text rule; the Chrome launcher's start fixed | Not published; on a fresh clone 47 defeat cases and 8 controls as expected and the full checks with axe pass; pre-publish search PASS; the CV search to rerun on the final commit |
 | 2026-10-12 to 13 | 2026-10-12-brief-1-build.md | Brief 1 with Addendum 1; first session | Engine copied from the owner's site at 5f3b84d and generalised; sample content; default and plain designs; gallery; file and browser checks, 46 defeat cases; gates, 15 defeat cases; workflows; documents; setup steps | Stands on its own locally; not published; workflows never run; pull_request_target needs an Actions policy; 8 questions for the owner |

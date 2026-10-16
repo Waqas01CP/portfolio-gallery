@@ -63,8 +63,8 @@ screenshots need Google Chrome; set PG_CHROME to its path if it is not in
 the usual place. They start their own headless Chrome with an empty
 temporary profile and never touch your browser. A full browser run on the
 gallery's two designs took 487 s on the seat's Windows machine on
-2026-10-12, about four minutes per design; `--quick` is for iterating and
-is not a pass.
+2026-10-12, about four minutes per design, and 623 s with `--axe` on
+2026-10-16; `--quick` is for iterating and is not a pass.
 
 To prove the checks can fail, run each on the case built to defeat it:
 

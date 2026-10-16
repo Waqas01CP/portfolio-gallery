@@ -11,7 +11,7 @@ place, for a reader who will open nothing else: any chat that needs to know
 the project, and any person who reads README.md to use it and this file
 for the nuance.
 
-**Current as of 2026-10-13 UTC**, written by the implementing seat in its
+**Current as of 2026-10-16 UTC**, written by the implementing seat in its
 lane: what the system does and how, the stack, the qualities, the numbers,
 the limits, and the timeline's rows for what was built. **The architecture
 chat's lane is not yet written**: the problem the project solves, where it
@@ -75,9 +75,10 @@ public-repository features only. Not yet published (ADR-0005).
   requests to another origin; the Content-Security-Policy in every page
   refuses them even if a check misses one.
 - **The owner's private material never enters the repository.** Gate A
-  refuses his name outside LICENSE and README.md, his email and his
-  private folder name, from a pattern file in git's own folder that is
-  never committed (ADR-0008).
+  refuses his name outside LICENSE and README.md, his personal email
+  addresses anywhere, the Code of Conduct's contact address outside
+  CODE_OF_CONDUCT.md, and his private folder name, from a pattern file in
+  git's own folder that is never committed (ADR-0008, ADR-0002).
 
 ## Tech stack
 
@@ -88,7 +89,8 @@ public-repository features only. Not yet published (ADR-0005).
 | Designs | `default`: Manrope, JetBrains Mono and Instrument Serif under the SIL Open Font License, none reserving a name (checked in each WOFF2's name table, 2026-10-12); `plain`: system fonts |
 | CI and hosting | GitHub Actions on ubuntu-24.04 and GitHub Pages, free for public repositories; every action pinned to a full commit SHA |
 | Browser checks and previews | Google Chrome, driven over its DevTools protocol by tools/cdp.py, standard library only (ADR-0010) |
-| Proposed, not added | axe-core 4.14.0 (ADR-0011) and Lighthouse 13.5.0 (ADR-0012), run only locally from a scratch folder until accepted; axe-core: 36 cells, 0 violations, 2026-10-13 |
+| Accessibility rules in CI | axe-core 4.14.0 from npm, MPL-2.0, fetched by exact version in the checks workflow and checked against the registry's SHA-512 before it runs; never shipped in a site (ADR-0011) |
+| Proposed, not added | Lighthouse 13.5.0 (ADR-0012), run only locally from a scratch folder; held as proposed by the owner on 2026-10-15 |
 
 ## Engineering qualities, and what enforces each
 
@@ -97,8 +99,8 @@ public-repository features only. Not yet published (ADR-0005).
 | A design cannot run code or load from elsewhere | The design format (ADR-0006); tools/check_design.py; the scope check; the page's Content-Security-Policy |
 | A pull request cannot change how it is checked | scope.yml on `pull_request_target`, from the default branch; it fails any change outside one design folder |
 | Every word in the first response, readable without scripts | The fixed HTML; the words check compares every design with no design, scripts off |
-| Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion (docs/reference/standing-checks.md) |
-| A check can fail | tools/prove_checks.py runs each on its defeat case: 38 file cases and 8 browser cases, with 7 controls |
+| Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
+| A check can fail | tools/prove_checks.py runs each on its defeat case: 38 file cases and 9 browser cases, with 8 controls |
 | Claims trace to the user's CV | tools/check_content.py, page to CV and CV to page |
 | Deterministic output | Two builds compared byte for byte in CI |
 | Nothing private published | Gates A to E; the pre-publish search |
@@ -107,15 +109,15 @@ public-repository features only. Not yet published (ADR-0005).
 
 | What | Value | Date | Source |
 |---|---|---|---|
-| Source | build.py 1,019 lines; 11 tools, 3,430 lines; 13 templates, 566 lines; scripts and engine styles 871 lines; designs: default 1,512 lines of CSS, plain 251; workflows 216 lines | 2026-10-12 | `wc -l` |
+| Source | build.py 1,019 lines; 11 tools, 3,486 lines; 13 templates, 566 lines; scripts and engine styles 871 lines; designs: default 1,521 lines of CSS, plain 251; workflows 231 lines | 2026-10-16 | `wc -l` |
 | Sample site, built | index.html 39,195 bytes (6,239 gzipped); site.js 22,481 (7,219); knot.js 5,715 (2,256); base.css 3,099 (1,489); layout.css 1,947 (562); default design.css 49,498 (11,160); fonts 78,396 | 2026-10-12 | `wc -c`; Python's gzip, level 6 |
 | Gallery page | 3,778 bytes (1,485 gzipped); plain design.css 11,678 bytes | 2026-10-12 | same |
 | Builds | site in each design and the gallery: exit 0, twice each, byte-identical (default 14 files, plain 8, gallery 18), from a fresh clone | 2026-10-12 | the session log |
 | Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-12 | tools/check_content.py |
-| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s | 2026-10-12 and 13 | the session log |
-| Defeat cases | 46 (38 file, 8 browser) fail as built, naming what failed; 7 controls pass; 645 s. Gates: 15 defeat cases refused, 3 controls passed | 2026-10-12 | tools/prove_checks.py --browser; the session log |
+| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures | 2026-10-12, 13 and 16 | the session log |
+| Defeat cases | 47 (38 file, 9 browser, axe's among them) fail as built, naming what failed; 8 controls pass; 934 s on a fresh clone of e794feb. Gates: 18 defeat cases refused, 4 controls passed | 2026-10-15 and 16 | tools/prove_checks.py --browser --axe; the session log |
 | Speed, sample site | Lighthouse 13.5.0, default mobile, median of five, served uncompressed from 127.0.0.1 (GitHub Pages compresses), Chrome 154 on the seat's Windows machine. Default design with font-display: optional (as committed), 2026-10-13: LCP 2,108 ms, CLS 0, TBT 40 ms (runs 174, 37, 40, 46, 25), 197,433 bytes. The same design with swap, 2026-10-12: LCP 2,179 ms, CLS 0, TBT 195 ms (runs 195, 248, 280, 22, 64). Plain, 2026-10-12: LCP 1,389 ms, CLS 0.048, TBT 0 ms, 79,399 bytes. ADR-0009's limits: 2,500 ms, 0.1, 200 ms | 2026-10-12 and 13 | the session log |
-| Decision records | 12: 5 accepted, 7 proposed | 2026-10-12 | docs/decisions/ |
+| Decision records | 14: 13 accepted, 1 proposed (ADR-0012, held by the owner) | 2026-10-16 | docs/decisions/ |
 
 ## How it was built
 
@@ -126,13 +128,14 @@ his site's implementing seat and amended by his site's architecture chat.
 | Date | What changed |
 |---|---|
 | 2026-10-12 | The engine copied by file from the owner's site at 5f3b84d and generalised; sample content; the default and plain designs; the gallery; the file and browser checks with their defeat cases; the gates; the workflows; the documents. Not published |
+| 2026-10-15 to 16 | The owner's answers applied: records 0006 to 0011 accepted, 0013 and 0014 written; axe-core in the checks workflow; the Code of Conduct's contact, allowed by gate A in that file alone; the Chrome launcher's start made safe. Not published |
 
 ## What it does not do, and its limits
 
 **Excluded by decision:** the scope floor, ADR-0001: no owner's content
 beyond a credit line; no cookies, tracking, analytics or requests to
 another origin; every word in the initial HTML; no paid service; no
-dependency without a record; designs are CSS only (proposed, ADR-0006).
+dependency without a record; designs are CSS only (ADR-0006).
 
 **Limits, as measured or known on 2026-10-12:**
 
@@ -145,8 +148,9 @@ dependency without a record; designs are CSS only (proposed, ADR-0006).
 - **Anchors and web fonts.** With `font-display: swap`, the default design's
   anchors landed 16 to 40 px off on about 1 load in 100, when its fonts
   arrived after the jump. With `font-display: optional`, as committed since
-  2026-10-13: none in 272 loads. The owner may prefer swap's behaviour on
-  slow connections; the choice is his.
+  2026-10-13: none in 272 loads. The owner kept optional on 2026-10-15
+  (ADR-0014): on a slow first visit the fallback font stays for that
+  page view.
 - **Blocking time varies by run on this machine**: the default design's
   median was 195 ms one evening (single runs up to 280 ms) and 40 ms the
   next morning, against ADR-0009's 200 ms. It passed both times as a
@@ -156,8 +160,8 @@ dependency without a record; designs are CSS only (proposed, ADR-0006).
 - **Tested in Chrome 154 on Windows only.** No other browser, and no
   screen reader by ear: the joins check is a model of NVDA, validated on
   the owner's site's known-bad page.
-- **Contrast and speed are checked locally, not in CI**, until ADR-0011
-  and ADR-0012 are accepted.
+- **Speed is checked locally, not in CI**, while ADR-0012 is proposed.
+  Contrast is checked in CI by axe-core (ADR-0011).
 
 ## Where the evidence lives
 

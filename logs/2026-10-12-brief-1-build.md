@@ -1,6 +1,6 @@
 ---
 type: log
-description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published."
+description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start."
 status: current
 ---
 
@@ -391,3 +391,182 @@ Recommendations (each the owner's or the chat's to decide):
 - Whether GitHub runs workflows for a template copy's first commit.
 - Whether a template copy shows a link back on GitHub.
 - GitHub Pages' redirect from /portfolio-gallery to /portfolio-gallery/.
+
+---
+
+# Round 2, 2026-10-15 to 16 UTC: the owner's answers to Report 1
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 43edeb2. HEAD at end: the commit that adds this
+section. Mode: mutating. Ran from 2026-10-15 22:58Z, paused at the
+owner's interruption at 23:16Z, and resumed at his word on 2026-10-16
+07:31Z. A background run of the defeat harness made no progress in those
+eight hours, so the machine was most likely asleep too. His local date
+(UTC+5) was 2026-10-16 throughout, and his answers carry that date.
+
+## What was asked
+
+His answers to Report 1, checked with the portfolio architecture chat and
+pasted to this seat: make the changes, commit locally, do not push, and
+report in the brief's report file. In short:
+
+1. Designs are CSS only, as built.
+2. The default design keeps his site's look, credited to Waqas01CP.
+3. CONTRIBUTING.md promises "a first response within 7 days", one promise
+   only.
+4. The README links his portfolio site beside the credit.
+5. The repository stays on his personal account. The Code of Conduct's
+   contact is a dedicated address of his, which his site's ADR-0012
+   allows in CODE_OF_CONDUCT.md only. The pre-publish search allows his
+   name in LICENSE and README.md and this address in CODE_OF_CONDUCT.md,
+   and fails anywhere else; his two personal addresses stay barred
+   everywhere. The placeholder goes from the Code of Conduct and from the
+   setup steps.
+6. The commit identity stays: Waqas01CP with GitHub's no-reply address.
+7. Records 0006 to 0011 accepted; 0012 held as proposed.
+8. `font-display: optional` stays in the default design.
+
+Also settled: the ruleset's bypass list stays empty; `pull_request_target`
+is not a stop condition, and step 5 with its stop condition stays; records
+name "Waqas01CP, the repository's owner"; the authority order is left to
+this repository's own chat. The chat ran the master CV search over the 129
+objects of the history at 43edeb2: 0 hits, and its defeat case found hits.
+The aim: the owner finishes the setup steps before 2026-11-02.
+
+## Errors this seat made
+
+1. **Backslashes through a Git Bash heredoc, again**: the trap the brief
+   named, Report 1's error 1.1, and this seat's own handoff. A Python edit
+   to the scratch gate harness turned an escaped tab into a real one and
+   broke a string. Cost: one failed parse, nothing committed. Restored
+   from a copy made first; the edit redone with the file tool.
+2. **The owner's decisions dated 2026-10-16 UTC** in thirteen files; he
+   gave them on 2026-10-15 UTC, and 2026-10-16 is his local date. Caught
+   from the gate proof's UTC timestamps, before any commit; corrected
+   everywhere, with the local date noted once in the records' index.
+3. **commands.md's first axe section claimed an `&&`** its commands do not
+   have. Caught on reading back, before any commit.
+4. **The default design's comment on its fonts**, written in 206c858, said
+   "none in 136 loads" after the count had reached 272, and that a late
+   font "is used from the next page view", which CSS Fonts 4 does not
+   promise. Found this round; corrected in e794feb.
+5. **tools/cdp.py since 64f9c64**: a failed start left its Chrome
+   running, and a port-file read refused by Windows failed the start.
+   Found when one defeat case hit the refusal on 2026-10-16. Cost: that
+   run's evidence, and an orphaned headless Chrome, stopped by hand.
+   Fixed in 322e0ea.
+
+## What was done
+
+Commits, each through gates A, B and C:
+
+- 328cdad Gate A: text allowed in a file is taken out of each line before
+  the other private patterns are matched there.
+- 322e0ea The Chrome launcher's two start failures.
+- c7e3fd9 axe-core in the checks workflow; ADR-0011 accepted.
+- e794feb The owner's other answers.
+- The commit that adds this section: STATE.md, completed.md,
+  CAPABILITIES.md and this log.
+
+Where each answer landed [VERIFIED, read in the committed files]:
+
+1. ADR-0006 accepted; ADR-0001's note and CLAUDE.md's floor line 6 say so.
+2. ADR-0013. Its Confirmation checked on a built gallery: the Default
+   card reads "By Waqas01CP", and the demo's footer "The Default design,
+   by Waqas01CP, on sample content."
+3. CONTRIBUTING.md: "A first response within 7 days." No other time is
+   promised anywhere in the repository.
+4. README.md's credit links https://waqas01cp.github.io/ (ADR-0002,
+   Changes).
+5. CODE_OF_CONDUCT.md line 45 holds the address, and the placeholder is
+   gone. The setup steps' "before you start" now asks only that the
+   pre-publish search has passed on the commit to be pushed. ADR-0002 and
+   ADR-0005, Changes; CLAUDE.md. The address is in
+   .git/info/never-commit with `@allow CODE_OF_CONDUCT.md`. Gate A
+   refused it there for the surname it holds until 328cdad.
+6. commands.md's Gates section gives the two `git config` lines;
+   CLAUDE.md points to them.
+7. Records 0006 to 0011 accepted, each with a Changes row; 0012 held, with
+   a Changes row; the index's Pending list holds 0012 alone.
+8. ADR-0014, sourced from CSS Fonts Module Level 4, read 2026-10-15.
+
+His site's ADR-0012 Changes row allowing the address was read at his
+site's a8f1da0: dated 2026-10-16, his local date, committed 2026-10-15
+22:56Z.
+
+**ADR-0011 built.** The checks workflow fetches axe-core 4.14.0's tarball
+from the npm registry, checks it with `sha512sum --check --strict` against
+the registry's integrity value written in the workflow in hex, extracts
+`package/axe.min.js` alone, and runs `tools/ci.py checks --axe`. The
+registry was read again on 2026-10-15: MPL-2.0, no dependencies, the same
+integrity value as on 2026-10-12, served directly with no redirect. The
+fetch and check ran here in the workflow's form and in the PowerShell and
+Git Bash forms commands.md gives; each refused a copy with one byte added.
+The extracted file is byte-identical to the one run on 2026-10-13.
+
+**Proofs** [VERIFIED]:
+
+- Gates, in a scratch clone with the working gates committed first,
+  2026-10-15 23:05Z to 23:08Z: 22 of 22 as expected, 18 defeat cases
+  refused and 4 controls passed. New: the address in another file, the
+  surname beside the address in CODE_OF_CONDUCT.md, a commit under the
+  address; control, the address in its own file.
+- The Chrome launcher: both failures planted against 43edeb2's cdp.py
+  left 11 and 10 processes running, and the refused read raised. Against
+  322e0ea: none left, Chrome started after three refused reads, and 40
+  starts and closes left no process and no profile folder.
+- The defeat harness on a fresh clone of e794feb, with a new venv from the hash-pinned requirements, `prove_checks.py --browser --axe`, 2026-10-16 07:48:32Z to 08:04:06Z, 934 s: 47 defeat cases (38 file, 9 browser, the axe case among them) failed as built, naming what failed; 8 controls passed, axe's among them.
+- `tools/ci.py checks --axe` on the same clone, 08:04:06Z to 08:14:38Z, 632 s, exit 0: both designs pass their file checks; two builds each of the site (14 files) and the gallery (18 files) byte-identical; the built files 0 problems; the content trace 196 blocks traced, 0 not, every CV line on the page, 8 of 8 sources; the browser checks 623 s, 0 failures (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3, axe 36).
+- The pre-publish search at e794feb: PASS. 155 blobs across all 12
+  commits, every text blob judged at each path it has in any commit (152
+  pairs), 12 commit headers, and the site and gallery freshly built (32
+  files). The name on LICENSE line 3 and README.md line 69, the address
+  on CODE_OF_CONDUCT.md line 45, nothing else. Its defeat run, six cases
+  planted in a scratch clone, each on its own branch: a personal address
+  committed then deleted, the address in CONTRIBUTING.md, the surname
+  beside the address in CODE_OF_CONDUCT.md, the first name alone there,
+  an identical copy of CODE_OF_CONDUCT.md at another path, and the name in
+  a commit message. All six found.
+- The first defeat run on the working tree, 2026-10-15 23:11Z to
+  2026-10-16 07:41Z across the pause, is not used as evidence: 45 cases
+  failed as built and 7 of 8 controls passed, and the two unproven were
+  error 5's.
+
+## Rejected alternatives
+
+- One commit per answer, as this seat's handoff suggested: the answers
+  share files (CLAUDE.md, commands.md, the records' index). Four commits
+  by piece of work instead, with an intermediate version staged through
+  git's index where a file belonged to two.
+- A Python script to fetch axe-core: ADR-0011 records the hash in the
+  workflow, so the workflow checks it in shell, and commands.md gives the
+  same steps for PowerShell and Git Bash.
+- Allowing the surname in CODE_OF_CONDUCT.md: it would let the name stand
+  alone there; the owner allowed the address only.
+- Records for the response time and the commit identity: neither weighed
+  options, and each lives where it binds.
+
+## Checked and found already correct
+
+- Step 9's ruleset: bypass list empty, required approvals 0, as the chat
+  settled.
+- SECURITY.md promises no time, so the 7 days stay the one promise.
+
+## Not done
+
+- Nothing published.
+- The master CV search on the commits after 43edeb2.
+- Lighthouse in CI (ADR-0012, held).
+- The workflows, axe's step among them, have never run.
+- The architecture chat's lane of CAPABILITIES.md.
+
+## Findings and recommendations
+
+1. The master CV search ran at 43edeb2; the setup steps now ask that it
+   pass on the commit to be pushed, so it needs one more run.
+2. The setup steps still open with "Do not start until the portfolio
+   architecture chat has checked these steps." The seat left it for the
+   chat to clear.
+3. The Windows sharing violation on DevToolsActivePort is Windows'
+   mandatory locking; the runner's Linux has none, so CI was not exposed.
+   Inferred, not tested on the runner.
