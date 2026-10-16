@@ -30,6 +30,7 @@ import shutil
 import socket
 import struct
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -184,20 +185,34 @@ class Chrome:
             args.append("--no-sandbox")
         args.append("about:blank")
         self.process = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        port_file = Path(self.profile) / "DevToolsActivePort"
-        deadline = time.monotonic() + 30
-        while not (port_file.is_file() and len(port_file.read_text().split()) >= 2):
-            if self.process.poll() is not None:
-                self._cleanup()
-                raise CDPError(f"Chrome exited at start with code {self.process.returncode}")
-            if time.monotonic() > deadline:
-                self.close()
-                raise CDPError("Chrome did not open its debugging port within 30 s")
-            time.sleep(0.05)
-        port, path = port_file.read_text().split()[:2]
-        self.ws = WebSocket(f"ws://127.0.0.1:{port}{path}")
         self.next_id = 0
         self.events: collections.deque = collections.deque()
+        try:
+            port, path = self._debugging_port(Path(self.profile) / "DevToolsActivePort")
+            self.ws = WebSocket(f"ws://127.0.0.1:{port}{path}")
+        except BaseException:
+            # A Chrome that started must not outlive a failed start.
+            if self.process.poll() is None:
+                self._kill_tree()
+            self._cleanup()
+            raise
+
+    def _debugging_port(self, port_file: Path) -> list[str]:
+        deadline = time.monotonic() + 30
+        while True:
+            try:
+                fields = port_file.read_text().split() if port_file.is_file() else []
+            except OSError:
+                # Windows refuses the read while Chrome still holds the file
+                # open (seen 2026-10-16); a later pass reads it whole.
+                fields = []
+            if len(fields) >= 2:
+                return fields[:2]
+            if self.process.poll() is not None:
+                raise CDPError(f"Chrome exited at start with code {self.process.returncode}")
+            if time.monotonic() > deadline:
+                raise CDPError("Chrome did not open its debugging port within 30 s")
+            time.sleep(0.05)
 
     def version(self) -> str:
         return self.send("Browser.getVersion")["product"]
@@ -298,9 +313,24 @@ class Chrome:
         try:
             self.process.wait(timeout=10)
         except subprocess.TimeoutExpired:
-            self.process.kill()
-            self.process.wait(timeout=10)
+            self._kill_tree()
         self._cleanup()
+
+    def _kill_tree(self) -> None:
+        """Stop Chrome and every process it started. Never raises: by now the
+        check's result is in, and a stuck exit must not turn it into a fail."""
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(self.process.pid)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            self.process.kill()
+        try:
+            self.process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            # Seen once, with a Chrome that ran across the machine sleeping
+            # (2026-10-16): say so, so it can be stopped by hand.
+            print(f"cdp: Chrome, process {self.process.pid}, did not exit; stop it by hand",
+                  file=sys.stderr)
 
     def __enter__(self) -> "Chrome":
         return self
