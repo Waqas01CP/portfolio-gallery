@@ -29,9 +29,9 @@
    When they arrive late, swap changed them in after the browser had
    jumped to a linked section, moving the text above it: anchors landed 16
    to 40 px off on about 1 load in 100 (2026-10-12 and 13, Chrome 154;
-   none in 136 loads with optional, none with no web fonts). With optional,
-   a late font is used from the next page view instead, so nothing shifts.
-   The owner may prefer swap: logs/2026-10-12-brief-1-build.md. */
+   none in 272 loads with optional, none in 136 with no web fonts). With
+   optional, a late font is not used for that page view, so nothing
+   shifts. The owner's decision of 2026-10-15: ADR-0014. */
 @font-face {
   font-family: "Manrope";
   font-style: normal;

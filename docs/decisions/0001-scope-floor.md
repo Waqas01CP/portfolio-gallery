@@ -63,8 +63,7 @@ enhance.
 We will use no paid service.
 We will add no dependency without a record.
 We will accept a contributed design as templates and CSS only, with no
-JavaScript (ADR-0006 narrows this to CSS only, pending the operator's
-answer).
+JavaScript (ADR-0006, accepted 2026-10-15, narrows this to CSS only).
 
 ### Consequences
 
@@ -122,3 +121,7 @@ before publication (ADR-0005), passes only for LICENSE and README.md.
 - Revisit only with a record that names the line it removes.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | Line 6's note updated: ADR-0006, accepted by the owner on 2026-10-15, narrows "templates and CSS only" to CSS only. The note read "pending the operator's answer". The floor line itself is unchanged. | The owner's answer 1 to the seat's report of 2026-10-13, checked with the portfolio architecture chat: "Designs are CSS only. Keep it as built." |

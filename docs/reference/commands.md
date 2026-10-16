@@ -134,6 +134,18 @@ git config core.hooksPath .githooks
 A fresh clone has no gates until this is run, and nothing catches the
 omission (ADR-0008). `--no-verify` bypasses every gate and is never used.
 
+Commits to this repository are made as Waqas01CP with GitHub's no-reply
+address (the owner's decision of 2026-10-15), set once per clone so a
+global identity never reaches the history:
+
+```
+git config user.name Waqas01CP
+git config user.email 135085564+Waqas01CP@users.noreply.github.com
+```
+
+Gate A refuses a commit whose author or committer holds a private
+pattern, so a forgotten setting is caught on the maintainer's machine.
+
 Private patterns for gate A, such as a name or an email that must never
 be committed, go in `.git/info/never-commit`, one per line; the format is
 in tools/gates.py. That file lives inside git's own folder and is never

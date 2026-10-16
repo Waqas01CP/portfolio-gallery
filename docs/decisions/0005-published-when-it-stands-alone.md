@@ -94,3 +94,7 @@ workflow running on GitHub.
 - Revisit never: once published, this record is history.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | The pre-publish search allows the Code of Conduct's contact address, a dedicated address of the owner's, in CODE_OF_CONDUCT.md alone, and fails on it anywhere else. "His email" in this record means his two personal addresses, which stay barred everywhere. | The owner's answer 5 to the seat's report of 2026-10-13; his site's ADR-0012, Changes row of 2026-10-16. ADR-0002, Changes. |

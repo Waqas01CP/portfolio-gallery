@@ -156,7 +156,8 @@ transitions.
   `swap`, a font that arrives after the browser has jumped to a linked
   section moves the text above it, and the anchors check fails now and
   then: the default design missed by 16 to 40 px on about 1 load in 100
-  with swap, and none in 272 loads with optional (2026-10-12 and 13).
+  with swap, and none in 272 loads with optional (2026-10-12 and 13;
+  ADR-0014).
 - **Nothing moves under reduced motion**, whatever `!important` says.
 - One "Sections" menu at each width; anchors land at their target; no
   request leaves the site.

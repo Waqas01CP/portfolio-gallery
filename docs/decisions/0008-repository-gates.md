@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 topic: process
 description: "The repository gates: what each blocks, where it fires and the case built to defeat it. Generic forms of the operator's site's gates, with private patterns kept out of the repository. Read before building or changing a gate."
 date: 2026-10-12
@@ -120,3 +120,8 @@ STATE.md.
 - Revisit when a second maintainer joins.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |
+| 2026-10-15 | **Gate A takes text allowed in a file out of each line before matching the other private patterns there.** So the Code of Conduct's address, allowed in CODE_OF_CONDUCT.md alone, does not count as the surname it holds, and the surname on its own is still refused in that file. Decision Driver "his email nowhere" now reads with the exception in ADR-0002's Changes row of this date. Defeat cases added: the address in another file, the surname beside the address in CODE_OF_CONDUCT.md, a commit under the address; control: the address in its own file passes. | The owner's answer 5 to the seat's report of 2026-10-13: the address in CODE_OF_CONDUCT.md only. Without this, gate A refused the address for the surname it holds. |

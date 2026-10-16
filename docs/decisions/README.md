@@ -47,13 +47,15 @@ itself a decision.
 | [0003](0003-designs-by-fork-and-pull-request.md) | Designs arrive as folders, by fork and pull request | Accepted |
 | [0004](0004-build-on-github-actions.md) | Build with a Python generator, on GitHub Actions | Accepted |
 | [0005](0005-published-when-it-stands-alone.md) | Published only once it stands on its own | Accepted |
-| [0006](0006-design-format-and-security-model.md) | The design format and the security model | Proposed |
-| [0007](0007-page-relative-addresses.md) | Every URL relative to the page | Proposed |
-| [0008](0008-repository-gates.md) | The repository gates | Proposed |
-| [0009](0009-quality-goals.md) | Quality goals, for every site and every design | Proposed |
-| [0010](0010-headless-chrome-from-the-standard-library.md) | Headless Chrome, driven from Python's standard library | Proposed |
+| [0006](0006-design-format-and-security-model.md) | The design format and the security model | Accepted |
+| [0007](0007-page-relative-addresses.md) | Every URL relative to the page | Accepted |
+| [0008](0008-repository-gates.md) | The repository gates | Accepted |
+| [0009](0009-quality-goals.md) | Quality goals, for every site and every design | Accepted |
+| [0010](0010-headless-chrome-from-the-standard-library.md) | Headless Chrome, driven from Python's standard library | Accepted |
 | [0011](0011-axe-core-in-ci.md) | axe-core in CI | Accepted |
 | [0012](0012-lighthouse-in-ci.md) | Lighthouse in CI | Proposed |
+| [0013](0013-default-design-keeps-the-owners-look.md) | The default design keeps the owner's site's look | Accepted |
+| [0014](0014-web-fonts-with-font-display-optional.md) | Web fonts with font-display: optional | Accepted |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
 on 2026-10-12 by the implementing seat from the brief that recorded them;
@@ -64,26 +66,15 @@ the brief is never committed, so these records and the session log of
 
 Decisions identified but not yet concluded. Each waits on the owner.
 
-- **CSS only, or templates too, for a design.** ADR-0006 recommends CSS
-  only and is proposed until he answers. What is built is CSS only.
-- **The `default` design's look.** It is the look of the owner's own site;
-  anyone using the template could publish a site that looks like his.
-  Keep it as `default`, give `default` a look of its own and keep his
-  under another name, or leave his out. Asked 2026-10-12.
-- **The default design's fonts.** `font-display: optional` is committed,
-  because with `swap`, as on his site, anchors landed a line off on about
-  1 load in 100 (logs/2026-10-12-brief-1-build.md). The look is the same
-  whenever the fonts arrive in time. His to keep or reverse.
-- **The response time promised to contributors.** CONTRIBUTING.md says
-  none until he sets one.
-- **Whether the README links his portfolio site.** It credits his GitHub
-  profile only until he answers.
-- **The contact for Code of Conduct reports.** GitHub's private content
-  reports go to maintainers only in organisation-owned repositories, and
-  his email may appear nowhere here; CODE_OF_CONDUCT.md marks it pending.
-- **The commit identity for this repository.** The seat committed as
-  Waqas01CP with GitHub's no-reply address; his global git identity
-  carries his name and email.
-- **Records 0006 to 0010 and 0012**, proposed, each awaiting acceptance;
-  0012 adds a dependency and is not built into CI until accepted. ADR-0011
-  was accepted on 2026-10-15 and is built.
+- **ADR-0012, Lighthouse in CI.** Held as proposed by the owner on
+  2026-10-15. Until he accepts it, the speed goals of ADR-0009 are
+  measured locally by the maintainer, not by CI.
+
+The owner's answers, dated 2026-10-16 in his local time (UTC+5) and
+given on 2026-10-15 UTC, concluded the rest: CSS only (ADR-0006); the
+default design keeps his site's look, credited to Waqas01CP (ADR-0013);
+a first response to contributors within 7 days (CONTRIBUTING.md); the
+README links his portfolio site, and the Code of Conduct's contact (both
+ADR-0002, Changes); the commit identity, Waqas01CP with GitHub's
+no-reply address (docs/reference/commands.md); records 0006 to 0011
+accepted; and `font-display: optional` in the default design (ADR-0014).

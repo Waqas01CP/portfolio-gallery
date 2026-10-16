@@ -84,3 +84,7 @@ defeat case; here, a scratch copy of site.js with a busy loop.
   numbers with their date and machine in CAPABILITIES.md.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Held as proposed** by the owner. Lighthouse runs only locally. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |

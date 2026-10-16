@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 topic: hosting
 description: "Every URL a page uses is relative to the page, so one build works at a user site's root, under /<repository>/ and under a custom domain, with nothing to configure. Read before writing any link, path or asset reference."
 date: 2026-10-12
@@ -105,3 +105,7 @@ https://<user>.github.io/ (docs/setup-on-github.md, the last steps).
   for the reason above; that rule binds his site, not this repository.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner, unchanged. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |

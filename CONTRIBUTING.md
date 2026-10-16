@@ -98,8 +98,7 @@ footer of its live demo.
 
 - Every pull request gets a review, with reasons for any change asked for
   or any decline.
-- A first response within a time the maintainer has not yet set. This line
-  will say it once he has.
+- A first response within 7 days.
 - Engine changes that would break a merged design are made with the
   design updated in the same change, or with its author told first.
 

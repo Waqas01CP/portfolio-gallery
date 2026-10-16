@@ -66,10 +66,11 @@ What the project is and does, in one file:
 
 ## Credit
 
-Made by Waqas Sharif ([@Waqas01CP](https://github.com/Waqas01CP)). If you
-use it, a link back is appreciated: every site carries a small "Built with
-portfolio-gallery" line in its footer, which you may turn off with
-`"credit": false` in `content/config.json`.
+Made by Waqas Sharif ([@Waqas01CP](https://github.com/Waqas01CP);
+portfolio: https://waqas01cp.github.io/). If you use it, a link back is
+appreciated: every site carries a small "Built with portfolio-gallery"
+line in its footer, which you may turn off with `"credit": false` in
+`content/config.json`.
 
 ## Licence
 

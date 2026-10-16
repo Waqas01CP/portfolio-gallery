@@ -121,3 +121,8 @@ pre-publish search confirms it before publication.
   different licence and a new record.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **The README's credit links his portfolio site**, https://waqas01cp.github.io/, beside the link to his GitHub profile. His name stays in LICENSE and README.md alone. | The owner's answer 4 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |
+| 2026-10-15 | **The Code of Conduct's contact for reports is a dedicated address of his**, in CODE_OF_CONDUCT.md and nowhere else, replaceable later by an ordinary commit. His two personal addresses stay barred everywhere. Gate A and the pre-publish search allow the address in that file alone and refuse it, and the surname it holds, anywhere else (ADR-0008, Changes). The repository stays on his personal account. | The owner's answer 5 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. GitHub's private content reports reach maintainers only in organisation-owned repositories (the seat's report, from GitHub's documentation, 2026-10-12), so a personal repository needs a written contact. His site's ADR-0012 allows the address in CODE_OF_CONDUCT.md alone, in its Changes row dated 2026-10-16, his local date (committed 2026-10-15 22:56 UTC), read by this seat at his site's a8f1da0. |

@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 topic: build
 description: "The gallery's previews and the browser checks use the Google Chrome already on the runner, driven over its DevTools protocol by Python's standard library: no package added. Screenshots are taken in a job that holds no write token. Read before changing the screenshots, the browser checks or the deploy workflow."
 date: 2026-10-12
@@ -107,3 +107,7 @@ design and the published gallery shows them.
   maintained package offers the same with fewer risks.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner, unchanged. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |

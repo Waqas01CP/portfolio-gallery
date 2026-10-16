@@ -62,15 +62,18 @@ this floor, name the line.
 3. Every word a reader needs is in the initial HTML; scripts only enhance.
 4. No paid service.
 5. No dependency added without a record.
-6. A contributed design is templates and CSS only, no JavaScript. ADR-0006
-   proposes CSS only, pending the owner's answer; what is built is CSS only.
+6. A contributed design is templates and CSS only, no JavaScript. ADR-0006,
+   accepted by the owner on 2026-10-15, narrows this to CSS only.
 
 ## The owner's name and private material
 
 This repository is public; its history cannot be deleted. The owner's name
 appears in exactly two places, LICENSE's copyright line and the README's
-credit (ADR-0002, and his site's ADR-0012). His email appears nowhere, nor
-does any path into his folders or anything from his site but the engine.
+credit (ADR-0002, and his site's ADR-0012). His personal email addresses
+appear nowhere. The Code of Conduct's contact, a dedicated address, appears
+in CODE_OF_CONDUCT.md and nowhere else (his decision of 2026-10-15,
+ADR-0002). No path into his folders appears, nor anything from his site
+but the engine.
 Refer to his Working Method by name only. Gate A enforces this on his
 machine from .git/info/never-commit, which is never committed.
 
@@ -134,8 +137,10 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 
 ## Committing and pushing
 
-One commit per piece of work, each passing the gates. Before committing,
-look for commits you did not make and say so. Nothing is pushed and no
+One commit per piece of work, each passing the gates. Commit as Waqas01CP
+with GitHub's no-reply address, set in the clone
+(docs/reference/commands.md). Before committing, look for commits you did
+not make and say so. Nothing is pushed and no
 remote exists until the owner publishes it himself (ADR-0005). End commit
 messages with the attribution line the session gives.
 

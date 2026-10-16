@@ -15,25 +15,14 @@ stop and send what you see instead; GitHub changes its settings pages.
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
-## Before you start: answers that must exist first
+## Before you start: the pre-publish search
 
-These are yours to decide and are asked in the seat's report. Steps 1 to 3
-must not happen until the first two are settled, because a public commit
-cannot be deleted (ADR-0005).
-
-1. **The Code of Conduct's contact.** CODE_OF_CONDUCT.md says the contact
-   is not yet chosen. GitHub's private content reports reach maintainers
-   only in organisation-owned repositories (GitHub Docs, "Managing how
-   contributors report abuse in your organization's repository", read
-   2026-10-12), and your email may appear nowhere in this repository. The
-   choice and the edit come before publishing.
-2. **The pre-publish search has passed.** The seat ran its part (the
-   report); the search for your master CV's text is your site's
-   implementing seat's, through the chat.
-3. The other open questions (CSS only or templates too; the default
-   design's look; the response time; a link to your site; the commit
-   identity) may be answered later; each is a change committed and pushed
-   like any other.
+Step 3 publishes every commit, and a public commit cannot be deleted
+(ADR-0005). Push only once the pre-publish search has passed on the
+commit you are about to push: the seat's part, and the search for your
+master CV's text, which runs through the chat. The seat's latest report
+names the commit each part last ran on; the top line of `git log` in
+step 1 must show that commit.
 
 ## Part A: on your computer
 

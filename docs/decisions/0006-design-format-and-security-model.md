@@ -1,7 +1,7 @@
 ---
-status: proposed
+status: accepted
 topic: security
-description: "What a design may contain (CSS only, on the engine's fixed HTML, with fonts and images), and the six layers that keep a contribution from running anything or reaching visitors, with what they cannot promise. Proposed: the operator chooses CSS only or templates too. Read before changing the design format, a check, a workflow or a repository setting."
+description: "What a design may contain (CSS only, on the engine's fixed HTML, with fonts and images), and the six layers that keep a contribution from running anything or reaching visitors, with what they cannot promise. Read before changing the design format, a check, a workflow or a repository setting."
 date: 2026-10-12
 decision-makers: Waqas01CP, the repository's owner
 # consulted:
@@ -73,8 +73,8 @@ cannot run code at build time either.
 
 ## Decision Outcome
 
-Chosen option: "CSS only, on the engine's fixed HTML", **proposed**: the
-operator was asked on 2026-10-12 to choose between it and templates too.
+Chosen option: "CSS only, on the engine's fixed HTML", decided by the
+owner on 2026-10-15 UTC: "Designs are CSS only. Keep it as built."
 
 We will accept a design as one folder holding exactly design.css,
 design.json, fonts/*.woff2 with each font's licence text in fonts/*.txt,
@@ -215,3 +215,7 @@ scope check on GitHub, and one adding a design passes both checks
   outright, or if a design needs markup the engine lacks.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner. Decision Outcome read "proposed: the operator was asked on 2026-10-12 to choose between it and templates too" and now records his decision; the description loses its "Proposed" sentence. Nothing else changed. | His answer 1 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |

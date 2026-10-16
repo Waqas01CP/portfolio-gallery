@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 topic: build
 description: "The quality bar every site and every design meets: the accessibility checks of the standing list, and Core Web Vitals goals under Lighthouse's default mobile run. Read before adding a check, a heavy element or a design rule."
 date: 2026-10-12
@@ -101,3 +101,7 @@ machine in CAPABILITIES.md.
   is a fail.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-15 | **Accepted** by the owner, unchanged. With ADR-0011 accepted the same day, contrast is checked in CI by axe-core; Consequences' "until ADR-0011 and ADR-0012 are accepted, contrast and speed are checked locally" now holds for speed only, while ADR-0012 is proposed. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |
