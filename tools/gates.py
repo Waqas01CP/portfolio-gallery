@@ -17,8 +17,10 @@ in the session log that built them; docs/reference/standing-checks.md):
      writing them into this public repository (format below). Prints the
      file, line and matched text, so a false positive can be seen for what
      it is. Defeated by staging CHAT_STATE.md with -f, a planted absolute
-     path, a planted private pattern, and a commit under a refused
-     identity. Control: prose naming a folder passes.
+     path, a planted private pattern, a commit under a refused identity,
+     an allowed text in a file it is not allowed in, and a refused name
+     beside an allowed text that holds it. Controls: prose naming a folder
+     passes; an allowed text in its own file passes.
   B  The staged tree builds, pre-commit. Copies the staged tree to a
      temporary folder and runs, there: every design checked; the site
      built, its files checked and its content traced; the gallery built
@@ -44,7 +46,11 @@ in the session log that built them; docs/reference/standing-checks.md):
 
   some text             refused anywhere, matched ignoring case
   some text<TAB>@allow LICENSE README.md
-                        refused except in the files named
+                        refused except in the files named; in those
+                        files it is taken out of each line before the
+                        other patterns are matched, so an allowed address
+                        does not count as the name it holds, and the name
+                        on its own is still refused there
   sha256:<hex>:<n>      refused wherever the SHA-256 of a lower-cased
                         window of n characters equals <hex>, so the text
                         itself need not be written down even there
@@ -132,6 +138,11 @@ def private_patterns() -> list[tuple[str, set[str]]]:
 
 def private_hits(line: str, patterns: list[tuple[str, set[str]]], path: str | None) -> list[str]:
     hits, lowered = [], line.lower()
+    # Text allowed in this file is taken out first, so it cannot count as
+    # another pattern it holds; the same length keeps every other match.
+    for pattern, allowed in patterns:
+        if path is not None and path in allowed and not pattern.startswith("sha256:"):
+            lowered = lowered.replace(pattern.lower(), "\0" * len(pattern))
     for pattern, allowed in patterns:
         if path is not None and path in allowed:
             continue
