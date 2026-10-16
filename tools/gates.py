@@ -22,12 +22,13 @@ in the session log that built them; docs/reference/standing-checks.md):
      beside an allowed text that holds it. Controls: prose naming a folder
      passes; an allowed text in its own file passes.
   B  The staged tree builds, pre-commit. Copies the staged tree to a
-     temporary folder and runs, there: every design checked; the site
-     built, its files checked and its content traced; the gallery built
-     and its files checked (tools/ci.py build). Building the staged tree,
-     not the working tree, judges what is about to be committed; untracked
-     files on disk play no part. Defeated by a staged design with
-     an @import, and by content whose cut is not a cut.
+     temporary folder and runs, there: the workflows' job conditions
+     (tools/check_workflows.py); every design checked; the site built,
+     its files checked and its content traced; the gallery built and its
+     files checked (tools/ci.py build). Building the staged tree, not the
+     working tree, judges what is about to be committed; untracked files
+     on disk play no part. Defeated by a staged design with an @import,
+     by content whose cut is not a cut, and by a deploy job with no if:.
   C  Map, pre-commit. Runs tools/generate_map.py --check against the
      staged files: refuses a stale map, and a staged Markdown header GitHub
      would refuse to read. Defeated by a new Markdown file committed without
@@ -213,10 +214,11 @@ def gate_b() -> list[str]:
     with tempfile.TemporaryDirectory(prefix="gate-b-") as tmp:
         tree = Path(tmp) / "tree"
         git("checkout-index", "--all", "--force", f"--prefix={tree.as_posix()}/")
-        for required in ("build.py", "tools/ci.py", "tools/check_design.py"):
+        for required in ("build.py", "tools/ci.py", "tools/check_design.py", "tools/check_workflows.py"):
             if not (tree / required).is_file():
                 raise MissingTool(f"{required} is not in the staged tree")
-        steps = [["tools/check_design.py"],
+        steps = [["tools/check_workflows.py"],
+                 ["tools/check_design.py"],
                  ["tools/ci.py", "build", "--mode", "site", "--out", str(Path(tmp) / "site")],
                  ["tools/ci.py", "build", "--mode", "gallery", "--out", str(Path(tmp) / "gallery")]]
         for step in steps:

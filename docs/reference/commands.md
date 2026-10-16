@@ -49,6 +49,7 @@ http://127.0.0.1:8000/ in your own browser.
 ## Checks
 
 ```
+python tools/check_workflows.py [FILE ...]      when each workflow job runs
 python tools/check_design.py [NAME ...]          designs: files, sizes, design.json, CSS
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
@@ -117,11 +118,11 @@ python tools/ci.py build --mode site|gallery [--out DIR]
 python tools/ci.py assemble --site DIR --shots DIR
 ```
 
-`checks` is everything a pull request must pass: designs, two builds each
-of the site and the gallery compared byte for byte, the built files, the
-content trace and the browser checks, axe among them when given
-`--axe`, as the checks workflow always gives it. It stops at the first
-failure with that tool's exit code.
+`checks` is everything a pull request must pass: the workflows' job
+conditions, designs, two builds each of the site and the gallery compared
+byte for byte, the built files, the content trace and the browser checks,
+axe among them when given `--axe`, as the checks workflow always gives
+it. It stops at the first failure with that tool's exit code.
 
 ## Gates
 

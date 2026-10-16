@@ -212,6 +212,28 @@ def file_cases():
     yield ("build: no proof route", build_case('"no_proof": "Checked with the university on request."', '"grade2": "x"'),
            "no proof link")
 
+    def workflow(old, new):
+        def plant(copy):
+            edit(copy / ".github/workflows/deploy.yml", old, new)
+            return ["tools/check_workflows.py"]
+        return plant
+
+    deploy_if = "    if: ${{ !cancelled() && needs.assemble.result == 'success' }}\n"
+    # The deploy job as published at 6a4de5e: skipped in every site-mode run.
+    yield "workflows: a job needing a skippable job, with no if:", workflow(deploy_if, ""), "has no if: of its own"
+    yield ("workflows: an if: with no status function", workflow(
+        deploy_if, "    if: needs.assemble.result == 'success'\n"), "success() is still applied")
+    yield ("workflows: !cancelled() without naming the result", workflow(
+        deploy_if, "    if: ${{ !cancelled() }}\n"), "does not name needs.assemble.result")
+    # deploy needs mid, which has no if: but needs shots, which has one:
+    # deploy is caught only if the check follows the chain.
+    yield ("workflows: a skip two jobs back", workflow(
+        "  deploy:\n    needs: assemble\n" + deploy_if,
+        "  mid:\n    needs: shots\n    runs-on: ubuntu-24.04\n    steps:\n      - run: echo\n\n"
+        "  deploy:\n    needs: mid\n"), "job 'deploy'")
+    yield ("workflows: an alias for needs", workflow("    needs: assemble\n", "    needs: *assemble\n"),
+           "unreadable under jobs:")
+
     def twice(copy):
         edit(copy / "build.py", '        (staging / ".nojekyll").write_text("", encoding="utf-8")',
              '        (staging / ".nojekyll").write_text(str(__import__("time").time_ns()), encoding="utf-8")')
@@ -301,7 +323,8 @@ def main(argv: list[str]) -> int:
         for name in ("default", "plain"):
             (shots / name).mkdir(parents=True)
             (shots / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
-        controls = [("design", ["tools/check_design.py"]),
+        controls = [("workflows", ["tools/check_workflows.py"]),
+                    ("design", ["tools/check_design.py"]),
                     ("assemble", ["tools/ci.py", "assemble", "--site", gallery_out, "--shots", shots]),
                     ("scope", ["tools/scope_check.py", "--files", "_scope.tsv"]),
                     ("built", ["tools/check_built.py", out]),

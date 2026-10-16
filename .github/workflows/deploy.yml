@@ -87,9 +87,14 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  # A job that needs a skipped job is skipped too, through the whole chain,
+  # unless its own if: holds a status function; one without gets success()
+  # added (GitHub Docs, "Using jobs" and "Expressions"). shots is skipped
+  # in site mode, so assemble and deploy each say when they run, and name
+  # the result of every job they need. tools/check_workflows.py checks it.
   assemble:
     needs: [build, shots]
-    if: always() && needs.build.result == 'success' && (needs.shots.result == 'success' || needs.shots.result == 'skipped')
+    if: ${{ !cancelled() && needs.build.result == 'success' && (needs.shots.result == 'success' || needs.shots.result == 'skipped') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -122,6 +127,7 @@ jobs:
 
   deploy:
     needs: assemble
+    if: ${{ !cancelled() && needs.assemble.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

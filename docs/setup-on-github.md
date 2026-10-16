@@ -74,9 +74,9 @@ Waqas01CP.
 
 Then open https://github.com/Waqas01CP/portfolio-gallery and click the
 **Actions** tab. You should see two runs for the push: **Checks**, which
-should go green in about 15 to 20 minutes, and **Deploy**, which will fail
-at its last job, "deploy", because Pages is not set up yet. That failure is
-expected; step 8 runs it again.
+should go green in about 10 minutes (9 on 2026-10-16), and **Deploy**,
+which will fail at its last job, "deploy", because Pages is not set up
+yet. That failure is expected; step 8 runs it again.
 
 **Send back:** the result of each run (green or the failed step's name).
 
@@ -170,7 +170,14 @@ have it, builds its owner's site instead.
 2. **Run workflow**, branch `main`, **Run workflow**.
 
 You should see four jobs: build, shots, assemble, deploy, all green within
-about 5 minutes. Then open https://waqas01cp.github.io/portfolio-gallery/:
+about 5 minutes. Open the run and look at each job's icon, not the run's:
+GitHub counts a skipped job as passed, so a run can be green while a job
+was skipped (a grey circle with a line through it). If **shots** was
+skipped, the build did not read the variable of step 7: check that it is
+on the **Variables** tab of **Settings**, **Secrets and variables**,
+**Actions** (not a secret, and not in an environment), named exactly
+`PORTFOLIO_GALLERY`, with the value `true`, then run this step again. Then
+open https://waqas01cp.github.io/portfolio-gallery/:
 the gallery, with two cards, Default and Plain, each with its screenshot,
 and a "Live demo" link that opens the design. Also open
 https://waqas01cp.github.io/portfolio-gallery (no slash at the end): it
@@ -238,6 +245,27 @@ GitHub Docs, "Creating a template repository".
 3. **Issues** tab, **Labels**, **New label**: `design`. The design proposal
    form applies it.
 
+### Step 12. Keep your email address out of commits made on GitHub
+
+GitHub Docs, "Setting your commit email address", read 2026-10-16. A file
+you edit, or a pull request you merge, on GitHub's website is a commit,
+authored with an email address of your account. Unless your addresses are
+kept private, it can be a personal one, and a public commit cannot be
+deleted. Part D's tests, and every merge of a contributor's design, are
+such commits; gate A guards only commits made on your computer.
+
+1. Your picture at the top right, **Settings**, then **Emails** in the
+   sidebar.
+2. Tick **Keep my email addresses private**. GitHub then authors your
+   website commits with your no-reply address, the one this repository's
+   commits use.
+3. Tick **Block command line pushes that expose my email**.
+
+You should see an address ending in `@users.noreply.github.com` named
+under the first box.
+
+**Send back:** that both boxes are ticked. Not the address.
+
 ## Part D: prove each workflow
 
 Each test is a pull request you open and then close without merging. The
@@ -287,7 +315,7 @@ summary::-webkit-details-marker { display: none; }
    description.
 
 You should see **scope** pass ("In scope: 2 file(s), all in
-designs/test-design/") and **checks** pass after about 15 to 20 minutes.
+designs/test-design/") and **checks** pass after about 10 minutes.
 
 4. **Close pull request**, then **Delete branch**.
 
@@ -302,6 +330,41 @@ ruleset. Cancel.
 **Send back:** for each test, what each check showed and whether merging
 was possible.
 
+### Test 4. A copy of the template publishes its owner's site
+
+This repository builds in gallery mode, so its own runs never take the
+path every copy takes: site mode, with shots skipped, the path the deploy
+job was skipped on until 2026-10-16. This test makes a copy as a user
+would and watches it publish. It needs steps 11 and 12 first. The copy
+is public while it exists and carries the same LICENSE, README credit and
+Code of Conduct as this repository, as every user's copy will; it is
+deleted at the end.
+
+1. On https://github.com/Waqas01CP/portfolio-gallery, click **Use this
+   template**, then **Create a new repository**.
+2. **Owner**: Waqas01CP. **Repository name**: `pg-copy-test`. **Public**.
+   Leave **Include all branches** unticked. **Create repository**.
+
+   You should see the new repository's page say it was generated from
+   Waqas01CP/portfolio-gallery.
+3. Its **Actions** tab. You should see **Checks** and **Deploy** for its
+   first commit; if none appear, note it and go on to 4. In Deploy: build
+   and assemble green, shots skipped (grey), and deploy started and failed
+   at "Check that Pages is set to publish from GitHub Actions", because
+   the copy has no Pages yet. Deploy starting at all is the fix at work.
+4. In the copy: **Settings**, **Pages**, **Source**: **GitHub Actions**.
+5. **Actions**, **Deploy**, **Run workflow**, branch `main`, **Run
+   workflow**. You should see build, assemble and deploy green and shots
+   skipped, within about 3 minutes. Then open
+   https://waqas01cp.github.io/pg-copy-test/: the sample site, Alex
+   Example.
+6. Delete the copy: its **Settings**, **General**, at the bottom **Delete
+   this repository**, and confirm with its name. Its site goes with it.
+
+**Send back:** whether the first runs appeared on their own; each Deploy
+job's icon in both runs; whether the address showed Alex Example; and
+that the copy is deleted.
+
 ## What the tests prove, and what they do not
 
 - Test 1 proves the scope check runs from the default branch and refuses a
@@ -309,7 +372,10 @@ was possible.
 - Test 2 proves a design passes the scope check and the full checks on
   GitHub's runner, browser checks included.
 - Test 3 proves the ruleset binds main.
-- Step 8 proved the deploy, the screenshots and the addressing.
+- Test 4 proves a copy of the template publishes its owner's site in site
+  mode, and shows whether a copy's first commit runs its workflows.
+- Step 8 proved the deploy, the screenshots and the addressing, in gallery
+  mode.
 - None of them is a fork from another account. The approval setting of
   step 4 shows itself on the first real contributor's pull request, as
   "Awaiting approval" on the checks; the scope check runs without waiting.

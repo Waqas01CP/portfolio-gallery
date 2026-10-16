@@ -8,10 +8,11 @@ status: current
 
 Every check here ran first on its defeat case, and counts as a pass only
 once that case has failed. A check whose defeat case passes is unproven.
-The proofs of 2026-10-12, 13 and 15 are in `logs/2026-10-12-brief-1-build.md`.
+The proofs of 2026-10-12, 13, 15 and 16 are in `logs/2026-10-12-brief-1-build.md`.
 
 | Check | Tool | Runs | Pass | Defeat case |
 |---|---|---|---|---|
+| Workflows | check_workflows.py | gate B, CI | Every job that needs a job that can be skipped has an `if:` holding `always()`, `cancelled()` or `failure()`, and with the first two names the result of each job it needs; every `needs` names a job; anything it cannot read at the job level is a failure | The deploy job as published at 6a4de5e, with no `if:`; an `if:` with no status function; `!cancelled()` alone; a skip two jobs back; an alias for `needs` |
 | Designs | check_design.py | gate B, CI | Only allowed files, within size, design.json complete, CSS with no @import, no url() outside the design, nothing that loads or runs | A .js file; an .svg; `@import`; `@\69mport`; `url(https://...)`; `url(../..)`; a 101 KB stylesheet; no author_url |
 | Scope | scope_check.py | CI, `pull_request_target` | Every changed path in one designs/<name>/ folder, of an allowed type, not a maintained design | A path in tools/; two designs; a .js file in a design |
 | Build twice | ci.py checks | CI | Two builds of the site and of the gallery byte-identical | Output that depends on the clock or file order |

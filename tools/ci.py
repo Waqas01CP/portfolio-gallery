@@ -1,7 +1,8 @@
 """The one entry point the workflows call, and the same commands locally.
 
   python tools/ci.py checks [--quick] [--axe FILE]
-      Everything a pull request must pass: every design checked; the site
+      Everything a pull request must pass: the workflows' job conditions
+      (tools/check_workflows.py); every design checked; the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; and the browser checks on
@@ -87,6 +88,7 @@ def twice(as_of: str, *mode: str) -> None:
 
 def checks(quick: bool, axe: Path | None) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
+    run("tools/check_workflows.py")
     run("tools/check_design.py")
     twice(as_of)
     twice(as_of, "--gallery")

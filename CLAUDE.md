@@ -130,7 +130,7 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 | Gate | When | Blocks |
 |---|---|---|
 | A | pre-commit | CHAT_STATE.md; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
-| B | pre-commit | A staged tree whose designs, site build, gallery build, built files or content trace fail |
+| B | pre-commit | A staged tree whose workflows' job conditions, designs, site build, gallery build, built files or content trace fail |
 | C | pre-commit | A stale MAP.md, or a Markdown header GitHub cannot read |
 | D | every hook | A missing tool: a refusal naming it, never a skip |
 | E | pre-push | Implementation work pushed with no commit in the range touching STATE.md |
@@ -140,9 +140,9 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 One commit per piece of work, each passing the gates. Commit as Waqas01CP
 with GitHub's no-reply address, set in the clone
 (docs/reference/commands.md). Before committing, look for commits you did
-not make and say so. Nothing is pushed and no
-remote exists until the owner publishes it himself (ADR-0005). End commit
-messages with the attribution line the session gives.
+not make and say so. Seats never push: the owner pushes, and published
+the repository on 2026-10-16 (ADR-0005). End commit messages with the
+attribution line the session gives.
 
 ## Heavy work
 
