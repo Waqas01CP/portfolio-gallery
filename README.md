@@ -52,7 +52,7 @@ that styles the same page every other design styles. It arrives by pull
 request from your fork, is checked automatically, and is reviewed and
 merged by the maintainer. Start with
 [docs/how-to/add-a-design.md](docs/how-to/add-a-design.md) and the rules in
-[CONTRIBUTING.md](CONTRIBUTING.md).
+[CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## How this repository is run
 
