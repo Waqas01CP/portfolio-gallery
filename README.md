@@ -38,7 +38,7 @@ What every site gets, whatever the design:
    in `cv.md` (or set `content_trace` to `false` in `config.json`), and the
    design in `config.json`, such as `"design": "plain"`.
 4. Commit. The **Actions** tab shows the build; when it is green, your site
-   is live.
+   is live
 
 The full walk-through, with what you should see at each step, is in
 [docs/how-to/use-this-template.md](docs/how-to/use-this-template.md).
