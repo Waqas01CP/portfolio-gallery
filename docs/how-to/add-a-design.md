@@ -79,8 +79,8 @@ python -m http.server --directory _site 8000
 
 Open http://127.0.0.1:8000/ and look at it at a phone's width and a
 desktop's, in light mode and, if `dark` is `true`, in dark mode and with
-the Dark switch both ways, and with every "In
-depth" panel and timeline card open. `python build.py --gallery` builds
+the Dark switch both ways, and with every "In depth" panel and timeline
+card open. `python build.py --gallery` builds
 every design, as the gallery shows them.
 
 ## 4. Run the checks
