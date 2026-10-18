@@ -13,6 +13,10 @@ portfolio architecture chat has checked these steps** (the brief's
 Addendum 1). Where a screen differs from what a step says you should see,
 stop and send what you see instead; GitHub changes its settings pages.
 
+**Status, 2026-10-18 UTC:** the owner followed every step and Tests 1 to
+4 between 2026-10-16 and 18, and the steps below carry what that showed.
+One proof waits for a date: Test 1 again on or after 2026-11-02 (below).
+
 Each step is one action. "Send back" lists what to paste to the chat.
 
 ## Before you start: the pre-publish search
@@ -47,9 +51,9 @@ GitHub Docs, "Creating a new repository".
 
 1. Go to https://github.com/new.
 2. **Owner**: Waqas01CP. **Repository name**: `portfolio-gallery`.
-3. **Description**: A free portfolio site for GitHub Pages, and a gallery
-   of accessible designs contributed by pull request. No install, no
-   tracking.
+3. **Description**: A portfolio site you can copy and publish on GitHub Pages without
+   installing anything, and a gallery of designs for it, each contributed
+   by pull request and checked automatically.
 4. **Public**.
 5. Leave **Add a README file** unticked, **.gitignore** at "None" and
    **License** at "None": the local copy has its own, and GitHub's would
@@ -204,15 +208,16 @@ rulesets".
    approvals** to **0**: you cannot approve your own pull requests, and
    your merge is the review (ADR-0003). Leave the other options under it
    unticked.
-7. Tick **Require status checks to pass**. Add the check **checks** and the
-   check **scope**, each with the source **GitHub Actions** if the page
-   offers a source. Leave **Require branches to be up to date before
-   merging** unticked.
+7. Tick **Require status checks to pass**. Add the check **checks**, with
+   the source **GitHub Actions** if the page offers a source. The picker
+   offers only checks that have already run here, and **scope** runs only
+   on a pull request, so it cannot be added yet: Test 1 adds it. Leave
+   **Require branches to be up to date before merging** unticked.
 8. **Create**.
 
 You should see the ruleset `main` listed as Active.
 
-**Send back:** the rules ticked and the two status checks as listed.
+**Send back:** the rules ticked and the status check as listed.
 
 ### Step 10. Private vulnerability reporting
 
@@ -236,14 +241,17 @@ GitHub Docs, "Creating a template repository".
    graph", where a fork's do not; and a fork's workflows stay off until its
    owner enables them. Forks remain the way to contribute a design.
 2. On the repository's main page, the gear beside **About**:
+   - **Description**, if it differs: the text of step 2.
    - **Website**: tick **Use your GitHub Pages website**, or paste
      `https://waqas01cp.github.io/portfolio-gallery/`.
    - **Topics**: `portfolio-template`, `portfolio`, `portfolio-website`,
      `github-pages`, `template`, `developer-portfolio`, `accessibility`,
      `static-site-generator`, `python`, `jinja2`, `css`, `resume`.
    - **Save changes**.
-3. **Issues** tab, **Labels**, **New label**: `design`. The design proposal
-   form applies it.
+3. **Issues** tab, **Labels**, **New label**: `design`, with the
+   description "A design proposed for the gallery: one folder of CSS,
+   fonts and images on the shared page." The design proposal form applies
+   it.
 
 ### Step 12. Keep your email address out of commits made on GitHub
 
@@ -258,13 +266,17 @@ such commits; gate A guards only commits made on your computer.
    sidebar.
 2. Tick **Keep my email addresses private**. GitHub then authors your
    website commits with your no-reply address, the one this repository's
-   commits use.
-3. Tick **Block command line pushes that expose my email**.
+   commits use, and with your profile's name.
+3. Optional: **Block command line pushes that expose my email**. It
+   refuses a push, from any repository of yours, whose latest commit
+   carries one of your private addresses. Tick it only if none of your
+   repositories commits with one.
 
 You should see an address ending in `@users.noreply.github.com` named
 under the first box.
 
-**Send back:** that both boxes are ticked. Not the address.
+**Send back:** that the first box is ticked, and whether you ticked the
+second. Not the address.
 
 ## Part D: prove each workflow
 
@@ -283,39 +295,62 @@ own pull requests pass the scope check as the owner's.
    **Create pull request**.
 
 You should see **scope** fail within a minute, its summary saying
-"README.md: outside designs/", and **checks** start and pass. The merge
-button stays blocked.
+"README.md: outside designs/", and **checks** start.
 
-4. **Close pull request**, then **Delete branch**.
+4. Now that scope has run, make it required: **Settings**, **Rules**,
+   **Rulesets**, `main`; under **Require status checks to pass**, **Add
+   checks**, choose **scope** (source **GitHub Actions**), and **Save
+   changes**.
+5. Back on the pull request, wait for **checks** to pass, about 10
+   minutes. You should see both checks marked **Required**, and the merge
+   button disabled because scope failed.
+6. **Close pull request**, then **Delete branch**.
 
 ### Test 2. A design is in scope and passes every check
 
-1. **Add file**, **Create new file**, name
+A design is two files at least, and both must be in one pull request: a
+pull request with one of them fails the design check, rightly.
+
+1. On the repository's main page, **Add file**, **Create new file**, name
    `designs/test-design/design.css`, with this content, the least CSS
-   that meets the rules (one menu shown, no list or disclosure markers),
-   checked by the seat on 2026-10-12 with every check:
+   that meets the rules (light only, one menu shown, no list or
+   disclosure markers):
 
 ```
+:root { color-scheme: light; }
 .mbar, .rail, .knot { display: none; }
 ul, ol, summary { list-style: none; }
 summary::-webkit-details-marker { display: none; }
 ```
 
-   **Commit changes**, **Create a new branch** `test-design`, **Propose
-   changes**.
-2. Before creating the pull request, add a second file to the same branch:
-   switch to branch `test-design`, **Add file**, **Create new file**,
-   `designs/test-design/design.json`, content:
+   The first line keeps the page light whatever the device's setting.
+   The page declares both light and dark, so a design that sets no
+   colours of its own otherwise gets the browser's dark defaults on a
+   device set to dark, and fails axe's contrast rule. With this content
+   every check passed on GitHub's runner (pull request 5, 2026-10-18);
+   on the seat's machine the same day, axe passed with it and failed in
+   device dark without the first line.
+
+   **Commit changes**, choose **Create a new branch** and name it
+   `test-design`, **Propose changes**. GitHub then offers to open a pull
+   request: do not open it yet.
+2. Open https://github.com/Waqas01CP/portfolio-gallery/tree/test-design/designs/test-design
+   and **Add file**, **Create new file**, name `design.json`, with this
+   content:
 
 ```
 {"name": "Test", "author": "Waqas01CP", "author_url": "https://github.com/Waqas01CP", "description": "A test design.", "assets": []}
 ```
 
-3. Open the pull request with `[scope: as contributor]` in its
-   description.
+   **Commit changes**, choose **Commit directly to the `test-design`
+   branch**, **Commit changes**.
+3. Open https://github.com/Waqas01CP/portfolio-gallery/compare/main...test-design,
+   click **Create pull request**, write `[scope: as contributor]` in the
+   description, and **Create pull request**.
 
 You should see **scope** pass ("In scope: 2 file(s), all in
-designs/test-design/") and **checks** pass after about 10 minutes.
+designs/test-design/") and **checks** pass after about 15 minutes (13.5
+on 2026-10-18). Wait for both before going on.
 
 4. **Close pull request**, then **Delete branch**.
 
@@ -369,6 +404,10 @@ that the copy is deleted.
 
 - Test 1 proves the scope check runs from the default branch and refuses a
   change outside designs/, and that a failed required check blocks a merge.
+  It proves step 5's policy only when run on or after 2026-11-02: until
+  then GitHub only evaluates its block on `pull_request_target`, so the
+  scope check runs with or without the policy. Run Test 1 once more on or
+  after that date; scope must run and fail as before.
 - Test 2 proves a design passes the scope check and the full checks on
   GitHub's runner, browser checks included.
 - Test 3 proves the ruleset binds main.
