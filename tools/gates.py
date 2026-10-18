@@ -6,7 +6,9 @@
 Each gate, what it blocks, and the case built to defeat it (the proofs are
 in the session log that built them; docs/reference/standing-checks.md):
 
-  A  Never commit, pre-commit. Refuses CHAT_STATE.md at any path; anything
+  A  Never commit, pre-commit. Refuses CHAT_STATE.md and
+     CAPABILITIES-PRIVATE.md, the architecture chat's own files, at any
+     path and in any letter case; anything
      under briefs/ but briefs/README.md; any staged path matching a pattern
      in tools/never-commit.txt; and any staged text file holding a
      drive-letter absolute path or a climb out of the repository. Also
@@ -16,7 +18,9 @@ in the session log that built them; docs/reference/standing-checks.md):
      name, his email or a private folder name out of the history without
      writing them into this public repository (format below). Prints the
      file, line and matched text, so a false positive can be seen for what
-     it is. Defeated by staging CHAT_STATE.md with -f, a planted absolute
+     it is. Defeated by staging CHAT_STATE.md with -f, and
+     CAPABILITIES-PRIVATE.md with -f at the root and as
+     docs/capabilities-private.md, a planted absolute
      path, a planted private pattern, a commit under a refused identity,
      an allowed text in a file it is not allowed in, and a refused name
      beside an allowed text that holds it. Controls: prose naming a folder
@@ -163,6 +167,9 @@ def never_commit_reason(path: str, globs: list[str]) -> str | None:
     lowered = path.lower()
     if lowered.rsplit("/", 1)[-1] == "chat_state.md":
         return "CHAT_STATE.md is the architecture chat's ledger and is never committed"
+    if lowered.rsplit("/", 1)[-1] == "capabilities-private.md":
+        return ("CAPABILITIES-PRIVATE.md is the architecture chat's lane of CAPABILITIES.md "
+                "and is never committed: every copy of the template inherits what is")
     if lowered.startswith("briefs/") and lowered != "briefs/readme.md":
         return "briefs are working space and are never committed (briefs/README.md)"
     for glob in globs:

@@ -6,6 +6,11 @@ briefs/*
 # The architecture chat's ledger, once there is one, is never committed.
 CHAT_STATE.md
 
+# The architecture chat's lane of CAPABILITIES.md: never committed, since
+# every copy of the template inherits what is (the owner's decision of
+# 2026-10-18). Gate A refuses it at any path.
+CAPABILITIES-PRIVATE.md
+
 # Local build environment and Python artefacts. The venv is recreated from
 # requirements.txt, which is committed.
 .venv/

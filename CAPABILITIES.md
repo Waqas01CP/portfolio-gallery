@@ -14,11 +14,11 @@ for the nuance.
 **Current as of 2026-10-18 UTC**, written by the implementing seat in its
 lane: what the system does and how, the stack, the qualities, the numbers,
 the limits, and the timeline's rows for what was built. **The architecture
-chat's lane is not yet written**: the problem the project solves, where it
-is going, the decisions it restates and the owner's role are for the
-chat this repository will have once it is published (the owner's decision
-of 2026-10-10). Until then the brief that started it and the records stand
-in.
+chat's lane is kept privately**: the problem the project solves, where it
+is going, the decisions it restates and the owner's role live in a file
+that is never committed, because every copy of the template inherits what
+is (the owner's decision of 2026-10-18). The decisions themselves are
+public, in docs/decisions/.
 
 It decides nothing. Where it disagrees with the code or a record, it is
 stale.
@@ -123,9 +123,8 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 
 ## How it was built
 
-**Seats.** The owner, Waqas01CP, decided scope and every non-trivial
-choice; the implementing seat, Claude Code, built to a brief written by
-his site's implementing seat and amended by his site's architecture chat.
+Every decision is a record in docs/decisions/, and what each session did
+is in logs/.
 
 | Date | What changed |
 |---|---|
@@ -149,12 +148,11 @@ dependency without a record; designs are CSS only (ADR-0006).
   Chrome run without its sandbox (ADR-0010). Step 5's policy for the
   scope check is proven only by a run on or after 2026-11-02, when GitHub
   starts enforcing its block.
-- **A design that sets no colours fails in dark mode.** The page declares
-  light and dark, so on a device set to dark such a design gets the
-  browser's dark defaults and fails axe's contrast rule; `:root {
-  color-scheme: light; }` keeps it light. Whether the contract should ask
-  every design for dark, or the engine change, is the owner's to decide
-  (2026-10-18).
+- **Light only, or light and dark, by the design's word.** A design says
+  in design.json whether it offers dark (ADR-0006, Changes, 2026-10-18).
+  A light-only design's page stays light on every device and has no Dark
+  switch; one that offers dark follows the device and carries the switch,
+  and is checked in both.
 - **`pull_request_target` needs the owner's Actions policy.** GitHub blocks
   it by default in public repositories from 2026-11-02; without the policy
   the scope check stops running (docs/setup-on-github.md, step 5).

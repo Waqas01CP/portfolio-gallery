@@ -132,7 +132,7 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 
 | Gate | When | Blocks |
 |---|---|---|
-| A | pre-commit | CHAT_STATE.md; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
+| A | pre-commit | CHAT_STATE.md and CAPABILITIES-PRIVATE.md at any path; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
 | B | pre-commit | A staged tree whose workflows' job conditions, designs, site build, gallery build, built files or content trace fail |
 | C | pre-commit | A stale MAP.md, or a Markdown header GitHub cannot read |
 | D | every hook | A missing tool: a refusal naming it, never a skip |
@@ -164,11 +164,15 @@ so; replaced only after the old one is read for what it still says.
 
 ## CAPABILITIES.md
 
-Everything the project is and does, for a reader who opens nothing else.
-This seat's lane: what it does and how, the stack, the qualities, the
+Everything the product is and does, for a reader who opens nothing else.
+It holds this seat's lane only, product-facing, since every copy of the
+template inherits it: what it does and how, the stack, the qualities, the
 numbers with their dates, the limits, the built rows of the timeline. The
-architecture chat's, once it exists: the purpose, where it is going, the
-decisions and the owner's role. Re-measure a number rather than carry it.
+architecture chat's lane (the problem, where the project is going, the
+decisions, the owner's role) is never committed: it lives in
+CAPABILITIES-PRIVATE.md, gitignored and refused by gate A, kept by this
+repository's architecture chat (the owner's decision of 2026-10-18).
+Re-measure a number rather than carry it.
 
 ## Writing
 
