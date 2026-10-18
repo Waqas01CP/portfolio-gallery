@@ -1,0 +1,41 @@
+# What the template cleanup removes from a copy of portfolio-gallery
+# (.github/workflows/template-cleanup.yml; ADR-0015). One path per line,
+# a file or a folder, from the repository's root. Everything here serves
+# only the project itself; what a copy needs to build, check and publish
+# its site stays. Most important first.
+
+# They name the project's owner: reports about a copy would reach him.
+CODE_OF_CONDUCT.md
+.github/CODEOWNERS
+
+# How the project is run: its records, logs, state and rules.
+docs/decisions
+docs/deferred
+logs
+briefs
+STATE.md
+CAPABILITIES.md
+MAP.md
+CLAUDE.md
+CONTRIBUTING.md
+SECURITY.md
+.github/ISSUE_TEMPLATE
+.github/pull_request_template.md
+
+# The project's own guides and references.
+docs/setup-on-github.md
+docs/how-to/add-a-design.md
+docs/reference/commands.md
+docs/reference/completed.md
+docs/reference/provenance.md
+docs/reference/standing-checks.md
+
+# The project's own tools: its local gates, its map, its defeat cases,
+# its scope check and the test of this cleanup.
+.githooks
+tools/gates.py
+tools/never-commit.txt
+tools/generate_map.py
+tools/prove_checks.py
+tools/scope_check.py
+tools/check_template_cleanup.py

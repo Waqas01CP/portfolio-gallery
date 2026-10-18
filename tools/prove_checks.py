@@ -254,6 +254,29 @@ def file_cases():
     yield ("workflows: an alias for needs", workflow("    needs: assemble\n", "    needs: *assemble\n"),
            "unreadable under jobs:")
 
+    def cleanup(rel, old, new):
+        def plant(copy):
+            edit(copy / rel, old, new)
+            return ["tools/check_template_cleanup.py"]
+        return plant
+
+    removal = ".github/template-cleanup/remove.txt"
+    script = ".github/template-cleanup/cleanup.py"
+    yield ("cleanup: CODE_OF_CONDUCT.md left in a copy", cleanup(removal, "\nCODE_OF_CONDUCT.md\n", "\n"),
+           "CODE_OF_CONDUCT.md, which names the project's owner")
+    yield ("cleanup: a file the copy needs removed", cleanup(removal, "\nSTATE.md\n", "\nSTATE.md\nbuild.py\n"),
+           "the cleaned copy fails")
+    yield ("cleanup: no guard for the project itself", cleanup(
+        script, "if repository.lower() == PROJECT.lower():", "if False:"),
+        "changed files in Waqas01CP/portfolio-gallery")
+    yield ("cleanup: no guard for a fork", cleanup(script, "if fork is not False:", "if False:"),
+           "changed files in a fork")
+    yield ("cleanup: acts more than once", cleanup(
+        script, "    shutil.rmtree(HERE)\n", ""), "acts more than once")
+    yield ("cleanup: a kept document links to a removed one", cleanup(
+        "docs/reference/content.md", "\n# ", "\n[The records](../decisions/README.md)\n\n# "),
+        "which the copy lacks")
+
     def twice(copy):
         edit(copy / "build.py", '        (staging / ".nojekyll").write_text("", encoding="utf-8")',
              '        (staging / ".nojekyll").write_text(str(__import__("time").time_ns()), encoding="utf-8")')
@@ -357,6 +380,7 @@ def main(argv: list[str]) -> int:
             (shots / name).mkdir(parents=True)
             (shots / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
         controls = [("workflows", ["tools/check_workflows.py"]),
+                    ("template cleanup", ["tools/check_template_cleanup.py"]),
                     ("design", ["tools/check_design.py"]),
                     ("assemble", ["tools/ci.py", "assemble", "--site", gallery_out, "--shots", shots]),
                     ("scope", ["tools/scope_check.py", "--files", "_scope.tsv"]),

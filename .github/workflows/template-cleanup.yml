@@ -1,0 +1,64 @@
+# In a copy made with "Use this template", removes portfolio-gallery's own
+# project files once, and commits (ADR-0015). It never runs in
+# Waqas01CP/portfolio-gallery or in a fork of it: the job's condition says
+# so, and .github/template-cleanup/cleanup.py refuses again by itself.
+#
+# Its commits are made with the workflow's token, so GitHub starts no new
+# run for them; the copy's next commit builds and checks the cleaned tree.
+# A token of this kind cannot create or change workflow files; whether it
+# may delete them is tried by the last step, in a commit of its own, and
+# setup Test 5 records what GitHub answered.
+name: Template cleanup
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: template-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    if: ${{ github.repository != 'Waqas01CP/portfolio-gallery' && !github.event.repository.fork }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      # The newest commit on the default branch, not the one that started
+      # this run, so a second run finds the cleanup already done.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Remove portfolio-gallery's own files, once
+        id: clean
+        run: |
+          if [ ! -f .github/template-cleanup/cleanup.py ]; then
+            echo "Nothing to clean: this copy was cleaned up already."
+            exit 0
+          fi
+          python3 .github/template-cleanup/cleanup.py
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Make it yours: remove portfolio-gallery's project files"
+          git push
+          echo "cleaned=true" >> "$GITHUB_OUTPUT"
+      - name: Try to remove the project's own workflows too
+        if: ${{ steps.clean.outputs.cleaned == 'true' }}
+        run: |
+          git rm -q --ignore-unmatch .github/workflows/scope.yml .github/workflows/template-cleanup.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Make it yours: remove portfolio-gallery's own workflows"
+          if git push; then
+            echo "::notice::Removed scope.yml and template-cleanup.yml."
+          else
+            echo "::notice::GitHub did not let this workflow's token change workflow files, so scope.yml and template-cleanup.yml stay. Each runs nothing in a copy; delete them by hand if you like."
+          fi

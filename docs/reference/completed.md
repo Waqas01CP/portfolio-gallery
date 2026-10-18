@@ -29,3 +29,5 @@ Proof is a commit, a decision record or a log filename. Never a file path.
 | The setup guide's fixes merged: pull request 6, merge 5fe7e11, its tree 165fa5a's; Checks and Deploy green on it | [VERIFIED] trees compared; [BELIEVED] the runs, from the chat's report | 2026-10-18 | 96675dc, 165fa5a |
 | Dark mode by the design's word: design.json's dark; a light-only tag and no Dark switch for false; checked in check_design.py, build.py and check_built.py | [VERIFIED] 6 defeat cases; the maintained designs' pages byte-identical; the guide's light-only test design passes every check with axe | 2026-10-18 | 39e49e6; ADR-0006 |
 | CAPABILITIES' architecture lane kept out of the repository: CAPABILITIES-PRIVATE.md ignored and refused by gate A | [VERIFIED] 2 gate defeat cases | 2026-10-18 | d612b96; ADR-0008 |
+| Dark mode and the private lane merged: pull request 7, merge 2b70358, its tree bb5a4bb's | [VERIFIED] trees compared | 2026-10-18 | 39e49e6, d612b96, bb5a4bb |
+| The "Make it yours" list and what a copy's first commit runs, in the user guide | [VERIFIED] read in the committed file; the first-commit runs from setup Test 4 | 2026-10-18 | d46f349; ADR-0015 |

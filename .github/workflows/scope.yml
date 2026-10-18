@@ -28,6 +28,9 @@ permissions:
 
 jobs:
   scope:
+    # Only here: in a copy of the template this file may stay, if the
+    # template cleanup cannot delete it, and it runs nothing (ADR-0015).
+    if: ${{ github.repository == 'Waqas01CP/portfolio-gallery' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

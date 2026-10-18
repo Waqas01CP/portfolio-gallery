@@ -5,7 +5,8 @@
       (tools/check_workflows.py); every design checked; the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
-      built files checked; the content trace; and the browser checks on
+      built files checked; the content trace; the template cleanup, while
+      there is one (tools/check_template_cleanup.py); and the browser checks on
       every design's page, with axe when given axe.min.js.
       .github/workflows/checks.yml runs this, always with --axe, after
       fetching axe-core and checking its SHA-512 (ADR-0011).
@@ -98,6 +99,11 @@ def checks(quick: bool, axe: Path | None) -> None:
     run("tools/check_content.py", "--page", site / "index.html")
     run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
     run("tools/check_built.py", gallery)
+    # The template cleanup, while there is one (a cleaned copy has none),
+    # after the checks it repeats on the cleaned copy, so a fault in the
+    # tree itself is reported by the check that finds it first.
+    if (ROOT / ".github" / "template-cleanup" / "cleanup.py").is_file():
+        run("tools/check_template_cleanup.py")
     browser = ["tools/check_browser.py", gallery]
     if quick:
         browser.append("--quick")
