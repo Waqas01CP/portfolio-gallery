@@ -1,6 +1,6 @@
 ---
 type: log
-description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run. Round 4, 2026-10-18: the setup guide corrected from the owner's run of every step and test. Round 5, 2026-10-18: dark mode by the design's word, and CAPABILITIES' architecture lane kept out of the repository."
+description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run. Round 4, 2026-10-18: the setup guide corrected from the owner's run of every step and test. Round 5, 2026-10-18: dark mode by the design's word, and CAPABILITIES' architecture lane kept out of the repository. Round 6, 2026-10-18: a copy cleans itself up, once."
 status: current
 ---
 
@@ -944,3 +944,138 @@ not only CAPABILITIES.md but every file that serves only this project.
 
 - Nothing pushed; the branch waits for the owner.
 - What to do about project files in copies: the owner's to decide.
+
+---
+
+# Round 6, 2026-10-18 UTC: a copy cleans itself up, once
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 2b70358, the website merge of pull request 7,
+whose tree is bb5a4bb's (compared here). Work on the branch
+template-cleanup. HEAD at end: the commit that adds this section, on that
+branch. Mode: mutating. Ran from about 18:00Z.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner, after reading the
+dark-mode branch before he pushed it: his decision of 2026-10-18 on what
+copies inherit. Option (a) now, a "Make it yours" list in the user guide,
+CODE_OF_CONDUCT.md and CODEOWNERS first; and, in place of (c), his idea: a
+cleanup workflow that runs once in a copy, removes the project-only files
+and commits. Read JetBrains' intellij-platform-plugin-template's cleanup at
+its source and rate it as research 0004 rates sources. Guard it: never in
+Waqas01CP/portfolio-gallery, once and idempotent in a copy. Establish by
+test, not by forum, whether the workflow's token can change files under
+.github/workflows/, and if not, make project-only workflows inert in a
+copy. Make sure the copy's checks and build pass after the cleanup, and
+say what the user sees. contents: write in the cleanup job only. Record
+it. Prove it by a setup test like Test 4. Then shrink the list to what the
+cleanup cannot remove. And, from the owner: the guide's line "Not
+verified: whether GitHub runs workflows for the first commit of a template
+copy" is to say what Test 4 saw.
+
+## Errors this seat made
+
+1. **The new check first listed files with git**, which neither gate B's
+   staged tree nor the defeat harness's copy has: all six of its defeat
+   cases and its control failed on a traceback, not on what they plant.
+   Caught by the harness's first run, before any commit; it now walks the
+   folder when there is no repository.
+2. **Two claims in the user guide's first draft** went past the evidence:
+   that Template cleanup starts "within a minute" beside Checks and Deploy,
+   which Test 4 could not have seen, and that GitHub "does not let" the
+   token change workflow files, which rests on one practitioner's log.
+   Caught on reading back; reworded before the commit.
+3. **The cleanup's check ran before the design check** in gate B and
+   ci.py checks, so a staged design with a fault surfaced as "the cleaned
+   copy fails tools/check_design.py", one step from its cause. Caught by
+   the gate proofs (24 of 25); moved after the checks it repeats in
+   d5771c3, after which 25 of 25.
+4. **The gate harness's planted design** (scratch) had no `dark` since
+   Round 5, so "B: a design with @import" was refused for two faults, not
+   the one it names. Caught the same run; it now says `"dark": false`.
+
+## What was done
+
+**Research** [VERIFIED, read 2026-10-18]. JetBrains'
+`.github/workflows/template-cleanup.yml` at its source (repository a
+template, 3,764 stars; file last changed 2026-09-28, b871890), rated
+**Primary, a precedent**: on push to main when the repository's name is
+not the template's; `contents: write`; replaces files from
+`.github/template-cleanup/`; deletes the project's own files and two
+workflow files, its own among them; pushes with the workflow's token
+through ad-m/github-push-action; actions not pinned. Their issue 486
+(2024-11-04) quotes a run's log, "refusing to allow a GitHub App to create
+or update workflow ... without `workflows` permission", rated
+**Practitioner report, one user's run**; searching their issues found no
+report of the cleanup's deletions failing. GitHub's documentation, rated
+**First-party**: events from the workflow's token start no new run, except
+workflow_dispatch and repository_dispatch; the token's permissions have no
+workflows scope.
+
+**Built** (d46f349, with the check's order in d5771c3):
+
+- `.github/template-cleanup/remove.txt`, the project-only paths, those
+  naming the owner first; `copy-README.md`, a copy's README with a credit
+  line to the project and no name; `cleanup.py`, which refuses unless
+  GITHUB_REPOSITORY is another repository and the event says it is not a
+  fork, refuses a listed path that is absolute, climbs out or names a
+  workflow file, deletes what is listed, puts the README in place, and
+  deletes its own folder last, so a later run finds nothing.
+- `.github/workflows/template-cleanup.yml`: on push to main and by hand;
+  the job only where the repository is not Waqas01CP/portfolio-gallery and
+  not a fork; `contents: write` in that job, `permissions: {}` above it;
+  checks out the newest default branch, so a second run sees the work
+  done; commits as github-actions[bot]; then, only when it cleaned, tries
+  to delete scope.yml and itself in a commit of their own and leaves a
+  notice either way. scope.yml's job now runs only in this repository.
+- `tools/check_template_cleanup.py`, in ci.py checks and gate B while the
+  cleanup exists, and its six defeat cases with a control.
+- use-this-template.md: step 1 says what Test 4 saw of a first commit; a
+  new step 2, "Make it yours", with what the cleanup does, the list for a
+  copy whose cleanup did not run, CODE_OF_CONDUCT.md and CODEOWNERS first,
+  and the two workflow files that may stay; the link to add-a-design.md
+  points at the project, since a copy loses it.
+- The setup guide's Test 5: a throwaway copy, pg-cleanup-test, whose runs
+  and files the chat reads before it is deleted.
+- ADR-0015, accepted; ADR-0008's Changes; the index; standing-checks.md,
+  commands.md and CLAUDE.md's gate table.
+
+**What a user sees**: three runs for the copy's first commit, Checks,
+Deploy and Template cleanup; then a commit "Make it yours: remove
+portfolio-gallery's project files" by github-actions, with perhaps a
+second removing the two workflows, or a notice in the run that they stay.
+The cleanup's commits start no run; the user's next commit builds and
+checks the cleaned files.
+
+**Proofs** [VERIFIED]:
+
+- The check on the tree, 8 s: the guards change nothing as this
+  repository or as a fork; as a copy 49 files go and README.md is
+  replaced; a later run changes nothing; the cleaned copy passes its
+  workflows, designs, builds, built files and trace; its 5 relative
+  Markdown links resolve.
+- File defeat cases, 18:26Z to 18:28Z: 54 failed as built, 6 new for the
+  cleanup (CODE_OF_CONDUCT.md left off the list; build.py put on it; each
+  guard removed; its folder not removed; a kept document linking to a
+  removed record); 8 controls passed, the cleanup's among them.
+- On a fresh clone of d5771c3 with a new venv, 18:53Z to 19:05Z: the file defeat cases, 54 failed as built and 8 controls passed; then `tools/ci.py checks --axe`, exit 0 in 633 s, the cleanup's check after the content trace (50 files removed in its copy, a fresh clone's tree), the browser checks 621 s with 0 failures. The same run on d46f349, before the reorder: exit 0 in 637 s.
+- Gates, in a clone of d5771c3, 18:48Z to 18:52Z: 25 of 25 as expected, 21 defeat cases refused and 4 controls passed. On d46f349 the run was 24 of 25 (errors 3 and 4).
+- The pre-publish search runs on the final commit after this section is committed; Report 6 gives its result.
+
+## Rejected alternatives
+
+- A guard by the repository's name alone, as JetBrains has: a copy that
+  keeps the name would be skipped and a fork caught only by accident; the
+  guard here is the full name and the fork flag.
+- Running the cleanup on every push and deleting whatever matches: a user
+  who later adds a `logs/` of their own would lose it; the list deletes
+  itself, so the cleanup acts once.
+- Granting `actions: write` to disable the workflow afterwards: more
+  permission than the job needs.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner.
+- Test 5, the owner's, then the chat's reading, before the list in the
+  guide can shrink to what the cleanup truly leaves.
