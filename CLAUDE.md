@@ -133,7 +133,7 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 | Gate | When | Blocks |
 |---|---|---|
 | A | pre-commit | CHAT_STATE.md and CAPABILITIES-PRIVATE.md at any path; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
-| B | pre-commit | A staged tree whose workflows' job conditions, designs, site build, gallery build, built files or content trace fail |
+| B | pre-commit | A staged tree whose workflows' job conditions, template cleanup, designs, site build, gallery build, built files or content trace fail |
 | C | pre-commit | A stale MAP.md, or a Markdown header GitHub cannot read |
 | D | every hook | A missing tool: a refusal naming it, never a skip |
 | E | pre-push | Implementation work pushed with no commit in the range touching STATE.md |

@@ -15,7 +15,8 @@ stop and send what you see instead; GitHub changes its settings pages.
 
 **Status, 2026-10-18 UTC:** the owner followed every step and Tests 1 to
 4 between 2026-10-16 and 18, and the steps below carry what that showed.
-One proof waits for a date: Test 1 again on or after 2026-11-02 (below).
+Two proofs wait: Test 5, the template cleanup in a real copy; and Test 1
+again on or after 2026-11-02 (below).
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
@@ -396,6 +397,46 @@ deleted at the end.
 job's icon in both runs; whether the address showed Alex Example; and
 that the copy is deleted.
 
+### Test 5. A copy cleans itself up, once
+
+ADR-0015's cleanup in a real copy: that it runs once, what it removes,
+that the copy still builds and checks, and whether GitHub lets a
+workflow's own token delete workflow files. It needs steps 11 and 12.
+The copy is public while it exists; the architecture chat reads its files
+and runs before you delete it.
+
+1. On https://github.com/Waqas01CP/portfolio-gallery, click **Use this
+   template**, then **Create a new repository**. **Owner**: Waqas01CP.
+   **Repository name**: `pg-cleanup-test`. **Public**. Leave **Include
+   all branches** unticked. **Create repository**.
+2. Its **Actions** tab. You should see three runs for its first commit:
+   **Checks**, **Deploy** and **Template cleanup**. Template cleanup goes
+   green within a few minutes. Open it, then its job, then its last step,
+   "Try to remove the project's own workflows too", and note what it
+   says: "Removed scope.yml and template-cleanup.yml.", or "GitHub did
+   not let this workflow's token change workflow files...".
+3. Its **Code** tab. You should see the latest commit "Make it yours:
+   remove portfolio-gallery's project files" by github-actions, perhaps
+   with a second, "Make it yours: remove portfolio-gallery's own
+   workflows". The README reads "My portfolio"; there is no
+   `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` or `STATE.md`, and no
+   `docs/decisions/` folder.
+4. In the copy: **Settings**, **Pages**, **Source**: **GitHub Actions**.
+5. Open `content/site.json`, click the pencil, change one word of the
+   `"location"` value, and **Commit changes** directly to `main`. On the
+   **Actions** tab you should see **Checks** and **Deploy** run on the
+   cleaned files, and both go green; Template cleanup, if it is still
+   there, runs and changes nothing. Open
+   https://waqas01cp.github.io/pg-cleanup-test/: the sample site, with
+   your word.
+6. Send the chat the copy's address and wait for its word: it reads the
+   copy's files and runs through GitHub's API.
+7. Delete the copy: its **Settings**, **General**, **Delete this
+   repository**, and confirm with its name.
+
+**Send back:** what step 2's last step said; the commits in step 3;
+each run of step 5; then that the copy is deleted.
+
 ## What the tests prove, and what they do not
 
 - Test 1 proves the scope check runs from the default branch and refuses a
@@ -409,6 +450,10 @@ that the copy is deleted.
 - Test 3 proves the ruleset binds main.
 - Test 4 proves a copy of the template publishes its owner's site in site
   mode, and shows whether a copy's first commit runs its workflows.
+- Test 5 proves a copy cleans itself up once and still builds and checks,
+  and shows whether a workflow's own token may delete workflow files. In
+  this repository, the cleanup's run on main after it merged shows its
+  job skipped.
 - Step 8 proved the deploy, the screenshots and the addressing, in gallery
   mode.
 - None of them is a fork from another account. The approval setting of

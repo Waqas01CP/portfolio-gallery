@@ -27,7 +27,8 @@ in the session log that built them; docs/reference/standing-checks.md):
      passes; an allowed text in its own file passes.
   B  The staged tree builds, pre-commit. Copies the staged tree to a
      temporary folder and runs, there: the workflows' job conditions
-     (tools/check_workflows.py); every design checked; the site built,
+     (tools/check_workflows.py); the template cleanup, while there is one
+     (tools/check_template_cleanup.py); every design checked; the site built,
      its files checked and its content traced; the gallery built and its
      files checked (tools/ci.py build). Building the staged tree, not the
      working tree, judges what is about to be committed; untracked files
@@ -225,6 +226,8 @@ def gate_b() -> list[str]:
             if not (tree / required).is_file():
                 raise MissingTool(f"{required} is not in the staged tree")
         steps = [["tools/check_workflows.py"],
+                 *([["tools/check_template_cleanup.py"]]
+                   if (tree / ".github" / "template-cleanup" / "cleanup.py").is_file() else []),
                  ["tools/check_design.py"],
                  ["tools/ci.py", "build", "--mode", "site", "--out", str(Path(tmp) / "site")],
                  ["tools/ci.py", "build", "--mode", "gallery", "--out", str(Path(tmp) / "gallery")]]

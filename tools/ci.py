@@ -2,7 +2,8 @@
 
   python tools/ci.py checks [--quick] [--axe FILE]
       Everything a pull request must pass: the workflows' job conditions
-      (tools/check_workflows.py); every design checked; the site
+      (tools/check_workflows.py); the template cleanup, while there is one
+      (tools/check_template_cleanup.py); every design checked; the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; and the browser checks on
@@ -89,6 +90,9 @@ def twice(as_of: str, *mode: str) -> None:
 def checks(quick: bool, axe: Path | None) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
     run("tools/check_workflows.py")
+    # The template cleanup, while there is one: a cleaned copy has none.
+    if (ROOT / ".github" / "template-cleanup" / "cleanup.py").is_file():
+        run("tools/check_template_cleanup.py")
     run("tools/check_design.py")
     twice(as_of)
     twice(as_of, "--gallery")

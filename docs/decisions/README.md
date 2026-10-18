@@ -56,6 +56,7 @@ itself a decision.
 | [0012](0012-lighthouse-in-ci.md) | Lighthouse in CI | Proposed |
 | [0013](0013-default-design-keeps-the-owners-look.md) | The default design keeps the owner's site's look | Accepted |
 | [0014](0014-web-fonts-with-font-display-optional.md) | Web fonts with font-display: optional | Accepted |
+| [0015](0015-a-copy-cleans-itself-once.md) | A copy cleans itself up, once | Accepted |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
 on 2026-10-12 by the implementing seat from the brief that recorded them;

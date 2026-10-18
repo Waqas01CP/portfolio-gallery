@@ -50,6 +50,7 @@ http://127.0.0.1:8000/ in your own browser.
 
 ```
 python tools/check_workflows.py [FILE ...]      when each workflow job runs
+python tools/check_template_cleanup.py          what a copy keeps after its cleanup
 python tools/check_design.py [NAME ...]          designs: files, sizes, design.json, CSS
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace

@@ -25,7 +25,8 @@ from a template", read 2026-10-12):
   the Actions tab of the forked repository" (GitHub Docs, "Events that
   trigger workflows"). A template copy has no such step.
 
-Fork only to contribute a design (docs/how-to/add-a-design.md).
+Fork only to contribute a design
+([how to add a design](https://github.com/Waqas01CP/portfolio-gallery/blob/main/docs/how-to/add-a-design.md)).
 
 1. On the repository's page, click **Use this template**, then **Create a
    new repository**.
@@ -38,12 +39,52 @@ Fork only to contribute a design (docs/how-to/add-a-design.md).
 4. Click **Create repository**. You see your new repository with all the
    files, and one commit.
 
-The **Actions** tab may already show a failed "Deploy" run: GitHub ran it
-for that first commit, before Pages was set up. That is expected; the next
-step fixes it. (Not verified: whether GitHub runs workflows for the first
-commit of a template copy.)
+GitHub runs your copy's workflows for that first commit on its own:
+"Checks" and "Deploy" started by themselves in a test copy on 2026-10-18,
+and "Template cleanup" runs beside them. "Deploy" fails at its last job,
+because Pages is not set up yet; step 3 fixes it.
 
-## 2. Turn on GitHub Pages
+## 2. Make it yours
+
+Your copy starts with portfolio-gallery's own project files: its decision
+records, logs, contribution rules and tools, and two files that name the
+project's owner. The "Template cleanup" workflow removes them once, by
+itself, and commits: in your history you see "Make it yours: remove
+portfolio-gallery's project files", by github-actions. It also puts a
+short README of your own in place of the project's. It never runs in
+portfolio-gallery itself or in a fork, and its commit starts no other run;
+your next commit builds and checks the cleaned files.
+
+If it did not run, as when Actions are turned off, delete these yourself,
+the first two above all:
+
+1. `CODE_OF_CONDUCT.md`: it names the project owner's address, so reports
+   about your site would reach him.
+2. `.github/CODEOWNERS`: it names him as the owner of your files.
+3. The project's records and rules: `docs/decisions/`, `docs/deferred/`,
+   `logs/`, `briefs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
+   `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+   `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`.
+4. Its own guides: `docs/setup-on-github.md`,
+   `docs/how-to/add-a-design.md`, and in `docs/reference/`:
+   `commands.md`, `completed.md`, `provenance.md`, `standing-checks.md`.
+5. Its own tools: `.githooks/`, and in `tools/`: `gates.py`,
+   `never-commit.txt`, `generate_map.py`, `prove_checks.py`,
+   `scope_check.py`, `check_template_cleanup.py`.
+6. `.github/template-cleanup/`, the cleanup's own list and script.
+
+Then replace `README.md` with your own. The full list, with why each goes,
+is `.github/template-cleanup/remove.txt` in portfolio-gallery.
+
+Two workflow files may stay even after the cleanup:
+`.github/workflows/scope.yml` and `.github/workflows/template-cleanup.yml`.
+A workflow's own token may not be allowed to change workflow files, so
+the cleanup tries to delete them in a commit of its own and says in its
+run what GitHub answered. Each is written to run nothing in a copy;
+delete them by hand if you like. Keep `LICENSE`: the MIT licence asks that
+its notice stays with every copy.
+
+## 3. Turn on GitHub Pages
 
 1. In your repository, click **Settings**, then **Pages** in the left
    sidebar.
@@ -51,7 +92,7 @@ commit of a template copy.)
 
 Nothing else on that page needs changing.
 
-## 3. Write your content
+## 4. Write your content
 
 Everything you write is in the `content/` folder. Click a file, then the
 pencil icon to edit it in the browser. Each file's fields are explained
@@ -75,7 +116,7 @@ in docs/reference/content.md.
 
 Commit each change with **Commit changes**.
 
-## 4. Watch it publish
+## 5. Watch it publish
 
 Open the **Actions** tab. Each commit to `main` starts a "Deploy" run:
 build, then assemble, then deploy. When all three are green, your site is
@@ -94,7 +135,7 @@ The "Checks" run, beside it, runs the accessibility checks on your content
 in every design. It does not stop your site from publishing; read it to
 see what a design does with your content.
 
-## 5. Later
+## 6. Later
 
 - **Another design**: change `"design"` in `config.json` and commit.
 - **The address `https://<your-username>.github.io/`**: rename the
