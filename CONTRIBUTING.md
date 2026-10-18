@@ -22,7 +22,7 @@ A design is one folder, `designs/<your-design>/`, holding:
 | File | What |
 |---|---|
 | `design.css` | Your stylesheet, at most 100 KB |
-| `design.json` | The design's name, your name as you want it shown, your profile's address, a one-line description, the fonts to preload, and the licence of every font and image |
+| `design.json` | The design's name, your name as you want it shown, your profile's address, a one-line description, whether it offers a dark theme, the fonts to preload, and the licence of every font and image |
 | `fonts/*.woff2` | Optional fonts, at most 200 KB each, each with its licence text as `fonts/*.txt` |
 | `img/*.png`, `*.webp`, `*.jpg`, `*.jpeg` | Optional images, at most 300 KB each |
 
@@ -77,8 +77,8 @@ Checks cannot read intent. The maintainer reviews what they cannot:
 - that **you have the right to every font and image**: a font must ship
   with its licence, and a font whose licence reserves its name must be the
   unmodified original;
-- that it reads well, at a phone's width and a desktop's, in light and
-  dark if it offers both;
+- that it reads well, at a phone's width and a desktop's, in light, and
+  in dark too when its `design.json` says it offers dark;
 - that its name and description say what it is.
 
 A design can be declined for these reasons, with the reason given.

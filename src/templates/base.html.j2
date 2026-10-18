@@ -20,7 +20,9 @@
 <meta name="generator" content="{{ project_name }}">
 <title>{{ site.name }}</title>
 <meta name="description" content="{{ site.headline|join(' | ') }}">
-<meta name="color-scheme" content="light dark">
+{# A design that offers no dark theme is light only, whatever the device
+   says, so the browser's dark defaults never meet its colours. #}
+<meta name="color-scheme" content="{{ 'light dark' if design.dark else 'light' }}">
 {# An empty icon, so the browser does not ask the server for one. #}
 <link rel="icon" href="data:,">
 {# The design's own fonts that set text on the opening screen, preloaded

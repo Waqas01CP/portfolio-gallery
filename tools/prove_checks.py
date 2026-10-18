@@ -71,7 +71,7 @@ def new_design(copy: Path, name: str, css: str = "body { color: #111; }\n", extr
     folder.mkdir(parents=True)
     (folder / "design.css").write_text(css, encoding="utf-8")
     meta = {"name": "Test", "author": "Tester", "author_url": "https://example.com/",
-            "description": "A test design.", "assets": [], **(extra or {})}
+            "description": "A test design.", "dark": False, "assets": [], **(extra or {})}
     (folder / "design.json").write_text(json.dumps(meta), encoding="utf-8")
     return folder
 
@@ -115,6 +115,8 @@ def file_cases():
            "image-set() is not allowed")
     yield "design: over the size limit", design(css="/*" + "x" * 103_000 + "*/\n"), "over the 100 KB limit"
     yield "design: design.json without author_url", design(drop="author_url"), "author_url"
+    yield "design: design.json without dark", design(drop="dark"), "dark must be true or false"
+    yield "design: dark neither true nor false", design(meta={"dark": "yes"}), "dark must be true or false"
     yield ("design: a renamed file", design(files=[("img/photo.png", b"<svg onload=alert(1)>")],
                                             meta={"assets": [{"file": "img/photo.png", "licence": "CC0-1.0",
                                                               "source": "own work"}]}),
@@ -156,6 +158,18 @@ def file_cases():
     yield "built: an inline script", built("</main>", "<script>alert(1)</script></main>"), "inline <script>"
     yield "built: no policy tag", built('<meta http-equiv="Content-Security-Policy"', '<meta name="x"'), "no Content-Security-Policy"
     yield "built: a link to a missing id", built('href="#main"', 'href="#nowhere"'), "names no id"
+    yield ("built: a light-only tag on a page with the Dark switch", built(
+        '<meta name="color-scheme" content="light dark">', '<meta name="color-scheme" content="light">'),
+        "says light only, yet the page has a Dark switch")
+
+    def no_switch(copy):
+        out = build_site(copy)
+        page = out / "index.html"
+        text = page.read_text(encoding="utf-8")
+        page.write_text(re.sub(r"<button [^>]*data-theme-switch.*?</button>", "", text), encoding="utf-8")
+        return ["tools/check_built.py", out]
+
+    yield "built: a page offering dark without its Dark switch", no_switch, "offers dark, yet the page has no Dark switch"
 
     def no_previews(copy):
         return ["tools/check_built.py", build_site(copy, "--gallery"), "--previews"]
@@ -209,6 +223,12 @@ def file_cases():
     yield ("build: layer1 not a cut", build_case('"layer1": "Wrote 212 automated tests',
                                                  '"layer1": "Wrote 213 automated tests'), "not a cut")
     yield ("build: tier out of order", build_case('"tier": 3,', '"tier": 1,'), "tier must not decrease")
+
+    def build_no_dark(copy):
+        edit(copy / "designs/plain/design.json", '  "dark": true,\n', "")
+        return ["build.py", "--as-of", "2026-10", "--design", "plain", "--out", copy / "_out"]
+
+    yield "build: a design.json without dark", build_no_dark, "dark must be true or false"
     yield ("build: no proof route", build_case('"no_proof": "Checked with the university on request."', '"grade2": "x"'),
            "no proof link")
 
@@ -293,6 +313,19 @@ def browser_cases(axe: Path | None):
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")
 
     if axe:
+        # A light-only design that sets no colours, on an engine that
+        # declares dark for every design: the failure of 2026-10-18.
+        def declared_dark(copy):
+            new_design(copy, "probe", ".mbar, .rail, .knot { display: none; }\n"
+                       "ul, ol, summary { list-style: none; }\n"
+                       "summary::-webkit-details-marker { display: none; }\n")
+            edit(copy / "src/templates/base.html.j2",
+                 """<meta name="color-scheme" content="{{ 'light dark' if design.dark else 'light' }}">""",
+                 '<meta name="color-scheme" content="light dark">')
+            return ["tools/check_browser.py", build_site(copy, "--gallery"), "--only", "axe", "--axe", axe]
+
+        yield "axe: dark declared for a light-only design", declared_dark, "color-contrast"
+
         def faint(copy):
             edit(copy / "designs/plain/design.css", "/* Footer. */", ".lede { color: #eee; }\n/* Footer. */")
             edit(copy / "src/templates/footer.html.j2", "</footer>",

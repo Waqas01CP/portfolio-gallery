@@ -30,6 +30,7 @@ Pick a name: lowercase letters, digits and single hyphens, such as
   "author": "Your Name",
   "author_url": "https://github.com/your-username",
   "description": "One line: what it looks like and who it is for.",
+  "dark": true,
   "preload": ["fonts/your-font.woff2"],
   "assets": [
     {
@@ -41,6 +42,12 @@ Pick a name: lowercase letters, digits and single hyphens, such as
   ]
 }
 ```
+
+`dark` says whether your design styles a dark theme. With `true`, the
+page follows the visitor's device and offers a Dark switch, and your CSS
+styles both themes (docs/reference/design-contract.md, "Light and dark").
+With `false`, the page stays light on every device and has no switch, and
+you style one theme only.
 
 `preload` lists the fonts that set text on the first screen, so they load
 with the page. `assets` lists every font and image, each once; an image
@@ -71,7 +78,8 @@ python -m http.server --directory _site 8000
 ```
 
 Open http://127.0.0.1:8000/ and look at it at a phone's width and a
-desktop's, with your device in light and in dark mode, and with every "In
+desktop's, in light mode and, if `dark` is `true`, in dark mode and with
+the Dark switch both ways, and with every "In
 depth" panel and timeline card open. `python build.py --gallery` builds
 every design, as the gallery shows them.
 

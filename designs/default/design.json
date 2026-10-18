@@ -2,6 +2,7 @@
   "name": "Default",
   "author": "Waqas01CP",
   "author_url": "https://github.com/Waqas01CP",
+  "dark": true,
   "description": "A dark first screen with a lime accent and a turning 3D knot, then a page that follows the device's light or dark setting; the timeline drawn to scale on a wide screen.",
   "preload": [
     "fonts/manrope-normal.woff2",

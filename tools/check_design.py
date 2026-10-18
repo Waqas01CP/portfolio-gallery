@@ -7,8 +7,9 @@ A design is CSS on the engine's fixed HTML, and nothing that runs. Its
 folder may hold exactly:
 
   design.css            the stylesheet
-  design.json           its name, author, author URL, description, the
-                        fonts to preload, and each asset's licence
+  design.json           its name, author, author URL, description,
+                        whether it offers a dark theme, the fonts to
+                        preload, and each asset's licence
   fonts/*.woff2         fonts, each listed in design.json with its licence
   fonts/*.txt           each font's licence text
   img/*.png, *.webp, *.jpg, *.jpeg
@@ -67,7 +68,7 @@ LICENCES = {"OFL-1.1", "Apache-2.0", "MIT", "CC0-1.0"}
 LICENCE_TEXT = {"OFL-1.1": ("SIL Open Font License", "Version 1.1"),
                 "Apache-2.0": ("Apache License", "Version 2.0"),
                 "MIT": ("Permission is hereby granted",)}
-META_FIELDS = {"name", "author", "author_url", "description", "preload", "assets"}
+META_FIELDS = {"name", "author", "author_url", "description", "dark", "preload", "assets"}
 ASSET_FIELDS = {"file", "licence", "licence_file", "source"}
 
 REFUSED_FUNCTIONS = {"image-set", "-webkit-image-set", "src", "element", "-moz-element",
@@ -339,6 +340,9 @@ def meta_problems(name: str, texts: dict[str, str], files: dict[str, Path]) -> l
             fail(f"{field} must be one line of text, at most {most} characters")
     if not _https(meta.get("author_url")):
         fail("author_url must be an https:// address, such as your GitHub profile")
+    if not isinstance(meta.get("dark"), bool):
+        fail("dark must be true or false: true if the design styles a dark theme, which gives "
+             "the page the Dark switch; false keeps it light on every device")
     fonts = sorted(f for f in files if f.endswith(".woff2"))
     images = sorted(f for f in files if f.startswith("img/"))
     licence_texts = sorted(f for f in files if f.endswith(".txt"))

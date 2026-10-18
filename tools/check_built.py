@@ -20,6 +20,11 @@ seen without running anything:
   - inside the sections, anything hidden in the markup is also aria-hidden,
     so a screen reader at load does not read it while a section skips its
     layout (base.css; tools/check_browser.py checks the page as it runs);
+  - a site page's colour-scheme tag agrees with its Dark switch: "light
+    dark" with the switch, for a design that offers dark, or "light"
+    without it, for one that does not (design.json's dark; ADR-0006,
+    Changes, 2026-10-18). The gallery's own page, which is no design's,
+    is not held to this;
   - with --previews, every design in a gallery has its preview image;
     without it, a missing preview is not reported, because the previews
     are taken after the build.
@@ -64,6 +69,9 @@ class Page(HTMLParser):
         self.title = False
         self.viewport = False
         self.section_depth = 0
+        self.color_scheme: str | None = None
+        self.theme_switches = 0
+        self.nav = False
         self.stack: list[str] = []
         self.in_section: list[bool] = []
 
@@ -83,6 +91,12 @@ class Page(HTMLParser):
             self.title = True
         if tag == "meta" and a.get("name") == "viewport":
             self.viewport = True
+        if tag == "meta" and a.get("name") == "color-scheme":
+            self.color_scheme = " ".join(a.get("content", "").split())
+        if "data-theme-switch" in a:
+            self.theme_switches += 1
+        if "data-nav-box" in a:
+            self.nav = True
         if tag == "meta" and a.get("http-equiv", "").lower() == "content-security-policy":
             if a.get("content") != CSP:
                 self.problems.append("the Content-Security-Policy meta tag is not the build's policy")
@@ -187,6 +201,15 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
         problems.append("no <title>")
     if not page.viewport:
         problems.append("no viewport meta tag")
+    if page.nav:
+        # A site page, in one design: the tag and the switch say the same.
+        if page.color_scheme == "light" and page.theme_switches:
+            problems.append("the colour-scheme tag says light only, yet the page has a Dark switch")
+        elif page.color_scheme == "light dark" and not page.theme_switches:
+            problems.append("the colour-scheme tag offers dark, yet the page has no Dark switch")
+        elif page.color_scheme not in ("light", "light dark"):
+            problems.append(f"the colour-scheme tag must be 'light' or 'light dark', not "
+                            f"{page.color_scheme!r}")
     for url in page.loads:
         # A gallery's previews are taken after the build, by the screenshot
         # job (tools/screenshots.py); --previews requires them, and the

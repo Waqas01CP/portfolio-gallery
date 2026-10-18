@@ -317,19 +317,10 @@ pull request with one of them fails the design check, rightly.
    disclosure markers):
 
 ```
-:root { color-scheme: light; }
 .mbar, .rail, .knot { display: none; }
 ul, ol, summary { list-style: none; }
 summary::-webkit-details-marker { display: none; }
 ```
-
-   The first line keeps the page light whatever the device's setting.
-   The page declares both light and dark, so a design that sets no
-   colours of its own otherwise gets the browser's dark defaults on a
-   device set to dark, and fails axe's contrast rule. With this content
-   every check passed on GitHub's runner (pull request 5, 2026-10-18);
-   on the seat's machine the same day, axe passed with it and failed in
-   device dark without the first line.
 
    **Commit changes**, choose **Create a new branch** and name it
    `test-design`, **Propose changes**. GitHub then offers to open a pull
@@ -339,8 +330,13 @@ summary::-webkit-details-marker { display: none; }
    content:
 
 ```
-{"name": "Test", "author": "Waqas01CP", "author_url": "https://github.com/Waqas01CP", "description": "A test design.", "assets": []}
+{"name": "Test", "author": "Waqas01CP", "author_url": "https://github.com/Waqas01CP", "description": "A test design.", "dark": false, "assets": []}
 ```
+
+   `"dark": false` makes the page light on every device, with no Dark
+   switch, so a design that sets no colours reads in every case (ADR-0006,
+   Changes, 2026-10-18). The two files passed every check on the seat's
+   machine on 2026-10-18, axe included.
 
    **Commit changes**, choose **Commit directly to the `test-design`
    branch**, **Commit changes**.
