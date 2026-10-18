@@ -816,6 +816,11 @@ def load_design(name: str) -> dict:
                                              ("name", "author", "author_url", "description")):
         raise BuildError(f"designs/{name}/design.json needs name, author, author_url and "
                          f"description (run tools/check_design.py for every rule)")
+    # Whether the design offers a dark theme: the page's colour-scheme tag
+    # and the Dark switch follow it (ADR-0006, Changes, 2026-10-18).
+    if not isinstance(meta.get("dark"), bool):
+        raise BuildError(f"designs/{name}/design.json: dark must be true or false, saying "
+                         f"whether the design offers a dark theme")
     files = []
     for path in sorted(folder.rglob("*")):
         if path.is_symlink() or not (path.is_file() or path.is_dir()):
@@ -829,7 +834,7 @@ def load_design(name: str) -> dict:
         raise BuildError(f"designs/{name}/design.json: preload must list .woff2 files in the design")
     return {"slug": name, "name": meta["name"], "author": meta["author"],
             "author_url": meta["author_url"], "description": meta["description"],
-            "preload": preload, "files": files}
+            "dark": meta["dark"], "preload": preload, "files": files}
 
 
 # Environment and output.

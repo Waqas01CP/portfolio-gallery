@@ -14,8 +14,8 @@
 <li><a href="#{{ s.id }}" data-nav-link="{{ s.id }}"{% if loop.first %} aria-current="location"{% endif %}>{{ s.label }}</a></li>
 {% endfor %}
 </ol>
-<button type="button" class="theme-switch" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 15) }}<span>Dark<span class="vh"> theme</span></span><span class="track" aria-hidden="true"><span class="knob"></span></span></button>
-</nav>
+{% if design.dark %}<button type="button" class="theme-switch" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 15) }}<span>Dark<span class="vh"> theme</span></span><span class="track" aria-hidden="true"><span class="knob"></span></span></button>
+{% endif %}</nav>
 <div class="rail dark" aria-hidden="true" data-nav-box data-rail data-js hidden>
 <span class="rail-pct" data-pct></span>
 <div class="rail-bar"><div class="rail-fill" data-rail-fill></div>
@@ -36,6 +36,6 @@
 </ol>
 </div>
 </details>
-<button type="button" class="theme-btn" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 17) }}<span class="vh">Dark theme</span></button>
-</div>
+{% if design.dark %}<button type="button" class="theme-btn" role="switch" aria-checked="false" data-theme-switch data-js hidden>{{ m.icon("moon", 17) }}<span class="vh">Dark theme</span></button>
+{% endif %}</div>
 </nav>

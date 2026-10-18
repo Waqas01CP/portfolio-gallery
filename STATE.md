@@ -6,13 +6,12 @@ status: current
 
 # STATE
 
-**Verified against commit 96675dc, the last commit before this file's
-update, 2026-10-18 UTC, by the Brief 1 implementing session's fourth
-round**: the file defeat cases run on its tree and the gates passed on
-it; the setup guide's test design run with axe both ways; the
-repository's ruleset, pull requests and runs read from GitHub's public
-API (logs/2026-10-12-brief-1-build.md, Round 4). This is the only line in
-this file that names a commit.
+**Verified against commit d612b96, the last commit before this file's
+update, 2026-10-18 UTC, by the Brief 1 implementing session's fifth
+round**: a fresh clone of it run through every defeat case with the
+browser and axe and every check with axe, and the gates proven on a clone
+of it (logs/2026-10-12-brief-1-build.md, Round 5). This is the only line
+in this file that names a commit.
 
 This file is where to start, not where to stop. It outranks memory. It does
 not outrank the code or the data: where a row disagrees with them, the row
@@ -36,27 +35,27 @@ clears, remove it from Blocked and record the clearing in its row.
 
 ## Headline
 
-Public, set up and tested. The owner followed every setup step and Tests
-1 to 4 between 2026-10-16 and 18 (the architecture chat's report, checked
-against GitHub's API where it can be). main takes changes only by pull
-request, with the checks and the scope check required; this seat commits
-on a branch, which the owner pushes and opens as a pull request. Open:
-step 5's policy, provable only by a scope run on or after 2026-11-02; the
-owner's decision on dark mode in the design contract; ADR-0012, held.
+Public, set up and tested; main changes only by pull request. The owner's
+decisions of 2026-10-18 are built on the branch dark-mode-and-capabilities,
+not yet pushed: a design says in design.json whether it offers dark, and
+CAPABILITIES' architecture lane is kept out of the repository. Open: the
+branch's merge; what copies of the template should inherit (a question to
+the owner); step 5's policy, provable only on or after 2026-11-02;
+ADR-0012, held.
 
 ## Publishing
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
-| The Actions policy allowing `pull_request_target` (step 5) | PARTIAL | [BELIEVED] set by the owner (the chat's report); the scope check ran on every pull request, but until 2026-11-02 GitHub runs it without the policy too | 2026-10-18 | ADR-0006, A2; setup Test 1 |
-| This branch, setup-guide-fixes, merged to main | PENDING | the owner pushes it and opens the pull request; checks and scope must pass | 2026-10-18 | 96675dc |
+| The Actions policy allowing `pull_request_target` (step 5) | PARTIAL | [BELIEVED] set by the owner (the chat's report); until 2026-11-02 GitHub runs the scope check without the policy too | 2026-10-18 | ADR-0006, A2; setup Test 1 |
+| This branch, dark-mode-and-capabilities, merged to main | PENDING | the owner pushes it and opens the pull request; checks and scope must pass | 2026-10-18 | 39e49e6, d612b96 |
 
 ## Decisions waiting on the owner
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | Lighthouse in CI | PENDING | held as proposed by the owner; speed measured locally | 2026-10-15 | ADR-0012 |
-| Dark mode in the design contract | PENDING | [VERIFIED] the page declares light and dark, so a design that sets no colours fails axe in device dark; CONTRIBUTING.md says a design is checked in dark "if it offers both"; options in the report of 2026-10-18 | 2026-10-18 | logs/2026-10-12-brief-1-build.md |
+| What a copy of the template inherits | PENDING | [VERIFIED] a copy inherits every tracked file: the records, logs, STATE.md, CLAUDE.md, the Code of Conduct's address, CODEOWNERS; options in the report of 2026-10-18 | 2026-10-18 | logs/2026-10-12-brief-1-build.md |
 
 ## Built, not yet complete
 
@@ -75,9 +74,7 @@ DONE rows are in docs/reference/completed.md.
 
 ## Known unverified
 
-- Whether a template copy shows a link back to its template on GitHub
-  (Test 4 showed its first runs start on their own; the link was not
-  reported).
+- Whether a template copy shows a link back to its template on GitHub.
 - Whether the step 5 policy lets the scope check run once GitHub enforces
   its block, from 2026-11-02.
 - Whether Chrome runs on the runner with its sandbox; it runs with

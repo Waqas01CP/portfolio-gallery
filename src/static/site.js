@@ -10,9 +10,10 @@
    itself is knot.js, beside this file, in a worker.
 
    The same file serves every design. A design turns the four heavy
-   effects and the theme switch on or off with custom properties on :root,
-   1 or 0 (docs/reference/design-contract.md); this file reads them once
-   the styles are in. */
+   effects on or off with custom properties on :root, 1 or 0
+   (docs/reference/design-contract.md); this file reads them once the
+   styles are in. The Dark switch is in the page only when the design's
+   design.json says it offers dark. */
 (() => {
   "use strict";
 
@@ -59,9 +60,8 @@
 
   /* Theme. The page follows the device; the switch overrides it for this
      visit only, by an attribute on <html> that a reload discards. A design
-     with one theme sets --pg-theme to 0, and the switch stays hidden. */
+     that offers no dark theme has no switch in its page (design.json). */
   const switches = $$("[data-theme-switch]");
-  if (!designSays("--pg-theme")) switches.forEach((s) => { s.hidden = true; });
   const pageDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : darkQuery.matches);
   const syncTheme = () => switches.forEach((s) => s.setAttribute("aria-checked", String(pageDark())));
   switches.forEach((s) => s.addEventListener("click", () => {

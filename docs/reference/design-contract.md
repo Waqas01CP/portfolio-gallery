@@ -23,7 +23,7 @@ content. base.css comes after the design, so on equal terms its rules win.
 ```
 body
   a.skip                                  skip link (base.css places it)
-  nav.dnav.dark         "Sections"        the menu as a bar: links, theme switch
+  nav.dnav.dark         "Sections"        the menu as a bar: links, Dark switch
   div.rail.dark         aria-hidden       a progress rail, decoration
   nav.mbar.dark         "Sections"        the menu as a phone bar, a <details>
   main#main
@@ -94,7 +94,8 @@ Shared pieces: `.wrap` (the content width), `.btn`, `.btn-acc`, `.btn-sm`,
 
 - `html.js`: the script has run. Controls that need it start `hidden`.
 - `html[data-theme="dark"]` or `[data-theme="light"]`: the visitor's switch,
-  for this visit. Without it, follow `prefers-color-scheme`.
+  for this visit. Without it, follow `prefers-color-scheme`. Only in a
+  design that offers dark (below).
 - `.dark`: on the Intro and the menus, which the default design sets dark.
 - `button.depth-toggle[aria-expanded="true"]`, `.proj.is-open`: a panel is
   open. `details[open]`, `.tl-entry.is-open`: a timeline card is open.
@@ -122,8 +123,21 @@ on, 0 off.
 | `--pg-tilt` | cards tilting toward the pointer |
 | `--pg-strip` | the moving availability strip |
 | `--pg-scroll` | the timeline's reading line and the faded words' drift |
-| `--pg-theme` | the theme switch |
 | `--knot` | (on `.intro`) the knot's colour |
+
+## Light and dark
+
+`dark` in design.json says whether the design styles a dark theme
+(ADR-0006, Changes, 2026-10-18).
+
+- `true`: the page declares `<meta name="color-scheme" content="light
+  dark">` and carries the Dark switch, in both menus. The design follows
+  `prefers-color-scheme` and `data-theme` as above, and every check runs
+  it in light, in device dark and switched dark. Set `color-scheme` on
+  `:root` for each theme, as both maintained designs do.
+- `false`: the page declares `content="light"` and has no Dark switch. The
+  browser keeps its light defaults on a device set to dark, so a design
+  that sets few colours still reads, and the design styles one theme.
 
 ## What base.css guarantees
 

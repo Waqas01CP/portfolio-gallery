@@ -22,7 +22,6 @@
   --pg-tilt: 0;
   --pg-strip: 0;
   --pg-scroll: 0;
-  --pg-theme: 1;
   color-scheme: light;
 }
 :root[data-theme="dark"] {

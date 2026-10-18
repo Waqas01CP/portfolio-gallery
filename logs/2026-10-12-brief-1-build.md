@@ -1,6 +1,6 @@
 ---
 type: log
-description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run. Round 4, 2026-10-18: the setup guide corrected from the owner's run of every step and test."
+description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run. Round 4, 2026-10-18: the setup guide corrected from the owner's run of every step and test. Round 5, 2026-10-18: dark mode by the design's word, and CAPABILITIES' architecture lane kept out of the repository."
 status: current
 ---
 
@@ -837,3 +837,110 @@ dark. Either way CONTRIBUTING.md's "dark if it offers both" changes.
 - Nothing pushed; the branch waits for the owner.
 - Step 5's proof, on or after 2026-11-02.
 - The dark-mode decision and what follows from it.
+
+---
+
+# Round 5, 2026-10-18 UTC: dark mode by the design's word; CAPABILITIES' private lane
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 5fe7e11, the website merge of pull request 6,
+whose tree is 165fa5a's (compared here). Work on the branch
+dark-mode-and-capabilities. HEAD at end: the commit that adds this
+section, on that branch. Mode: mutating. Ran from about 15:35Z.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner, after verifying
+Report 4 (pull request 6 merged as 5fe7e11; Checks and Deploy green on it;
+its CV search over 220 objects found no CV text). Two of the owner's
+decisions of 2026-10-18:
+
+1. Dark mode, option (b): a design states in design.json whether it
+   offers dark; when it does not, the engine writes a light-only
+   colour-scheme tag and leaves out the Dark switch. An ADR-0006 Changes
+   row; build.py, the templates and check_design.py changed, each with a
+   defeat case; CONTRIBUTING.md and add-a-design.md to match; then show
+   that the guide's Test 2 CSS passes without its colour-scheme line, and
+   simplify Test 2 if it does.
+2. CAPABILITIES: the public file stays, in this seat's lane only and
+   product-facing. The architecture chat's lane is never committed: a
+   gitignored file this repository's chat will keep, its name this seat's
+   to choose, in .gitignore and gate A with a defeat case. The public
+   file's line on that lane and CLAUDE.md's section to say so. And a
+   question to propose on: copies inherit the public CAPABILITIES.md.
+
+Commit on a branch; the owner pushes it and opens the pull request.
+
+## Errors this seat made
+
+1. **Backslashes through a Git Bash heredoc, a third time**: two `\\n` in
+   an edit to tools/prove_checks.py reached the file as line breaks and
+   broke two strings. Caught by Python refusing the file, before any run
+   or commit; repaired with the file tool, and the whole diff read for
+   other damage. Every later edit this round went through scripts written
+   with the file tool.
+2. **The Dark switch's `{% endif %}` at a line's end** ate the newline
+   after each switch, changing both maintained designs' pages by one
+   whitespace each. Caught by diffing a gallery built from main against
+   the branch's; moved to the next line's start, after which the pages
+   are byte-identical.
+3. **A background job started with `&`** inside a background command, so
+   its notification came at once; watched by its log instead.
+
+## What was done
+
+**Dark mode** (39e49e6). design.json's `dark`, true or false, required.
+build.py's `load_design` refuses anything else and passes it on;
+base.html.j2 writes `light dark` or `light`; nav.html.j2 includes both
+Dark switches only for `true`; site.js no longer reads `--pg-theme`, which
+`dark` replaces, and plain's design.css loses it. check_design.py
+requires `dark`; check_built.py refuses a site page whose colour-scheme
+tag and Dark switch disagree (the gallery's own page, which has no menu,
+is not held to it). Both maintained designs say `true`. A gallery built
+from main and one from the branch differ only in site.js and plain's
+design.css [VERIFIED by diff]. The contract gains "Light and dark" and
+loses `--pg-theme`; add-a-design.md shows `dark` and what it does;
+CONTRIBUTING.md reviews dark "when its design.json says it offers dark";
+ADR-0006's Changes row records the decision.
+
+**Test 2 without its line** [VERIFIED]: the guide's three-line CSS with
+`"dark": false`, built into a gallery beside both designs: its page has
+`content="light"` and no switch; every check with axe, 15:40Z to 15:56Z,
+0 failures in 960 s (tree 72 runs, keyboard 12, joins 6, anchors 204,
+words 6, motion 4, axe 48). The guide's Test 2 now drops the line and
+says `"dark": false`.
+
+**The private lane** (d612b96). The file is CAPABILITIES-PRIVATE.md, a
+name that says what it is beside CAPABILITIES.md. .gitignore ignores it
+at any depth; gate A refuses it at any path and in any letter case, as it
+refuses CHAT_STATE.md. CAPABILITIES.md says the lane is kept privately and
+loses its paragraph on the seats, which described the owner's role.
+CLAUDE.md's section and gate table, and ADR-0008's Changes, match.
+
+**Proofs** [VERIFIED]:
+
+- File defeat cases on the working tree, 15:38Z to 15:40Z: 48 failed as
+  built, 5 new (no dark, dark neither true nor false, a build without it,
+  a light-only tag with the switch, a page offering dark without it); 7
+  controls passed.
+- Every defeat case on a fresh clone of d612b96 with a new venv, `prove_checks.py --browser --axe`, 15:57:51Z to 16:16:59Z, 1,148 s: 58 failed as built (48 file, 10 browser), the 6 dark-mode cases among them; 9 controls passed, axe's among them.
+- `tools/ci.py checks --axe` on the same clone, 16:16:59Z to 16:27:21Z: exit 0 in 622 s; the workflow check, both designs, two builds each byte-identical (14 and 18 files), the built files, the trace (196 of 196), the browser checks 614 s with 0 failures (axe 36 runs).
+- Gates, in a clone of d612b96, 16:27:35Z to 16:30:26Z: 25 of 25 as expected, 21 defeat cases refused and 4 controls passed; new are CAPABILITIES-PRIVATE.md staged with -f at the root and as docs/capabilities-private.md.
+- The pre-publish search runs on the final commit after this section is committed; Report 5 gives its result.
+
+**The question, proposed**: see Report 5's section 6. A copy inherits
+not only CAPABILITIES.md but every file that serves only this project.
+
+## Rejected alternatives
+
+- Keeping `--pg-theme` beside `dark`: two sources for one fact, and a
+  design saying `true` in design.json could still hide its switch.
+- `dark` optional with a default: the decision asks the design to state
+  it, and a default would decide for contributors who never read it.
+- Naming the private file after the chat (as CHAT_STATE.md is): its
+  content is a lane of CAPABILITIES, and the name says so beside it.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner.
+- What to do about project files in copies: the owner's to decide.
