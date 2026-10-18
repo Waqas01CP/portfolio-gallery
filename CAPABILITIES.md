@@ -11,7 +11,7 @@ place, for a reader who will open nothing else: any chat that needs to know
 the project, and any person who reads README.md to use it and this file
 for the nuance.
 
-**Current as of 2026-10-16 UTC**, written by the implementing seat in its
+**Current as of 2026-10-18 UTC**, written by the implementing seat in its
 lane: what the system does and how, the stack, the qualities, the numbers,
 the limits, and the timeline's rows for what was built. **The architecture
 chat's lane is not yet written**: the problem the project solves, where it
@@ -132,6 +132,7 @@ his site's implementing seat and amended by his site's architecture chat.
 | 2026-10-12 | The engine copied by file from the owner's site at 5f3b84d and generalised; sample content; the default and plain designs; the gallery; the file and browser checks with their defeat cases; the gates; the workflows; the documents. Not published |
 | 2026-10-15 to 16 | The owner's answers applied: records 0006 to 0011 accepted, 0013 and 0014 written; axe-core in the checks workflow; the Code of Conduct's contact, allowed by gate A in that file alone; the Chrome launcher's start made safe. Not published |
 | 2026-10-16 | Published by the owner; the gallery live. The deploy job, skipped in every site-mode run, found by the architecture chat and fixed; the workflow check added |
+| 2026-10-17 to 18 | Every setup step and Tests 1 to 4 followed by the owner; main protected by a ruleset; the setup guide corrected from what the run showed |
 
 ## What it does not do, and its limits
 
@@ -142,10 +143,18 @@ dependency without a record; designs are CSS only (ADR-0006).
 
 **Limits, as measured or known on 2026-10-12:**
 
-- **Partly proven on GitHub.** Checks (9 minutes) and Deploy in gallery
-  mode pass there, with Chrome run without its sandbox (ADR-0010). The
-  scope check and the site-mode deploy, which every copy uses, are not
-  yet proven there (setup Tests 1, 2 and 4).
+- **Proven on GitHub, 2026-10-16 to 18**: Checks (9 minutes on a push,
+  13.5 on a design's pull request), Deploy in gallery mode and, in a
+  template copy, in site mode, and the scope check (4 to 6 seconds), with
+  Chrome run without its sandbox (ADR-0010). Step 5's policy for the
+  scope check is proven only by a run on or after 2026-11-02, when GitHub
+  starts enforcing its block.
+- **A design that sets no colours fails in dark mode.** The page declares
+  light and dark, so on a device set to dark such a design gets the
+  browser's dark defaults and fails axe's contrast rule; `:root {
+  color-scheme: light; }` keeps it light. Whether the contract should ask
+  every design for dark, or the engine change, is the owner's to decide
+  (2026-10-18).
 - **`pull_request_target` needs the owner's Actions policy.** GitHub blocks
   it by default in public repositories from 2026-11-02; without the policy
   the scope check stops running (docs/setup-on-github.md, step 5).

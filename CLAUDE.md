@@ -73,7 +73,10 @@ credit (ADR-0002, and his site's ADR-0012). His personal email addresses
 appear nowhere. The Code of Conduct's contact, a dedicated address, appears
 in CODE_OF_CONDUCT.md and nowhere else (his decision of 2026-10-15,
 ADR-0002). No path into his folders appears, nor anything from his site
-but the engine.
+but the engine. That rule covers files. Commits made on GitHub's website,
+his merges among them, are authored with his GitHub profile's name and
+his no-reply address: GitHub's doing, permanent once made (ADR-0002,
+Changes, 2026-10-18). Commits made in a clone use the handle.
 Refer to his Working Method by name only. Gate A enforces this on his
 machine from .git/info/never-commit, which is never committed.
 

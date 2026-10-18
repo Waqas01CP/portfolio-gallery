@@ -22,6 +22,12 @@ Every job that needs a job that can be skipped must have an `if:` that:
 
 It also refuses a `needs` naming no job in the file.
 
+Its limit: it checks that each result is named, not what the condition
+does with it. `!cancelled() && needs.assemble.result != 'success'` passes,
+though such a job runs only after assemble did not succeed (the portfolio
+architecture chat, 2026-10-18). Reading GitHub's expression language is
+beyond it; the review of a workflow change reads the condition.
+
 It reads only the YAML the workflows use under `jobs:`: block mappings by
 indentation, `needs:` as one name, a flow list or a block list, and `if:`
 as a plain or quoted scalar, a continued plain scalar, or a folded or

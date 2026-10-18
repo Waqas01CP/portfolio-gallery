@@ -1,6 +1,6 @@
 ---
 type: log
-description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run."
+description: "Brief 1 and its Addendum 1: the repository built from nothing to standing on its own, locally. The engine copied from the owner's site and generalised, two designs, the gallery, the checks and their defeat cases, the gates, the workflows and every document. Nothing published. Round 2, 2026-10-15 to 16: the owner's answers applied, axe-core in the checks workflow, gate A's allowed text and the Chrome launcher's start. Round 3, 2026-10-16: the deploy job, skipped in every site-mode run, fixed, and a check that says when workflow jobs run. Round 4, 2026-10-18: the setup guide corrected from the owner's run of every step and test."
 status: current
 ---
 
@@ -726,3 +726,114 @@ B run it first.
 - Nothing pushed by this seat. The fix is proven on GitHub only by Test 4,
   after the owner's push.
 - The scope check has not yet run; no pull request has been opened.
+
+---
+
+# Round 4, 2026-10-18 UTC: the setup guide as followed
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: e0b0f5e, equal to origin/main after the owner's
+push; main is protected by a ruleset, so this round's work is on the
+branch setup-guide-fixes. HEAD at end: the commit that adds this section,
+on that branch. Mode: mutating. Ran from about 12:10Z.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner: setup steps 1 to
+12 and Tests 1 to 4 are done, each result checked against GitHub's API.
+Eight fixes: step 9.7 and Test 1 (scope cannot be added to the ruleset
+before it has run); Test 2's CSS, which fails axe in device dark, with
+`:root { color-scheme: light; }` as the remedy; Test 2's steps, with
+direct links and a wait for both checks; a question for the owner on dark
+mode in the design contract, proposed, not decided; step 11's
+description and the label's; step 12's second box optional; website
+commits carry his profile name, to be said and recorded; and
+check_workflows.py's limit, to be stated. Deliver on a branch; the owner
+pushes it and opens the first real pull request to main.
+
+## Errors this seat made
+
+1. **Test 2's CSS went stale when axe joined CI.** It was checked on
+   2026-10-12 with every check then standing; c7e3fd9 added axe to the
+   checks on 2026-10-16 and the guide's "checked with every check" was
+   not rerun. Cost: a failed checks run in the owner's setup (PR 5 at
+   4d96a72, 09:46Z to 09:59Z, read from the API) and the chat's run to
+   find the cause.
+2. **The guide's Test 2 steps** led to two pull requests of one file each
+   (PRs 2 and 3), each failing the design check, rightly. Cost: two
+   pull requests that cannot be deleted.
+3. **Step 9 asked for a check the picker cannot offer** before it has run.
+4. **Step 11's title promised a description** no sub-step set.
+5. **Step 12 made blocking command-line pushes mandatory**, which would
+   refuse pushes from any of his repositories that commit with an
+   account address.
+6. **This round's first defeat case for website commits** expected the
+   name anywhere in the output, which another case already put there, so
+   it could not fail. Tied to its own commit before it was run.
+
+## What was done
+
+**Checked from GitHub's API** [VERIFIED]: the ruleset `main` is active
+with deletion, non_fast_forward, pull_request (0 approvals) and required
+checks "checks" and "scope", both from GitHub Actions (integration 15368);
+the bypass list is not shown to an unauthenticated reader. Pull requests
+1 to 5 are closed unmerged; every commit in them is authored with his profile's name and the
+no-reply address, and committed by GitHub. Scope ran on
+each (pull_request_target): failed on PRs 1 and 4, passed on 2, 3 and 5;
+on PR 4 in 6 s, with checks passing in 9 min; on PR 5 (edfe07f) both
+passed, checks 10:52Z to 11:06Z. The CSS on PR 5 is the guide's with
+`:root { color-scheme: light; }` first. pg-copy-test answers 404.
+
+**Test 2's CSS, reproduced** on Chrome 154, axe-core 4.14.0, a gallery
+with the test design: without the line, 4 failures in 221 s, all on the
+test design in device dark at 360 and 1366 px, color-contrast on the
+menu's `a[aria-current]`; with it, 0 in 207 s. The chat's run on
+Chromium 141 found the same.
+
+**Committed on setup-guide-fixes** (96675dc), each item as the chat
+asked: step 9.7 adds checks only, and Test 1 adds scope once its pull
+request has run it; Test 2's CSS with the line and why, its steps by the
+two direct links, and a wait for both checks; step 2's and step 11's
+description as the owner set it, and the label's; step 12's second box
+optional, and its first now says website commits carry the profile's
+name; CLAUDE.md and ADR-0002's Changes record that name on website
+commits and merges; check_workflows.py's docstring and standing-checks.md
+state its limit, which this seat confirmed (`!cancelled() &&
+needs.assemble.result != 'success'` passes, exit 0). Two additions: a
+status line opening the guide, and Test 1 to run once more on or after
+2026-11-02, because until then GitHub only evaluates its block on
+`pull_request_target` and the scope check runs with or without step 5's
+policy; every scope run so far was on 2026-10-17 or 18.
+
+**The pre-publish search** now allows his profile's name as the author or
+committer name of a commit with his no-reply address, and nowhere else.
+Its defeat run, in a scratch clone: 7 of 7 cases found, the new one his
+name as a commit's author with another address; and the control, his
+name with his no-reply address, not reported.
+
+**Proofs** [VERIFIED]: the file defeat cases, 13:32Z to 13:33Z, 43 failed
+as built and 7 controls passed; gates A, B and C passed on 96675dc.
+
+**The question for the owner, proposed**: (a) the contract asks every
+design to be legible in light and in dark, and a light-only design adds
+`:root { color-scheme: light; }` and hides the Dark switch, both shown in
+add-a-design.md; or (b) the engine stops declaring dark for every design:
+a design says in design.json whether it offers dark, and the engine
+writes the colour-scheme tag from that and leaves the switch out when it
+does not. Recommended: (b), so the least CSS passes as it is and no
+design shows a switch that does nothing; it changes the design format,
+so ADR-0006 gains a Changes row, and the two maintained designs declare
+dark. Either way CONTRIBUTING.md's "dark if it offers both" changes.
+
+## Rejected alternatives
+
+- Changing the contract or the engine now: the chat asked for a proposal
+  and the owner's decision.
+- A new record for website commit names: it is a fact GitHub sets, not a
+  choice; ADR-0002's Changes holds it beside the rule it qualifies.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner.
+- Step 5's proof, on or after 2026-11-02.
+- The dark-mode decision and what follows from it.
