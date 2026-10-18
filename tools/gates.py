@@ -27,12 +27,12 @@ in the session log that built them; docs/reference/standing-checks.md):
      passes; an allowed text in its own file passes.
   B  The staged tree builds, pre-commit. Copies the staged tree to a
      temporary folder and runs, there: the workflows' job conditions
-     (tools/check_workflows.py); the template cleanup, while there is one
-     (tools/check_template_cleanup.py); every design checked; the site built,
+     (tools/check_workflows.py); every design checked; the site built,
      its files checked and its content traced; the gallery built and its
-     files checked (tools/ci.py build). Building the staged tree, not the
-     working tree, judges what is about to be committed; untracked files
-     on disk play no part. Defeated by a staged design with an @import,
+     files checked (tools/ci.py build); then the template cleanup, while
+     there is one (tools/check_template_cleanup.py). Building the staged
+     tree, not the working tree, judges what is about to be committed;
+     untracked files on disk play no part. Defeated by a staged design with an @import,
      by content whose cut is not a cut, and by a deploy job with no if:.
   C  Map, pre-commit. Runs tools/generate_map.py --check against the
      staged files: refuses a stale map, and a staged Markdown header GitHub
@@ -226,11 +226,12 @@ def gate_b() -> list[str]:
             if not (tree / required).is_file():
                 raise MissingTool(f"{required} is not in the staged tree")
         steps = [["tools/check_workflows.py"],
-                 *([["tools/check_template_cleanup.py"]]
-                   if (tree / ".github" / "template-cleanup" / "cleanup.py").is_file() else []),
                  ["tools/check_design.py"],
                  ["tools/ci.py", "build", "--mode", "site", "--out", str(Path(tmp) / "site")],
-                 ["tools/ci.py", "build", "--mode", "gallery", "--out", str(Path(tmp) / "gallery")]]
+                 ["tools/ci.py", "build", "--mode", "gallery", "--out", str(Path(tmp) / "gallery")],
+                 # After the checks it repeats on a cleaned copy.
+                 *([["tools/check_template_cleanup.py"]]
+                   if (tree / ".github" / "template-cleanup" / "cleanup.py").is_file() else [])]
         for step in steps:
             result = subprocess.run([sys.executable, *step], cwd=tree, capture_output=True, text=True)
             if result.returncode != 0:
