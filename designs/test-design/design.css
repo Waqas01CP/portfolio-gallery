@@ -1,3 +1,4 @@
-.mbar, .rail, .knot { display: none; }
-ul, ol, summary { list-style: none; }
-summary::-webkit-details-marker { display: none; }
+   :root { color-scheme: light; }
+   .mbar, .rail, .knot { display: none; }
+   ul, ol, summary { list-style: none; }
+   summary::-webkit-details-marker { display: none; }
