@@ -34,7 +34,10 @@ and a GitHub Actions workflow builds a one-page site with every word in
 the first response, no cookies, no tracking and nothing loaded from another
 site. Designs are folders of CSS, fonts and images, contributed by pull
 request, checked automatically for scope, file safety and accessibility,
-and merged only by the owner. It costs nothing to run: GitHub's free
+and merged only by the owner. After the designs, the gallery shows a
+showcase of contributors' own portfolio sites, each a link and a
+screenshot its author supplies, checked as files and, never rendered, by
+its response. It costs nothing to run: GitHub's free
 public-repository features only. Public on GitHub since 2026-10-16; the
 gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 
@@ -50,7 +53,9 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    inline style is needed, and copies the engine's scripts and the
    design's files into `_site/` (ADR-0004). In gallery mode it builds every
    design on the same content, each at `designs/<name>/`, and a gallery
-   page.
+   page: templates first, each with an optional "In use" link to its
+   author's own site, then the showcase from `showcase/` (ADR-0016). The
+   footer's credit names the project, the design and its author.
 3. **Checks before publishing.** The built files (no load from another
    origin, the policy tag, links resolve letter for letter) and the content
    trace; a failure publishes nothing.
@@ -67,10 +72,17 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 7. **Contributions.** A design pull request passes the scope check (from
    the default branch, reading only the file list), the design checks and
    the browser checks on every design, then the owner's review (ADR-0006).
+   A showcase entry, `showcase/<login>/` with entry.json and one
+   screenshot, passes the scope check as its author's own, the file
+   checks, and a fetch of its site, never rendered: https, a 200 page, not
+   parked, linking to the author's GitHub profile; then the owner's review.
+   Every site is fetched again weekly by a workflow that holds no
+   permissions and reports by failing (ADR-0016).
 8. **A copy cleans itself up.** In a repository made with "Use this
    template", a workflow removes the project's own files once, puts a
    README of the copy's own in place and commits; it never runs here or
-   in a fork (ADR-0015).
+   in a fork (ADR-0015). The showcase and every design's "In use" link go
+   with them.
 
 ## How data is stored, and where it may go
 
@@ -80,7 +92,8 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
   requests to another origin; the Content-Security-Policy in every page
   refuses them even if a check misses one.
 - **The owner's private material never enters the repository.** Gate A
-  refuses his name outside LICENSE and README.md, his personal email
+  refuses his name outside LICENSE, README.md and his own showcase entry,
+  his personal email
   addresses anywhere, the Code of Conduct's contact address outside
   CODE_OF_CONDUCT.md, and his private folder name, from a pattern file in
   git's own folder that is never committed (ADR-0008, ADR-0002).
@@ -103,7 +116,8 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 |---|---|
 | A design cannot run code or load from elsewhere | The design format (ADR-0006); tools/check_design.py; the scope check; the page's Content-Security-Policy |
 | A workflow job runs when it should | tools/check_workflows.py: a job after one that can be skipped must say when it runs, or GitHub skips it too and reports success |
-| A pull request cannot change how it is checked | scope.yml on `pull_request_target`, from the default branch; it fails any change outside one design folder |
+| A pull request cannot change how it is checked | scope.yml on `pull_request_target`, from the default branch; it fails any change outside one design folder or its author's own showcase entry |
+| A contributor's site is never rendered by the project | tools/check_showcase.py fetches responses only, bounded in time, size and redirects, refusing private addresses; the weekly workflow holds no permissions (tools/check_workflows.py refuses any) |
 | Every word in the first response, readable without scripts | The fixed HTML; the words check compares every design with no design, scripts off |
 | Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
 | A check can fail | tools/prove_checks.py runs each on its defeat case: 55 file cases and 10 browser cases, with 10 controls |

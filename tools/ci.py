@@ -2,7 +2,9 @@
 
   python tools/ci.py checks [--quick] [--axe FILE]
       Everything a pull request must pass: the workflows' job conditions
-      (tools/check_workflows.py); every design checked; the site
+      (tools/check_workflows.py); every design checked; the showcase's
+      files checked, while the project has the tool (tools/check_showcase.py,
+      no fetching; checks.yml fetches a pull request's sites); the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; the template cleanup, while
@@ -91,6 +93,10 @@ def checks(quick: bool, axe: Path | None) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
     run("tools/check_workflows.py")
     run("tools/check_design.py")
+    # The showcase's files; a cleaned copy of the template has no showcase
+    # and not this tool (ADR-0016).
+    if (ROOT / "tools" / "check_showcase.py").is_file():
+        run("tools/check_showcase.py")
     twice(as_of)
     twice(as_of, "--gallery")
     site, gallery = ROOT / "_site", ROOT / "_gallery"

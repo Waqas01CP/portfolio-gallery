@@ -20,7 +20,11 @@ Every job that needs a job that can be skipped must have an `if:` that:
   - with `always()` or `cancelled()`, names `needs.<job>.result` for every
     job it needs, so it cannot run after one of them failed.
 
-It also refuses a `needs` naming no job in the file.
+It also refuses a `needs` naming no job in the file, and a workflow that
+runs on a schedule unless it holds no permissions at all: `permissions: {}`
+at the top and none in its jobs. A scheduled run starts with nobody's
+review, so it may write nothing (ADR-0016, the owner's answer Q2 of
+2026-10-19).
 
 Its limit: it checks that each result is named, not what the condition
 does with it. `!cancelled() && needs.assemble.result != 'success'` passes,
@@ -145,6 +149,8 @@ def read_job(body: list[tuple[int, int, str]], job: dict) -> None:
             job["needs"] = read_needs(value, nested, number)
         elif key == "if":
             job["if"] = read_scalar(value, nested, number)
+        elif key == "permissions":
+            job["permissions"] = number
 
 
 def refuse_special(value: str, number: int) -> None:
@@ -186,6 +192,43 @@ def read_scalar(value: str, nested, number: int) -> str:
     return " ".join([value] + [strip_comment(content) for _, _, content in nested]).strip()
 
 
+def top_level(text: str) -> dict[str, tuple[int, str, list[str]]]:
+    """{key: (line, value, the lines under it)} for the file's top-level keys."""
+    keys: dict[str, tuple[int, str, list[str]]] = {}
+    current = None
+    for number, line in enumerate(text.splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if line[:1] not in (" ", "\t"):
+            match = KEY.match(line.strip())
+            if match:
+                current = match[1].strip("'\"")
+                keys[current] = (number, strip_comment(match[2] or ""), [])
+            continue
+        if current:
+            keys[current][2].append(line)
+    return keys
+
+
+def schedule_problems(text: str, jobs: dict[str, dict], shown: str) -> list[str]:
+    keys = top_level(text)
+    trigger = keys.get("on") or keys.get("true")
+    if not trigger:
+        return []
+    _, value, nested = trigger
+    if "schedule" not in value and not any(re.match(r"^\s+schedule\s*:", l) for l in nested):
+        return []
+    problems = []
+    if "permissions" not in keys or keys["permissions"][1] != "{}" or keys["permissions"][2]:
+        problems.append(f"{shown}: runs on a schedule, so it must hold no permissions: "
+                        f"`permissions: {{}}` at the top")
+    for name, job in jobs.items():
+        if job.get("permissions"):
+            problems.append(f"{shown}, job '{name}' (line {job['permissions']}): runs on a schedule, "
+                            f"so it may grant itself no permissions")
+    return problems
+
+
 def skippable(jobs: dict[str, dict]) -> set[str]:
     found = {name for name, job in jobs.items() if job["if"] is not None}
     changed = True
@@ -200,11 +243,12 @@ def skippable(jobs: dict[str, dict]) -> set[str]:
 
 def check_file(path: Path) -> list[str]:
     shown = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
+    text = path.read_text(encoding="utf-8")
     try:
-        jobs = read_jobs(path.read_text(encoding="utf-8"))
+        jobs = read_jobs(text)
     except Unreadable as error:
         return [f"{shown}: unreadable under jobs:, {error}"]
-    problems = []
+    problems = schedule_problems(text, jobs, shown)
     can_skip = skippable(jobs)
     for name, job in jobs.items():
         where = f"{shown}, job '{name}' (line {job['line']})"

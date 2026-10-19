@@ -12,7 +12,9 @@ Run with the project venv active:
   python build.py --design plain        the site, in another design
   python build.py --gallery             the gallery: every design in designs/,
                                         each built on the same content, and a
-                                        page showing them all
+                                        page showing them all, then the
+                                        showcase of contributors' own sites
+                                        in showcase/ (ADR-0016)
   python build.py --as-of YYYY-MM       as of a given month (default: this UTC month)
   python build.py --out DIR             write somewhere other than _site/
 
@@ -52,6 +54,7 @@ ITEMS = CONTENT_DIR / "items.json"
 TEMPLATES = ROOT / "src" / "templates"
 STATIC_SRC = ROOT / "src" / "static"
 DESIGNS = ROOT / "designs"
+SHOWCASE = ROOT / "showcase"
 REQUIREMENTS = ROOT / "requirements.txt"
 DEFAULT_OUT = ROOT / "_site"
 
@@ -137,6 +140,9 @@ GRID_COLUMNS = 6
 # build: the first screen at 1366 by 900 CSS pixels, saved at half size.
 PREVIEW_FILE = "preview.webp"
 PREVIEW_SIZE = (683, 450)
+# A showcase entry's screenshot, supplied by its author (ADR-0016, D1); the
+# card shows it whole, scaled into the preview's box.
+SHOWCASE_SHOTS = ("screenshot.png", "screenshot.jpg", "screenshot.jpeg", "screenshot.webp")
 
 
 class BuildError(Exception):
@@ -832,9 +838,48 @@ def load_design(name: str) -> dict:
     if not (isinstance(preload, list) and all(isinstance(p, str) and p in files
                                               and p.endswith(".woff2") for p in preload)):
         raise BuildError(f"designs/{name}/design.json: preload must list .woff2 files in the design")
+    # The author's own live site built with the design, shown as "In use"
+    # on its gallery card (ADR-0016).
+    in_use = meta.get("in_use")
+    if in_use is not None and not (_text(in_use) and in_use.startswith("https://")
+                                   and urlsplit(in_use).hostname):
+        raise BuildError(f"designs/{name}/design.json: in_use must be an https:// address")
     return {"slug": name, "name": meta["name"], "author": meta["author"],
             "author_url": meta["author_url"], "description": meta["description"],
-            "dark": meta["dark"], "preload": preload, "files": files}
+            "dark": meta["dark"], "preload": preload, "files": files, "in_use": in_use,
+            "in_use_host": urlsplit(in_use).hostname if in_use else None}
+
+
+# The showcase.
+
+def load_showcase() -> list[dict]:
+    """Contributors' own sites, one folder per person, by folder name. The
+    full rules are tools/check_showcase.py's; the build refuses only what
+    would stop it rendering a card."""
+    if not SHOWCASE.is_dir():
+        return []
+    entries = []
+    for folder in sorted(p for p in SHOWCASE.iterdir() if p.is_dir() and not p.is_symlink()):
+        where = f"showcase/{folder.name}"
+        try:
+            entry = json.loads((folder / "entry.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise BuildError(f"{where}/entry.json cannot be read: {error}") from None
+        if not (isinstance(entry, dict) and _text(entry.get("name"))
+                and _text(entry.get("url")) and entry["url"].startswith("https://")
+                and urlsplit(entry["url"]).hostname):
+            raise BuildError(f"{where}/entry.json needs a name and an https:// url "
+                             f"(run tools/check_showcase.py for every rule)")
+        shots = [n for n in SHOWCASE_SHOTS if (folder / n).is_file() and not (folder / n).is_symlink()]
+        if len(shots) != 1:
+            raise BuildError(f"{where}/ needs exactly one screenshot: "
+                             f"{', '.join(SHOWCASE_SHOTS)}")
+        description = entry.get("description")
+        entries.append({"login": folder.name, "name": entry["name"], "url": entry["url"],
+                        "host": urlsplit(entry["url"]).hostname,
+                        "description": description if _text(description) else None,
+                        "image": f"{where}/{shots[0]}"})
+    return entries
 
 
 # Environment and output.
@@ -925,6 +970,7 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
 
     names = design_names() if gallery else [design_override or config["design"]]
     designs = [load_design(name) for name in names]
+    showcase = load_showcase() if gallery else []
     env = environment()
 
     base = {
@@ -951,7 +997,7 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
         pages["index.html"] = render(env, "gallery.html.j2", {
             "as_of": as_of, "csp": CSP, "designs": designs, "project_name": PROJECT_NAME,
             "project_url": PROJECT_URL, "preview_file": PREVIEW_FILE,
-            "preview_size": PREVIEW_SIZE, "sample_name": site["name"]})
+            "preview_size": PREVIEW_SIZE, "sample_name": site["name"], "showcase": showcase})
     else:
         design = designs[0]
         pages["index.html"] = render(env, "base.html.j2", {
@@ -977,6 +1023,10 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
             shutil.copyfile(STATIC_SRC / "gallery.css", static / "gallery.css")
             for design in designs:
                 copy_design(design, staging / "designs" / design["slug"])
+            for entry in showcase:
+                target = staging / entry["image"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / entry["image"], target)
         else:
             copy_design(designs[0], staging / "design")
         if cv_pdf:
@@ -992,7 +1042,7 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
     except BaseException:
         shutil.rmtree(staging, ignore_errors=True)
         raise
-    what = (f"the gallery of {len(designs)} design(s)" if gallery
+    what = (f"the gallery of {len(designs)} design(s) and {len(showcase)} showcase site(s)" if gallery
             else f"the site in the '{designs[0]['slug']}' design")
     return (f"built {what}: {len(items)} item(s), as of {as_of}, "
             f"into {out.relative_to(ROOT).as_posix() if out.is_relative_to(ROOT) else out}")

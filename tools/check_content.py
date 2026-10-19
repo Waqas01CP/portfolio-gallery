@@ -423,6 +423,13 @@ def main(argv: list[str] | None = None) -> int:
     owned = [t for route in site.get("contact", []) for k in ("label", "line", "cta")
              if (t := route.get(k))]
     owned += [link["label"] for item in items for link in item.get("proof", [])]
+    # The footer's credit names the design and its author (ADR-0016, D2).
+    try:
+        design = json.loads((ROOT / "designs" / config.get("design", "") / "design.json")
+                            .read_text(encoding="utf-8"))
+        owned.append(f"design {design['name']} by {design['author']}")
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
     tracer = Tracer(cv, ENGINE_TEXT + owned)
 
     page = Blocks()

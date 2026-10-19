@@ -56,7 +56,10 @@ propose, add or reintroduce any of them. When you refuse something on
 this floor, name the line.
 
 1. No personal content of the owner's beyond a credit line: sample content
-   only, fictional and obviously so.
+   only, fictional and obviously so. Read, by the owner on 2026-10-19, as
+   protecting the template: a copy receives none of his details. It does
+   not limit what the gallery page shows, nor other people's details
+   (ADR-0001, Changes; ADR-0016).
 2. No cookies, tracking, analytics, or requests to another origin, in
    anything the template or a design ships.
 3. Every word a reader needs is in the initial HTML; scripts only enhance.
@@ -68,8 +71,13 @@ this floor, name the line.
 ## The owner's name and private material
 
 This repository is public; its history cannot be deleted. The owner's name
-appears in exactly two places, LICENSE's copyright line and the README's
-credit (ADR-0002, and his site's ADR-0012). His personal email addresses
+appears in LICENSE's copyright line and the README's credit (ADR-0002, and
+his site's ADR-0012), and may appear in his own showcase entry,
+showcase/waqas01cp/entry.json, and its card on the built gallery; his site
+may be the Default design's in_use (his answer Q3 of 2026-10-19, ADR-0016).
+A copy of the template receives his name only in LICENSE: the cleanup
+removes showcase/ and every in_use. His CV text never enters this
+repository. His personal email addresses
 appear nowhere. The Code of Conduct's contact, a dedicated address, appears
 in CODE_OF_CONDUCT.md and nowhere else (his decision of 2026-10-15,
 ADR-0002). No path into his folders appears, nor anything from his site
@@ -133,7 +141,7 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 | Gate | When | Blocks |
 |---|---|---|
 | A | pre-commit | CHAT_STATE.md and CAPABILITIES-PRIVATE.md at any path; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
-| B | pre-commit | A staged tree whose workflows' job conditions, template cleanup, designs, site build, gallery build, built files or content trace fail |
+| B | pre-commit | A staged tree whose workflows' job conditions or scheduled permissions, template cleanup, designs, showcase files, site build, gallery build, built files or content trace fail |
 | C | pre-commit | A stale MAP.md, or a Markdown header GitHub cannot read |
 | D | every hook | A missing tool: a refusal naming it, never a skip |
 | E | pre-push | Implementation work pushed with no commit in the range touching STATE.md |

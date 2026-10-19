@@ -1,0 +1,39 @@
+# The weekly showcase check (ADR-0016): every showcase entry's site and
+# every design's "In use" link, fetched as responses and never rendered,
+# for https, a 200 answer, a domain not parked, and, for an entry, a link
+# to its author's GitHub profile.
+#
+# It holds no permissions at all (the owner's answer Q2, 2026-10-19): it
+# edits nothing and opens nothing. A failed run, its summary listing the
+# entries, is the notice; GitHub sends it to the user who last changed the
+# cron line below. GitHub disables a schedule in a public repository after
+# 60 days without activity there (GitHub Docs, "Events that trigger
+# workflows"), so a quiet repository stops being checked until the owner
+# turns it back on (docs/setup-on-github.md).
+#
+# No action runs and no token is used: the default branch is copied by an
+# anonymous clone, as any visitor could.
+name: Showcase links
+
+on:
+  schedule:
+    # Mondays, 06:17 UTC.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  links:
+    # Only here: a copy of the template has no showcase; the template
+    # cleanup deletes this file, and it runs nothing if it stays (ADR-0015).
+    if: ${{ github.repository == 'Waqas01CP/portfolio-gallery' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Copy the default branch, anonymously
+        run: git clone --quiet --depth 1 "https://github.com/$REPOSITORY.git" repo
+      - name: Fetch every showcase site and In use link, never rendering one
+        run: python3 repo/tools/check_showcase.py --fetch-all

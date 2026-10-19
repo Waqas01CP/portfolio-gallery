@@ -60,18 +60,23 @@ these yourself, the first two above all:
    about your site would go there instead of to you.
 2. `.github/CODEOWNERS`: it makes the project's account the owner of
    every file in your repository.
-3. The project's records and rules: `docs/decisions/`, `docs/deferred/`,
+3. `showcase/`, the gallery's showcase of other people's sites, and the
+   `"in_use"` line in each `designs/*/design.json`, a link to a design
+   author's own site.
+4. The project's records and rules: `docs/decisions/`, `docs/deferred/`,
    `logs/`, `briefs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
    `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`,
    `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`.
-4. Its own guides: `docs/setup-on-github.md`,
-   `docs/how-to/add-a-design.md`, and in `docs/reference/`:
-   `commands.md`, `completed.md`, `provenance.md`, `standing-checks.md`.
-5. Its own tools: `.githooks/`, and in `tools/`: `gates.py`,
+5. Its own guides: `docs/setup-on-github.md`,
+   `docs/how-to/add-a-design.md`, `docs/how-to/add-to-the-showcase.md`,
+   and in `docs/reference/`: `commands.md`, `completed.md`,
+   `provenance.md`, `standing-checks.md`.
+6. Its own tools: `.githooks/`, and in `tools/`: `gates.py`,
    `never-commit.txt`, `generate_map.py`, `prove_checks.py`,
-   `scope_check.py`, `check_template_cleanup.py`.
-6. The cleanup itself: `.github/template-cleanup/`, and the project's own
-   workflows, `.github/workflows/scope.yml` and
+   `scope_check.py`, `check_showcase.py`, `check_template_cleanup.py`.
+7. The cleanup itself: `.github/template-cleanup/`, and the project's own
+   workflows, `.github/workflows/scope.yml`,
+   `.github/workflows/showcase-links.yml` and
    `.github/workflows/template-cleanup.yml`.
 
 Then replace `README.md` with your own. Each path, with why it goes, is
@@ -114,7 +119,8 @@ traced then.
    `"design": "plain"`; every design is in the gallery. Also the PDF to
    offer as "Download CV" (`"cv_pdf": ""` for none; upload yours to
    `content/` and name it here exactly, letter for letter), and whether the
-   footer says "Built with portfolio-gallery" (`"credit"`).
+   footer carries the credit line (`"credit"`), "Built with
+   portfolio-gallery", with the design and its author.
 
 Commit each change with **Commit changes**. The browser commits one file
 at a time, so when a fact changes in two files, the run for the first
@@ -150,5 +156,12 @@ see what a design does with your content.
   take an update, copy the changed engine files (`build.py`, `src/`,
   `tools/`, `designs/`, `.github/workflows/`) into your repository; your
   `content/` is never touched by an update.
-- **Credit**: the footer link is on by default. Turning it off is your
-  choice; a mention in your repository's README is appreciated.
+- **Credit**: the footer's line, "Built with portfolio-gallery, design
+  Default by Waqas01CP" for the default design, names this project and
+  the design's author, each linked, and is on by default. It is how the
+  people who made your site get found, so please keep it if you can.
+  Turning it off with `"credit": false` is your choice: the MIT licence
+  asks only that `LICENSE` stays. A mention in your repository's README is
+  appreciated either way.
+- **Your site in the gallery**: once it is live, you can add it to the
+  gallery's showcase (https://github.com/Waqas01CP/portfolio-gallery/blob/main/docs/how-to/add-to-the-showcase.md).

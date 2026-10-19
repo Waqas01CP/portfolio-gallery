@@ -25,6 +25,11 @@ seen without running anything:
     without it, for one that does not (design.json's dark; ADR-0006,
     Changes, 2026-10-18). The gallery's own page, which is no design's,
     is not held to this;
+  - the footer's credit, where a page has one, links this project, then
+    the design's author (ADR-0016, D2);
+  - in the gallery, every link to another site in a showcase card or a
+    design's "In use" line carries rel="ugc nofollow", and every
+    showcase picture loads lazily (ADR-0016);
   - with --previews, every design in a gallery has its preview image;
     without it, a missing preview is not reported, because the previews
     are taken after the build.
@@ -44,7 +49,7 @@ from urllib.parse import unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from build import CSP, PREVIEW_FILE  # noqa: E402
+from build import CSP, PREVIEW_FILE, PROJECT_URL  # noqa: E402
 from check_design import CSSError, tokens  # noqa: E402
 
 RESOURCE_ATTRS = {"src", "srcset", "poster", "data", "action", "formaction", "background",
@@ -74,6 +79,9 @@ class Page(HTMLParser):
         self.nav = False
         self.stack: list[str] = []
         self.in_section: list[bool] = []
+        self.credit_links: list[list[str]] = []
+        self.in_credit = False
+        self.contributed: str | None = None  # "site" in a showcase card, "in_use" in its line
 
     VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
             "source", "track", "wbr"}
@@ -130,12 +138,40 @@ class Page(HTMLParser):
                 self.problems.append(f"<link rel=\"{a.get('rel')}\"> is not one the build makes")
         if tag == "a" and "href" in a:
             self.anchors.append(a["href"])
+        classes = set(a.get("class", "").split())
+        if tag == "p" and "foot-credit" in classes:
+            self.in_credit = True
+            self.credit_links.append([])
+        if tag == "a" and self.in_credit:
+            self.credit_links[-1].append(a.get("href", ""))
+        # What contributors supply: a showcase card, and a design's "In use"
+        # line (ADR-0016). Their links to other sites are marked as such, so
+        # an entry earns its author no search ranking from this page, and a
+        # card's picture loads only as it scrolls into view.
+        if tag == "li" and "g-site" in classes:
+            self.contributed = "site"
+        if tag == "p" and "g-inuse" in classes:
+            self.contributed = "in_use"
+        if self.contributed and tag == "a" and urlsplit(a.get("href", "")).scheme in ("http", "https"):
+            if not {"ugc", "nofollow"} <= set(a.get("rel", "").lower().split()):
+                self.problems.append(f"a link to {a.get('href')} in a contributor's "
+                                     f"{'showcase card' if self.contributed == 'site' else 'In use line'} "
+                                     f"lacks rel=\"ugc nofollow\"")
+        if self.contributed == "site" and tag == "img" and a.get("loading") != "lazy":
+            self.problems.append(f"the showcase picture {a.get('src')} does not load lazily "
+                                 f"(loading=\"lazy\")")
         if inside and "hidden" in a and a.get("aria-hidden") != "true":
             name = a.get("id") or a.get("class") or tag
             self.problems.append(f"<{tag}> '{name}' is hidden inside a section but not "
                                  f"aria-hidden=\"true\"")
 
     def handle_endtag(self, tag):
+        if tag == "p":
+            self.in_credit = False
+            if self.contributed == "in_use":
+                self.contributed = None
+        if tag == "li" and self.contributed == "site":
+            self.contributed = None
         if tag in self.VOID:
             return
         while self.stack:
@@ -210,6 +246,13 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
         elif page.color_scheme not in ("light", "light dark"):
             problems.append(f"the colour-scheme tag must be 'light' or 'light dark', not "
                             f"{page.color_scheme!r}")
+    for links in page.credit_links:
+        # The credit names this project and the design's author, each
+        # linked (ADR-0016, D2); config.json may leave it out altogether.
+        # The author's link is the second; Plain's author is the project.
+        if len(links) < 2 or links[0] != PROJECT_URL or urlsplit(links[1]).scheme != "https":
+            problems.append("the footer credit does not link both portfolio-gallery and the "
+                            "design's author (ADR-0016, D2)")
     for url in page.loads:
         # A gallery's previews are taken after the build, by the screenshot
         # job (tools/screenshots.py); --previews requires them, and the

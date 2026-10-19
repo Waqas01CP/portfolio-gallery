@@ -1,6 +1,6 @@
 <!--
 type: reference
-description: The rules for contributing to portfolio-gallery. How a design is proposed and submitted, what the checks enforce, what the review covers, how credit is shown, and what the maintainer commits to.
+description: The rules for contributing to portfolio-gallery. How a design or a showcase entry is proposed and submitted, what the checks enforce, what the review covers, how credit is shown, and what the maintainer commits to.
 status: current
 -->
 
@@ -11,9 +11,16 @@ they apply to every contribution, the maintainer's included. They exist
 because a design you contribute is published by everyone who chooses it,
 under their own name.
 
-**Contributions are designs.** Anything else (a bug fix, a feature, a
-change to the page's HTML or to a check) starts as an issue, so it can be
-discussed before anyone writes it.
+**Contributions are designs, or a link to your own site.** The gallery
+shows templates first, designs anyone can use, then the showcase,
+contributors' own portfolio sites. A design is encouraged, and shown
+among the templates, with an optional "In use" link to your own site
+built with it. A showcase entry is your site's link and a screenshot, and
+nothing ranks it lower within the showcase:
+[docs/how-to/add-to-the-showcase.md](docs/how-to/add-to-the-showcase.md).
+Anything else (a bug fix, a feature, a change to the page's HTML or to a
+check) starts as an issue, so it can be discussed before anyone writes
+it.
 
 ## What a design is
 
@@ -22,7 +29,7 @@ A design is one folder, `designs/<your-design>/`, holding:
 | File | What |
 |---|---|
 | `design.css` | Your stylesheet, at most 100 KB |
-| `design.json` | The design's name, your name as you want it shown, your profile's address, a one-line description, whether it offers a dark theme, the fonts to preload, and the licence of every font and image |
+| `design.json` | The design's name, your name as you want it shown, your profile's address, a one-line description, whether it offers a dark theme, the fonts to preload, the licence of every font and image, and optionally `in_use`, your own live site built with it |
 | `fonts/*.woff2` | Optional fonts, at most 200 KB each, each with its licence text as `fonts/*.txt` |
 | `img/*.png`, `*.webp`, `*.jpg`, `*.jpeg` | Optional images, at most 300 KB each |
 
@@ -49,8 +56,9 @@ and one setting swaps it for another. What the HTML offers you is in
 
 They run on every pull request, and every one must pass before a review:
 
-- **Scope.** Your pull request changes one design folder and nothing else.
-  This check runs from this repository's own copy, not yours.
+- **Scope.** Your pull request changes one design folder, or your own
+  showcase folder, `showcase/<your-login>/`, and nothing else. This check
+  runs from this repository's own copy, not yours.
 - **The design's files**: only the files above, within their limits; every
   file's content matches its type; `design.json` complete; every font and
   image listed with its licence; the stylesheet has no `@import`, no
@@ -83,6 +91,13 @@ Checks cannot read intent. The maintainer reviews what they cannot:
 
 A design can be declined for these reasons, with the reason given.
 
+For a showcase entry, the checks cover its files and fetch the site
+without rendering it; the maintainer opens the site in a browser and
+checks that the screenshot shows it, that it is a portfolio, and that it
+is fit to show. Each listed site is fetched again every week; one that
+stops answering, is parked or loses its link to its author's GitHub
+profile is opened by hand, then removed if it is gone.
+
 ## Licence and credit
 
 By opening a pull request you license your contribution under this
@@ -92,7 +107,9 @@ with a licence. Fonts and images keep their own licences, which your
 
 Your design is credited on the gallery: its card shows your name as
 `design.json` gives it, linked to the address you give, and so does the
-footer of its live demo.
+footer of its live demo. Every site built with your design names it and
+you in its footer, beside portfolio-gallery, each linked, unless its
+owner turns the credit off.
 
 ## What the maintainer commits to
 
