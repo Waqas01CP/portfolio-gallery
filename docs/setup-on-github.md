@@ -15,7 +15,8 @@ stop and send what you see instead; GitHub changes its settings pages.
 
 **Status, 2026-10-19 UTC:** the owner followed every step and Tests 1 to
 5 between 2026-10-16 and 18, and the steps below carry what that showed.
-One proof waits: Test 1 again on or after 2026-11-02 (below).
+Two proofs wait: Test 6, the first showcase entry, once the showcase is
+on main; and Test 1 again on or after 2026-11-02 (below).
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
@@ -440,6 +441,64 @@ and runs before you delete it.
 **Send back:** what step 2's last step said; the commits in step 3;
 each run of step 5; then that the copy is deleted.
 
+### Test 6. Your own site joins the showcase by pull request
+
+The first real showcase entry, yours, made as any contributor would make
+one (ADR-0016) and merged, unlike the tests above. It needs the showcase
+on main. Your site already links to https://github.com/Waqas01CP (checked
+2026-10-19).
+
+1. Take the screenshot of https://waqas01cp.github.io/ as
+   docs/how-to/add-to-the-showcase.md, step 2, says: PNG, JPEG or WebP,
+   1,024 to 1,920 pixels wide, at most 500 KB. Name it `screenshot.png`,
+   `.jpg` or `.webp` as its format is.
+2. On https://github.com/Waqas01CP/portfolio-gallery, **Add file**,
+   **Create new file**, named `showcase/waqas01cp/entry.json`, holding:
+
+```
+{"name": "Your name as the card should show it", "url": "https://waqas01cp.github.io/", "description": "One line, at most 120 characters, or leave the field out."}
+```
+
+   **Commit changes**, choose **Create a new branch**, name it
+   `showcase-waqas01cp`, **Propose changes**. Do not create the pull
+   request yet.
+3. Switch to the `showcase-waqas01cp` branch, open `showcase/waqas01cp/`,
+   **Add file**, **Upload files**, add the screenshot, and commit it
+   directly to that branch.
+4. Open https://github.com/Waqas01CP/portfolio-gallery/compare/main...showcase-waqas01cp,
+   **Create pull request**, write `[scope: as contributor]` in the
+   description, and **Create pull request**.
+
+You should see **scope** pass, its summary "In scope: 2 file(s), all in
+showcase/waqas01cp/.", and **checks** pass, its step "Fetch the showcase
+sites this pull request adds or changes" saying "ok
+https://waqas01cp.github.io/ answers 200 with a web page linking to
+github.com/waqas01cp".
+
+5. Merge. When Deploy is green, open
+   https://waqas01cp.github.io/portfolio-gallery/#showcase: one site, your
+   card, the screenshot whole; a click on it opens it full size.
+6. **Actions**, **Showcase links**, **Run workflow**, branch `main`, **Run
+   workflow**. You should see it pass, its log listing one entry and its
+   response.
+
+**Send back:** the scope and checks results, the gallery's Showcase
+section, and the Showcase links run.
+
+## The weekly showcase check
+
+`.github/workflows/showcase-links.yml` fetches every showcase site and
+every design's "In use" link each Monday at 06:17 UTC, and holds no
+permissions: it edits nothing and opens nothing (ADR-0016). When it
+fails, its summary lists the entries, and GitHub notifies the user who
+last changed the workflow's cron line, which is you: open each site by
+hand, then remove an entry that is gone by a pull request of your own.
+
+GitHub disables a schedule in a public repository after 60 days without
+activity there ("Events that trigger workflows", read 2026-10-19). After
+a quiet spell, open **Actions**, **Showcase links**, and enable it again;
+**Run workflow** checks at once.
+
 ## What the tests prove, and what they do not
 
 - Test 1 proves the scope check runs from the default branch and refuses a
@@ -458,6 +517,11 @@ each run of step 5; then that the copy is deleted.
   2026-10-18 it did: the copy kept 52 files, and its `.github/` only
   checks.yml and deploy.yml. In this repository, the cleanup's run on main
   after it merged showed its job skipped.
+- Test 6 proves a showcase entry passes the scope check as an outsider's
+  and has its site fetched on GitHub's runner, that the gallery shows it,
+  and that the weekly check runs with no permissions. It does not prove
+  the check refuses a bad entry there: tools/prove_checks.py does, locally,
+  with a defeat case for each rule.
 - Step 8 proved the deploy, the screenshots and the addressing, in gallery
   mode.
 - None of them is a fork from another account. The approval setting of

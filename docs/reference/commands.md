@@ -52,11 +52,14 @@ http://127.0.0.1:8000/ in your own browser.
 python tools/check_workflows.py [FILE ...]      when each workflow job runs
 python tools/check_template_cleanup.py          what a copy keeps after its cleanup
 python tools/check_design.py [NAME ...]          designs: files, sizes, design.json, CSS
+python tools/check_showcase.py                   the showcase's files
+python tools/check_showcase.py --fetch-all       also every showcase site and In use link, by response
+python tools/check_showcase.py --fetch-url URL [--login LOGIN]   one address's response
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
 python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
 python tools/screenshots.py [_site]              the gallery's previews
-python tools/scope_check.py --files LIST.tsv     a pull request's scope, locally
+python tools/scope_check.py --files LIST.tsv [--author LOGIN]   a pull request's scope, locally
 ```
 
 Each exits 0 on a pass, 1 on a failure with every problem printed, and 2

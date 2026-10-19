@@ -11,8 +11,9 @@ from the event GitHub passes in GITHUB_EVENT_PATH. Outside GitHub Actions,
 with neither set, it refuses too.
 
 Otherwise it deletes every path listed in remove.txt beside this file that
-exists, puts copy-README.md in place of README.md, and deletes this folder
-last. With the folder gone a later run finds nothing to do, so it acts
+exists, drops "in_use", a link to a design author's own site, from every
+designs/*/design.json (ADR-0016), puts copy-README.md in place of
+README.md, and deletes this folder last. With the folder gone a later run finds nothing to do, so it acts
 once. It never touches .github/workflows/: the workflow's own next step
 tries that, by a separate commit.
 
@@ -82,6 +83,18 @@ def main() -> int:
         else:
             continue
         print(f"removed {entry}")
+    # A design's "In use" link shows its author's site in the project's
+    # gallery; a copy's own gallery has no use for it.
+    for meta_path in sorted((ROOT / "designs").glob("*/design.json")):
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(meta, dict) and "in_use" in meta:
+            del meta["in_use"]
+            meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
+                                 encoding="utf-8", newline="\n")
+            print(f"dropped in_use from {meta_path.relative_to(ROOT).as_posix()}")
     shutil.copyfile(HERE / "copy-README.md", ROOT / "README.md")
     print("replaced README.md with a copy's own")
     shutil.rmtree(HERE)

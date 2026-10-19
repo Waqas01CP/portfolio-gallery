@@ -29,10 +29,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # On a pull request, the merge commit and its first parent, the
+          # base, so the showcase step sees what the pull request changed.
+          fetch-depth: 2
       - name: Create the environment; pip checks every file's hash
         run: |
           python3 -m venv .venv
           .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      # The sites a pull request adds or changes, each fetched as a response
+      # and never rendered (ADR-0016). Every check below also checks the
+      # showcase's files.
+      - name: Fetch the showcase sites this pull request adds or changes
+        if: ${{ github.event_name == 'pull_request' && hashFiles('tools/check_showcase.py') != '' }}
+        run: .venv/bin/python tools/check_showcase.py --fetch-changed HEAD^1
       # axe-core at one exact version, checked against the npm registry's
       # integrity value before anything reads it (ADR-0011). AXE_SHA512 is
       # the registry's sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==

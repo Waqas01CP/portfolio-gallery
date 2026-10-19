@@ -49,6 +49,12 @@ styles both themes (docs/reference/design-contract.md, "Light and dark").
 With `false`, the page stays light on every device and has no switch, and
 you style one theme only.
 
+`in_use` is optional: the `https://` address of your own live site built
+with this design, shown as "In use" on its gallery card. Like a showcase
+entry, it is fetched on the pull request and every week, never rendered,
+for `https://`, a 200 answer and a domain not parked
+(docs/how-to/add-to-the-showcase.md).
+
 `preload` lists the fonts that set text on the first screen, so they load
 with the page. `assets` lists every font and image, each once; an image
 you made yourself is `"licence": "MIT", "source": "own work"`. Allowed

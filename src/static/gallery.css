@@ -1,7 +1,7 @@
 /* The gallery page's own styles. Not a design: the gallery is the engine's
    page, so it uses the system's fonts, loads nothing else, and follows the
-   device's light or dark setting. Every card is the same size, and every
-   preview has its size in the HTML, so nothing shifts as images load. */
+   device's light or dark setting. Every card's picture box has its size in
+   the HTML, so nothing shifts as images load. */
 
 :root {
   --bg: #F6F5F1;
@@ -87,13 +87,15 @@ img { display: block; max-width: 100%; height: auto; }
 .g-links { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 24px; font-weight: 600; }
 
 .g-main { padding-bottom: 48px; }
-.g-count {
+.g-section + .g-section { margin-top: 56px; }
+.g-sec {
   padding-top: 24px;
   border-top: 1px solid var(--line);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--muted);
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
+.g-count { margin-top: 8px; max-width: 72ch; font-size: 15px; color: var(--muted); }
 .g-grid {
   list-style: none;
   margin: 20px 0 0;
@@ -111,6 +113,11 @@ img { display: block; max-width: 100%; height: auto; }
   background: var(--surface);
 }
 .g-shot { width: 100%; aspect-ratio: 683 / 450; object-fit: cover; border-bottom: 1px solid var(--line); background: var(--bg); }
+/* A showcase screenshot: whole, scaled to fit the same box, never cropped;
+   what it leaves shows as bands in the card's own colour, in either theme. */
+.g-frame { display: block; border-bottom: 1px solid var(--line); }
+.g-frame:focus-visible { outline-offset: -3px; }
+.g-full { width: 100%; aspect-ratio: 683 / 450; object-fit: contain; background: var(--surface); }
 .g-body { display: flex; flex-direction: column; gap: 8px; flex: 1; padding: 18px 20px 20px; }
 .g-name { font-size: 22px; line-height: 1.2; }
 .g-name a { color: var(--ink); text-decoration: none; }
@@ -118,6 +125,8 @@ img { display: block; max-width: 100%; height: auto; }
 .g-by { font-size: 15px; color: var(--muted); }
 .g-desc { color: var(--ink2); }
 .g-use { font-size: 14px; color: var(--muted); }
+.g-inuse, .g-host { font-size: 15px; color: var(--muted); }
+.g-host { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
 .g-demo { margin-top: auto; padding-top: 8px; }
 .g-btn {
   display: inline-flex;

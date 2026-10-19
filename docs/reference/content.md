@@ -35,7 +35,7 @@ here is public, your CV included.
 | `cv_pdf` | A PDF to offer as "Download CV", a path in the repository, or `""` for none | `"content/Alex_Example_CV.pdf"` |
 | `cv_source` | Your CV in Markdown, for the content trace | `"content/cv.md"` |
 | `content_trace` | Check every word on the page against `cv_source`: `true` or `false` | `true` |
-| `credit` | Show "Built with portfolio-gallery" in the footer: `true` or `false` | `true` |
+| `credit` | Show the credit line in the footer, "Built with portfolio-gallery", with the design and its author, each linked: `true` or `false` | `true` |
 | `timeline_start` | The month the timeline starts at, `YYYY-MM`, or `""` for January of the earliest year an item outside the degree starts | `""` |
 
 A path must name the file exactly, letter for letter: GitHub Pages

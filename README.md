@@ -47,7 +47,7 @@ The full walk-through, with what you should see at each step, is in
 To build on your own computer instead, see
 [docs/reference/commands.md](docs/reference/commands.md).
 
-## Contribute a design
+## Contribute a design, or show your site
 
 A design is one folder of CSS, with fonts and images if it needs them,
 that styles the same page every other design styles. It arrives by pull
@@ -55,6 +55,10 @@ request from your fork, is checked automatically, and is reviewed and
 merged by the maintainer. Start with
 [docs/how-to/add-a-design.md](docs/how-to/add-a-design.md) and the rules in
 [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Built your portfolio some other way? Add it to the gallery's showcase,
+after the templates, with a screenshot:
+[docs/how-to/add-to-the-showcase.md](docs/how-to/add-to-the-showcase.md).
 
 ## How this repository is run
 
@@ -70,9 +74,10 @@ What the project is and does, in one file:
 
 Made by Waqas Sharif ([@Waqas01CP](https://github.com/Waqas01CP);
 portfolio: https://waqas01cp.github.io/). If you use it, a link back is
-appreciated: every site carries a small "Built with portfolio-gallery"
-line in its footer, which you may turn off with `"credit": false` in
-`content/config.json`.
+appreciated: every site carries a small line in its footer, "Built with
+portfolio-gallery, design Default by Waqas01CP", naming the design and
+its author, each linked. You may turn it off with `"credit": false` in
+`content/config.json`; the MIT licence asks only that LICENSE stays.
 
 ## Licence
 

@@ -8,9 +8,12 @@ Copies this repository's files to a temporary folder and there runs
   1. as Waqas01CP/portfolio-gallery itself: nothing may change;
   2. as a fork of it: nothing may change;
   3. as a copy: every path remove.txt lists is gone, CODE_OF_CONDUCT.md and
-     .github/CODEOWNERS above all, since they name the project's owner;
-     README.md is the copy's own; .github/template-cleanup/ is gone, so it
-     acts once; nothing else changed;
+     .github/CODEOWNERS above all, since they name the project's owner, and
+     showcase/, planted here with an entry so its removal is proven
+     whether or not the repository has one yet; no design.json keeps an
+     "in_use" link, also planted (ADR-0016); README.md is the copy's own;
+     .github/template-cleanup/ is gone, so it acts once; nothing else
+     changed;
   4. with only the script left and no list, as a later run would find it:
      nothing may change;
   5. the cleaned copy passes its own checks without a browser: its
@@ -40,7 +43,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CLEANUP = Path(".github/template-cleanup")
 PROJECT = "Waqas01CP/portfolio-gallery"
-MUST_GO = ("CODE_OF_CONDUCT.md", ".github/CODEOWNERS")
+MUST_GO = {"CODE_OF_CONDUCT.md": "which names the project's contact",
+           ".github/CODEOWNERS": "which makes the project's account the owner",
+           "showcase": "which holds the showcase's people, their sites and screenshots"}
+# Planted in the copy before the cleanup runs: a showcase entry and an
+# "In use" link, the details no copy may receive (ADR-0016).
+PLANTED_ENTRY = "showcase/someone/entry.json"
+PLANTED_IN_USE = "https://example.com/"
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 
 
@@ -89,7 +98,17 @@ def main() -> int:
             if source.is_file():
                 (copy / name).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, copy / name)
+        (copy / PLANTED_ENTRY).parent.mkdir(parents=True, exist_ok=True)
+        (copy / PLANTED_ENTRY).write_text(json.dumps({"name": "Someone", "url": "https://example.com/"}),
+                                          encoding="utf-8")
+        (copy / PLANTED_ENTRY).with_name("screenshot.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+        default_meta = copy / "designs" / "default" / "design.json"
+        meta = json.loads(default_meta.read_text(encoding="utf-8"))
+        meta["in_use"] = PLANTED_IN_USE
+        default_meta.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
         before = snapshot(copy)
+        before_meta = {p.relative_to(copy).as_posix(): json.loads(p.read_text(encoding="utf-8"))
+                       for p in copy.glob("designs/*/design.json")}
         listed = [line.strip() for line in (copy / CLEANUP / "remove.txt").read_text(encoding="utf-8").splitlines()
                   if line.strip() and not line.strip().startswith("#")]
 
@@ -113,9 +132,22 @@ def main() -> int:
         for entry in listed:
             if (copy / entry).exists():
                 problems.append(f"the cleanup left {entry}, which remove.txt lists")
-        for entry in MUST_GO:
+        for entry, why in MUST_GO.items():
             if (copy / entry).exists():
-                problems.append(f"the cleanup left {entry}, which names the project's owner")
+                problems.append(f"the cleanup left {entry}, {why}")
+        changed_meta = set()
+        for name, old in before_meta.items():
+            try:
+                new = json.loads((copy / name).read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                problems.append(f"the cleanup broke {name}")
+                continue
+            if "in_use" in new:
+                problems.append(f"the cleanup left in_use in {name}, a link to a design author's "
+                                f"own site")
+            elif new != {k: v for k, v in old.items() if k != "in_use"}:
+                problems.append(f"the cleanup changed more than in_use in {name}")
+            changed_meta.add(name)
         if (copy / CLEANUP).exists():
             problems.append("the cleanup left .github/template-cleanup/, so it acts more than once")
         if after.get("README.md") != before.get(f"{CLEANUP.as_posix()}/copy-README.md"):
@@ -124,7 +156,8 @@ def main() -> int:
         for path in sorted(gone):
             if not any(path == e or path.startswith(e.rstrip("/") + "/") for e in listed + [CLEANUP.as_posix()]):
                 problems.append(f"the cleanup removed {path}, which remove.txt does not list")
-        for path in sorted(p for p in after if p in before and after[p] != before[p] and p != "README.md"):
+        for path in sorted(p for p in after if p in before and after[p] != before[p]
+                           and p != "README.md" and p not in changed_meta):
             problems.append(f"the cleanup changed {path}")
         print(f"ok   a copy: {len(gone)} files removed, README.md replaced" if not problems else
               "FAIL a copy")
