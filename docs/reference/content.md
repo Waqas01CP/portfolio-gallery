@@ -18,6 +18,11 @@ Example, an invented person; replace it with your own.
 | `items.json` | Every dated item: projects, work, the degree, certificates |
 | `cv.md` | Your CV in Markdown, the source the content trace checks the page against (docs/reference/cv-format.md) |
 
+With the content trace on, the default, **every fact in `site.json` and
+`items.json` must also be in `cv.md`**: change a fact in one and change it
+in the other, or the build fails, naming the CV line to look at
+(docs/reference/cv-format.md).
+
 JSON, not YAML, because Python's standard library reads JSON and a YAML
 parser would be a second dependency (ADR-0001 line 5). Anything committed
 here is public, your CV included.

@@ -47,6 +47,11 @@ repository. How should a copy lose what is not its own?
   permissions, read 2026-10-18, has no workflows permission. Whether it
   may delete one is not known: JetBrains' cleanup deletes two and no
   report of its failing was found. Setup Test 5 establishes it.
+  **Measured** (annotated 2026-10-19): it may delete one. In setup Test
+  5, 2026-10-18, the cleanup's second commit in pg-cleanup-test deleted
+  scope.yml and template-cleanup.yml, and its log read "Removed scope.yml
+  and template-cleanup.yml." (the architecture chat's reading of the
+  copy's commits and run, before the copy was deleted).
 - A4. Forks start with workflows off, and a fork keeps the project's
   files on purpose. **Sourced**: GitHub Docs, "Events that trigger
   workflows", read 2026-10-12.
@@ -89,7 +94,8 @@ We will list the same files in the user guide, CODE_OF_CONDUCT.md and
 - Positive: the user does nothing; the commit shows what went.
 - Negative: one workflow in this repository holds a write permission,
   though it never runs here.
-- Negative: two workflow files may stay in a copy (A3), inert.
+- Negative: two workflow files may stay in a copy (A3), inert. (2026-10-19:
+  in Test 5 they went; they stay only if GitHub refuses the deletion.)
 - Negative: the guard names this repository; renaming or transferring it
   needs the guard changed with it.
 - Neutral: the copy's first runs check the uncleaned files; its next
@@ -111,6 +117,16 @@ chat, then deleted.
 
 **It never runs here.** After this record merges, the cleanup's run on
 main in this repository shows its job skipped.
+
+Results, 2026-10-18: in Test 5 the copy's first commit started Checks,
+Deploy and Template cleanup; the cleanup removed all 27 listed paths,
+replaced the README and removed its own folder, then removed the two
+workflows; the copy kept 52 files, its `.github/` only checks.yml and
+deploy.yml, and the owner's name only in LICENSE; after Pages was set and
+content changed, Checks and Deploy went green on the cleaned files (the
+architecture chat's report). Here, the cleanup's run on the merge of pull
+request 8, 39165247220, has its job skipped (read from GitHub's API on
+2026-10-19).
 
 ## Pros and Cons of the Options
 
@@ -156,3 +172,7 @@ main in this repository shows its job skipped.
   **First-party documentation**.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-19 | **A3 measured: the workflow's own token may delete workflow files.** The decision stands: the cleanup still tries the deletion in a commit of its own and leaves a notice if GitHub ever refuses. The user guide's "Make it yours" now lists the two workflows with the rest, for a copy whose cleanup did not run, in place of saying they may stay. | Setup Test 5, 2026-10-18, as read by the portfolio architecture chat; first-party by test. |

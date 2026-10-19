@@ -134,9 +134,9 @@ def _value(node: dict, key: str) -> str:
 
 
 def tree_lists(nodes: list[dict]) -> tuple[list[str], list[str]]:
-    """His method, docs/reference/standing-checks.md: text nodes' text, and
-    every other named node as role and name, whitespace collapsed, lower
-    case, empty entries dropped."""
+    """The tree as two lists: text nodes' text, and every other named node
+    as role and name, whitespace collapsed, lower case, empty entries
+    dropped."""
     texts, named = [], []
     for node in walk(nodes):
         if node.get("ignored"):

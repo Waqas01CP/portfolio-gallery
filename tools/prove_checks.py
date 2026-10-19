@@ -182,18 +182,26 @@ def file_cases():
             if where == "page":
                 edit(out / "index.html", old, new)
             else:
-                edit(copy / "content" / "items.json", old, new)
+                edit(copy / "content" / where, old, new)
                 out = build_site(copy)
             return ["tools/check_content.py", "--page", out / "index.html"]
         return plant
 
     yield "trace: a number changed on the page", trace("212 automated tests", "213 automated tests"), "NOT TRACED"
     yield ("trace: a source naming no entry", trace('"source": "Projects / Reading List: a static reading log"',
-                                                    '"source": "Projects / Reading Log"', where="items"),
+                                                    '"source": "Projects / Reading Log"', where="items.json"),
            "NO SUCH ENTRY")
     yield ("trace: a CV line missing from the page", trace('"date_style": "full",\n    "source": "Projects / Reading List',
-                                                           '"source": "Projects / Reading List', where="items"),
+                                                           '"source": "Projects / Reading List', where="items.json"),
            "MISSING: Jun 2025 to Jul 2025")
+    # Setup Test 5's edit: one word of site.json changed, cv.md not. The
+    # failure must name the CV's line and say what to do, not only fail.
+    yield ("trace: site.json changed without cv.md, the message",
+           trace('"Example City, Exampleland"', '"Example City, Examplelund"', where="site.json"),
+           ("NOT TRACED: Example City, Examplelund",
+            "nearest in content/cv.md, line 12: Example City, Exampleland",
+            "MISSING: Example City, Exampleland (content/cv.md, line 12)",
+            "Add the text to content/cv.md, or change site.json or items.json to match the CV line shown"))
 
     def assemble(extra=None, big=False):
         def plant(copy):

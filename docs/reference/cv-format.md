@@ -97,6 +97,11 @@ python build.py
 python tools/check_content.py
 ```
 
+A failure names the CV's file and line: for text on the page the CV
+lacks, the nearest CV line, when one is close; for CV text the page
+lacks, the line it is on. It ends with what to do. The usual cause is a
+fact changed in site.json or items.json and not in the CV.
+
 ## Turning it off
 
 Set `"content_trace": false` in `content/config.json` if you would rather

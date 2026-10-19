@@ -13,10 +13,9 @@ portfolio architecture chat has checked these steps** (the brief's
 Addendum 1). Where a screen differs from what a step says you should see,
 stop and send what you see instead; GitHub changes its settings pages.
 
-**Status, 2026-10-18 UTC:** the owner followed every step and Tests 1 to
-4 between 2026-10-16 and 18, and the steps below carry what that showed.
-Two proofs wait: Test 5, the template cleanup in a real copy; and Test 1
-again on or after 2026-11-02 (below).
+**Status, 2026-10-19 UTC:** the owner followed every step and Tests 1 to
+5 between 2026-10-16 and 18, and the steps below carry what that showed.
+One proof waits: Test 1 again on or after 2026-11-02 (below).
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
@@ -413,22 +412,26 @@ and runs before you delete it.
    **Checks**, **Deploy** and **Template cleanup**. Template cleanup goes
    green within a few minutes. Open it, then its job, then its last step,
    "Try to remove the project's own workflows too", and note what it
-   says: "Removed scope.yml and template-cleanup.yml.", or "GitHub did
-   not let this workflow's token change workflow files...".
-3. Its **Code** tab. You should see the latest commit "Make it yours:
-   remove portfolio-gallery's project files" by github-actions, perhaps
-   with a second, "Make it yours: remove portfolio-gallery's own
-   workflows". The README reads "My portfolio"; there is no
-   `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` or `STATE.md`, and no
-   `docs/decisions/` folder.
+   says: "Removed scope.yml and template-cleanup.yml." (as on 2026-10-18),
+   or "GitHub did not let this workflow's token change workflow files...".
+3. Its **Code** tab. You should see the latest commits "Make it yours:
+   remove portfolio-gallery's project files" and "Make it yours: remove
+   portfolio-gallery's own workflows", both by github-actions. The README
+   reads "My portfolio"; there is no `CODE_OF_CONDUCT.md`,
+   `CONTRIBUTING.md` or `STATE.md`, no `docs/decisions/` folder, and
+   `.github/` holds only `workflows/checks.yml` and `workflows/deploy.yml`.
 4. In the copy: **Settings**, **Pages**, **Source**: **GitHub Actions**.
-5. Open `content/site.json`, click the pencil, change one word of the
-   `"location"` value, and **Commit changes** directly to `main`. On the
-   **Actions** tab you should see **Checks** and **Deploy** run on the
-   cleaned files, and both go green; Template cleanup, if it is still
-   there, runs and changes nothing. Open
-   https://waqas01cp.github.io/pg-cleanup-test/: the sample site, with
-   your word.
+5. Open `content/site.json`, click the pencil, and in the first contact
+   route change the `"line"` value, "The quickest way to reach me.", to
+   "The fastest way to reach me."; **Commit changes** directly to
+   `main`. A contact route's line is one of the few texts the content
+   trace takes as written rather than tracing to the CV, so this one edit
+   needs no matching change in `content/cv.md`; a fact, such as the
+   `"location"`, would (on 2026-10-18 this step said "location", and the
+   trace refused it until cv.md matched). On the **Actions** tab you
+   should see **Checks** and **Deploy** run on the cleaned files, and
+   both go green. Open https://waqas01cp.github.io/pg-cleanup-test/: the
+   sample site, with "fastest" under Contact.
 6. Send the chat the copy's address and wait for its word: it reads the
    copy's files and runs through GitHub's API.
 7. Delete the copy: its **Settings**, **General**, **Delete this
@@ -451,9 +454,10 @@ each run of step 5; then that the copy is deleted.
 - Test 4 proves a copy of the template publishes its owner's site in site
   mode, and shows whether a copy's first commit runs its workflows.
 - Test 5 proves a copy cleans itself up once and still builds and checks,
-  and shows whether a workflow's own token may delete workflow files. In
-  this repository, the cleanup's run on main after it merged shows its
-  job skipped.
+  and shows whether a workflow's own token may delete workflow files. On
+  2026-10-18 it did: the copy kept 52 files, and its `.github/` only
+  checks.yml and deploy.yml. In this repository, the cleanup's run on main
+  after it merged showed its job skipped.
 - Step 8 proved the deploy, the screenshots and the addressing, in gallery
   mode.
 - None of them is a fork from another account. The approval setting of
