@@ -1215,3 +1215,161 @@ mechanisms.
 - Nothing pushed; the branch waits for the owner.
 - The showcase: waiting on the owner's answers.
 - Test 1 once more, on or after 2026-11-02.
+
+---
+
+# Round 8, 2026-10-19 UTC: templates first, then a showcase
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 4396a20, the website merge of pull request 9,
+whose tree is 1953bb4's (compared here); Checks and Scope green on the
+pull request, Checks and Deploy green on main, Template cleanup skipped
+(GitHub's API). Local main updated; content-trace-guidance deleted
+locally. Work on the branch showcase. HEAD at end: the commit that adds
+this section. Mode: mutating. Ran from about 14:20Z.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner: his answers to
+Report 7's six questions (one folder per login; the weekly check with no
+permissions, its failure the notice; floor line 1 read as protecting the
+template, so his own site may be an entry and the Default design's
+in_use; never renders means fetching responses is allowed; the home page
+links to github.com/<login>; no exact screenshot size, the card showing it
+whole with bands, HD the target). Measure screenshot sizes and the
+gallery's weight and Lighthouse with 10 and 50 cards before fixing the
+screenshot rules; investigate, not build, a screenshot workflow in a
+contributor's fork; then build everything settled, with a defeat case for
+every rule and the fetch cases on a local server, and no entry for the
+owner's site.
+
+## Errors this seat made
+
+1. **A capture script waited on lazy pictures** that never load outside
+   the view, and timed out on the phone view. A scratch script; the
+   capture was taken again without the wait.
+2. **check_built.py's first credit rule** asked for a link other than the
+   project's, which Plain's credit lacks, since Plain's author is the
+   project. Caught on reading it back, before any run; the rule now asks
+   for the project's link, then the author's.
+
+## The measurements
+
+**Screenshots** [VERIFIED, 14:30Z to 14:45Z]. First screens of the
+gallery's Default and Plain demos and of two live portfolio sites, the
+owner's and brittanychiang.com, captured by headless Chrome 154 at device
+scale 1, in bytes:
+
+| Site | 1280x720 PNG | JPEG q85 | WebP q82 | 1920x1080 PNG | JPEG | WebP |
+|---|---|---|---|---|---|---|
+| Default | 426,464 | 114,554 | 65,800 | 611,863 | 192,528 | 107,566 |
+| Plain | 52,739 | 94,344 | 51,830 | 75,620 | 139,733 | 69,842 |
+| Owner's site | 460,892 | 117,322 | 67,578 | 628,364 | 188,963 | 106,258 |
+| brittanychiang.com | 200,927 | 97,877 | 56,868 | 257,119 | 140,435 | 78,196 |
+
+The operating system's tool could not be driven headless here. The same
+pixels re-encoded with Windows' own encoders, GDI+ (System.Drawing) and
+WIC (PresentationCore), at JPEG quality 85: at 1280x720, PNG 43,779 to
+476,882 and JPEG 100,593 to 121,691; at 1920x1080, PNG 65,081 to 656,604
+and JPEG 148,756 to 202,262. At a Retina Mac's density, 1280x720 at
+scale 2 is 2560x1440: PNG 158,343 to 1,399,366. Metadata: Chrome's files
+carry none but an ICC profile; Windows' GDI+ JPEG writes an EXIF block of
+three resolution tags (0x5110 to 0x5112); two Mac screenshots from public
+repositories carry eXIf and an XMP block saying "Screenshot", one with
+Apple's iDOT chunk. So "no EXIF or XMP" would refuse ordinary
+screenshots; the rule is no location.
+
+**The gallery** [VERIFIED, 14:45Z to 14:59Z]. Built with 0, 10 and 50
+entries, the screenshots cycling through the 1280x720 captures: the page
+4,681, 10,575 and 33,881 bytes; every file on it 69,427, 1,777,947 and
+7,626,211 bytes. Lighthouse 13.5.0, default mobile, median of five, from
+127.0.0.1: LCP 1,113, 1,149 and 1,662 ms; CLS 0; TBT 71, 54 and 38 ms;
+70,310, 973,985 and 997,291 bytes loaded, since Chrome fetches lazy
+pictures some way ahead of the view. Within ADR-0009's limits in every
+case. Looked at in light, dark and at a phone's width: each screenshot
+whole, bands in the card's colour.
+
+**The limits** chosen from them: MIN_WIDTH 1,024, MAX_WIDTH 1,920,
+MAX_BYTES 500 KB, landscape, still, PNG, JPEG or WebP by first bytes, no
+GPS in EXIF or XMP. Every 1280x720 capture passes in every format and
+encoder; at 1920x1080 every JPEG and WebP passes and the PNGs of the three
+busier sites (517 to 657 KB) do not; every 2560x1440 capture fails on
+width. The two Mac screenshots pass.
+
+**The fork workflow, investigated** [sourced and measured]: a
+workflow_dispatch workflow in this repository, guarded to run only in a
+fork, taking the screenshot of the URL in the contributor's entry.json
+with the runner's Chrome and committing it to their branch with the
+fork's own token. A fork's Actions are off until its owner enables them
+("Events that trigger workflows", already cited by use-this-template.md);
+the workflow must be on the fork's default branch to be run by hand
+("Manually running a workflow", read 2026-10-19); public repositories run
+free on standard runners (GitHub's billing documentation, read
+2026-10-19); the deploy's screenshot job took 12 to 14 s for two designs
+on GitHub's runner (runs 39265254071 and 39165247248). Costs: one more
+workflow here holding contents: write in forks, removed from copies; the
+contributor's click to enable Actions and its warning; sites that refuse
+datacenter addresses give a blank or blocked capture. Not built; the
+manual screenshot stays the default.
+
+## What was built
+
+- tools/check_showcase.py: the files, and with --fetch-changed,
+  --fetch-all or --fetch-url the responses, never rendered.
+- The scope check takes showcase/<author>/; build.py reads showcase/ and
+  in_use; the gallery shows Templates, then Showcase, each with a count;
+  the footer credit names the design and its author; check_built.py,
+  check_design.py, check_content.py and check_workflows.py learn the new
+  rules; checks.yml fetches a pull request's changed sites;
+  showcase-links.yml checks weekly with permissions: {} and an anonymous
+  clone (tried here: it needs no token).
+- The template cleanup removes showcase/, the how-to, the tool and the
+  weekly workflow, and drops in_use from every design.json; its check
+  plants both and proves them gone.
+- docs/how-to/add-to-the-showcase.md; CONTRIBUTING.md, the README, the
+  user guide, add-a-design.md, content.md, standing-checks.md and
+  commands.md; the setup guide's Test 6 and the weekly check's notes.
+- ADR-0016, accepted; Changes rows on ADR-0001, 0002, 0006 and 0015;
+  CLAUDE.md's rule of places and floor line 1's reading.
+- Gate A's private list allows his name in showcase/waqas01cp/entry.json;
+  the pre-publish search allows it there and on his own card in the built
+  gallery.
+
+## Proofs
+
+- File defeat cases on the working tree, before the commit: 95 failed as built, 40 of
+  them new; 7 planted controls passed (a Mac screenshot with EXIF and
+  XMP; a JPEG with Windows' EXIF; a WebP; the author's own entry in scope;
+  a page linking its profile; a 403 reported, not failed; a gallery with
+  an entry); 9 controls passed; 144 s.
+- Live, 2026-10-19: the owner's site and brittanychiang.com pass with
+  their owners' logins and fail with another; example.com fails for its
+  missing link; http:// fails; expired.badssl.com fails for its
+  certificate; 10.0.0.1 fails as an IP address.
+- Gates, in a clone of 5a7cecf, 17:56Z to 18:03Z: 27 of 27 as expected,
+  22 defeat cases refused and 5 controls passed, among them his name
+  allowed in his own entry and refused in another's.
+- On a fresh clone of 5a7cecf with a new venv, 18:03Z to 18:45Z: every defeat case with the browser and axe, exit 0 in 1,227 s, 105 failed as built (95 file, 10 browser), 11 controls and 7 planted controls passed; tools/ci.py checks --axe, exit 0 in 642 s, the browser checks 0 failures in 627 s, the cleanup's check removing 55 files from its copy; and a gallery holding ten showcase entries: its files checked, then every browser check with axe, 0 failures in 620 s.
+- The pre-publish search runs on the final commit; Report 8 gives its
+  result.
+
+## Rejected alternatives
+
+- Refusing all EXIF and XMP: it refuses ordinary Mac and Windows
+  screenshots (measured); location is the harm.
+- An exact screenshot size: the owner's answer Q6.
+- One shared showcase.json: the scope check could not tell whose entry
+  changed.
+- actions/checkout in the weekly workflow: whether it works with
+  permissions: {} was not established here; an anonymous clone needs no
+  token at all.
+- Requiring the engine's generator tag on an in_use site: the owner's own
+  site, the Default design's likely in_use, does not carry this engine's.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner, whose merge approves
+  the limits.
+- Test 6, the owner's own entry, after the merge.
+- The fork screenshot workflow: investigated only.
+- Test 1 once more, on or after 2026-11-02.
