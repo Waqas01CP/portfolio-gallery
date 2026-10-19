@@ -33,10 +33,12 @@ What every site gets, whatever the design:
    `https://<your-username>.github.io/<name>/`.
 2. In your new repository, open **Settings**, then **Pages**, and under
    "Build and deployment", set **Source** to **GitHub Actions**.
-3. Open the `content/` folder and edit the files in your browser: your
-   details in `site.json`, your projects and roles in `items.json`, your CV
-   in `cv.md` (or set `content_trace` to `false` in `config.json`), and the
-   design in `config.json`, such as `"design": "plain"`.
+3. Open the `content/` folder and edit the files in your browser: your CV
+   in `cv.md` first, then your details in `site.json` and your projects
+   and roles in `items.json`, and the design in `config.json`, such as
+   `"design": "plain"`. Every fact in `site.json` and `items.json` must
+   also be in `cv.md`, or the build fails; to publish without a CV, set
+   `content_trace` to `false` in `config.json`.
 4. Commit. The **Actions** tab shows the build; when it is green, your site
    is live.
 
