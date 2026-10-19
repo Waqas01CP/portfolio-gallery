@@ -106,7 +106,7 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 | A pull request cannot change how it is checked | scope.yml on `pull_request_target`, from the default branch; it fails any change outside one design folder |
 | Every word in the first response, readable without scripts | The fixed HTML; the words check compares every design with no design, scripts off |
 | Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
-| A check can fail | tools/prove_checks.py runs each on its defeat case: 54 file cases and 10 browser cases, with 10 controls |
+| A check can fail | tools/prove_checks.py runs each on its defeat case: 55 file cases and 10 browser cases, with 10 controls |
 | Claims trace to the user's CV | tools/check_content.py, page to CV and CV to page |
 | Deterministic output | Two builds compared byte for byte in CI |
 | Nothing private published | Gates A to E; the pre-publish search |
@@ -115,15 +115,15 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 
 | What | Value | Date | Source |
 |---|---|---|---|
-| Source | build.py 1,024 lines; 13 tools, 4,093 lines; 13 templates, 568 lines; scripts and engine styles 871 lines; designs: default 1,521 lines of CSS, plain 250; workflows 304 lines | 2026-10-18 | `wc -l` |
+| Source | build.py 1,024 lines; 13 tools, 4,169 lines; 13 templates, 568 lines; scripts and engine styles 871 lines; designs: default 1,521 lines of CSS, plain 250; workflows 304 lines | 2026-10-19 | `wc -l` |
 | Sample site, built | index.html 39,195 bytes (6,239 gzipped); site.js 22,481 (7,219); knot.js 5,715 (2,256); base.css 3,099 (1,489); layout.css 1,947 (562); default design.css 49,498 (11,160); fonts 78,396 | 2026-10-12 | `wc -c`; Python's gzip, level 6 |
 | Gallery page | 3,778 bytes (1,485 gzipped); plain design.css 11,678 bytes | 2026-10-12 | same |
 | Builds | site in each design and the gallery: exit 0, twice each, byte-identical (default 14 files, plain 8, gallery 18), from a fresh clone | 2026-10-12 | the session log |
-| Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-12 | tools/check_content.py |
-| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures | 2026-10-12 to 18 | the session log; GitHub's API |
-| Defeat cases | 64 (54 file, 10 browser) fail as built, naming what failed; 10 controls pass. The 54 file cases and 8 controls on a fresh clone of d5771c3; the 10 browser cases and their 2 controls on a fresh clone of d612b96, unchanged since. Gates: 21 defeat cases refused, 4 controls passed | 2026-10-18 | tools/prove_checks.py; the session log |
+| Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-19 | tools/check_content.py |
+| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures. On a fresh clone of db055e5, 2026-10-19: exit 0 in 648 s, the browser checks 634 s, 0 failures | 2026-10-12 to 19 | the session log; GitHub's API |
+| Defeat cases | 65 (55 file, 10 browser) fail as built, naming what failed; 10 controls pass. The 55 file cases and 8 controls on db055e5's tree; the 10 browser cases and their 2 controls on a fresh clone of d612b96, unchanged since. Gates: 21 defeat cases refused, 4 controls passed, on a clone of db055e5 | 2026-10-19 | tools/prove_checks.py; the session log |
 | Speed, sample site | Lighthouse 13.5.0, default mobile, median of five, served uncompressed from 127.0.0.1 (GitHub Pages compresses), Chrome 154 on the seat's Windows machine. Default design with font-display: optional (as committed), 2026-10-13: LCP 2,108 ms, CLS 0, TBT 40 ms (runs 174, 37, 40, 46, 25), 197,433 bytes. The same design with swap, 2026-10-12: LCP 2,179 ms, CLS 0, TBT 195 ms (runs 195, 248, 280, 22, 64). Plain, 2026-10-12: LCP 1,389 ms, CLS 0.048, TBT 0 ms, 79,399 bytes. ADR-0009's limits: 2,500 ms, 0.1, 200 ms | 2026-10-12 and 13 | the session log |
-| Decision records | 14: 13 accepted, 1 proposed (ADR-0012, held by the owner) | 2026-10-16 | docs/decisions/ |
+| Decision records | 15: 14 accepted, 1 proposed (ADR-0012, held by the owner) | 2026-10-19 | docs/decisions/ |
 
 ## How it was built
 
@@ -138,6 +138,7 @@ is in logs/.
 | 2026-10-17 to 18 | Every setup step and Tests 1 to 4 followed by the owner; main protected by a ruleset; the setup guide corrected from what the run showed |
 | 2026-10-18 | A design says in design.json whether it offers dark; a light-only design's page stays light with no Dark switch. CAPABILITIES' architecture lane kept out of the repository |
 | 2026-10-18 | A copy of the template cleans itself up once: the project's own files removed by a workflow, listed in the user guide for a copy whose cleanup did not run |
+| 2026-10-19 | A failed content trace names the CV's line and what to do; the user guide puts the CV first |
 
 ## What it does not do, and its limits
 

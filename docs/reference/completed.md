@@ -31,3 +31,6 @@ Proof is a commit, a decision record or a log filename. Never a file path.
 | CAPABILITIES' architecture lane kept out of the repository: CAPABILITIES-PRIVATE.md ignored and refused by gate A | [VERIFIED] 2 gate defeat cases | 2026-10-18 | d612b96; ADR-0008 |
 | Dark mode and the private lane merged: pull request 7, merge 2b70358, its tree bb5a4bb's | [VERIFIED] trees compared | 2026-10-18 | 39e49e6, d612b96, bb5a4bb |
 | The "Make it yours" list and what a copy's first commit runs, in the user guide | [VERIFIED] read in the committed file; the first-commit runs from setup Test 4 | 2026-10-18 | d46f349; ADR-0015 |
+| The template cleanup merged: pull request 8, merge 122dc8b, its tree 1173d13's; Checks and Deploy green on main, and Template cleanup's job skipped there | [VERIFIED] trees compared; the runs read from GitHub's API | 2026-10-18 | d46f349, d5771c3, 1173d13 |
+| The template cleanup in a real copy: once, all 27 listed paths and both workflows removed, 52 files kept, then Checks and Deploy green on the cleaned files | [VERIFIED] by the architecture chat on the copy's commits and runs before it was deleted (setup Test 5) | 2026-10-18 | ADR-0015 |
+| A failed content trace names the CV line and what to do; the guides say the CV comes first | [VERIFIED] a defeat case, Test 5's edit, unproven under main's message | 2026-10-19 | db055e5 |

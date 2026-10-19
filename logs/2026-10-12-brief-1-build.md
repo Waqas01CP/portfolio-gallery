@@ -1079,3 +1079,139 @@ checks the cleaned files.
 - Nothing pushed; the branch waits for the owner.
 - Test 5, the owner's, then the chat's reading, before the list in the
   guide can shrink to what the cleanup truly leaves.
+
+---
+
+# Round 7, 2026-10-19 UTC: the content trace says where and what to do
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 122dc8b, the website merge of pull request 8,
+whose tree is 1173d13's (compared here). Local main updated from origin;
+the merged branches setup-guide-fixes, dark-mode-and-capabilities and
+template-cleanup deleted locally. Work on the branch
+content-trace-guidance. HEAD at end: the commit that adds this section,
+on that branch. Mode: mutating. Ran from about 12:00Z.
+
+## What was asked
+
+The portfolio architecture chat, relayed by the owner, after setup Test 5:
+record that the workflow's token may delete workflow files (ADR-0015,
+A3); correct Test 5's step 5, which changed a fact in site.json alone and
+predicted green; make the rule that every edit to site.json or items.json
+must also be in cv.md impossible to miss, in the user guide before the
+field list, in the copy's README and in the content trace's failure
+message, which is to name content/cv.md, say what to do and point at the
+nearest CV line, with a defeat case for the message; shrink "Make it
+yours" to the fallback for a copy whose cleanup did not run, in neutral
+wording. And, as a proposal only, the showcase: the owner's direction and
+his decisions D1 to D3 of 2026-10-18, with options and a record.
+
+## Checked before starting
+
+[VERIFIED, GitHub's API, 2026-10-19] Pull request 8 merged at
+2026-10-18 20:51:50Z as 122dc8b, head 1173d13. On it, Checks and Scope
+succeeded; on main, Checks and Deploy succeeded, and Template cleanup's
+run 39165247220 concluded skipped, its one job skipped: ADR-0015's third
+confirmation.
+
+## Errors this seat made
+
+1. **Test 5's step 5, written in Round 6**, changed one word of
+   site.json's "location" and predicted green. The content trace refused
+   it, correctly: content/cv.md line 12 holds the same text. The step was
+   never run against the trace before it was written. It cost the owner
+   two commits and three runs (the chat's report). Step 5 now edits a
+   contact line, which the trace takes as written; run here first: the
+   trace passes, 196 blocks, and the word shows under Contact.
+2. **The full-check script** (scratch) did not start: GNU tar read the
+   "C:" of the axe tarball's path as a remote host. Fixed with
+   --force-local; nothing in the repository.
+3. **The first commit attempt** passed its message through PowerShell 5.1,
+   which split it at its inner double quotes; git refused and nothing was
+   committed. Committed from a file.
+4. **CAPABILITIES.md's "Decision records" row** still said 14 records,
+   13 accepted, after Round 6 added ADR-0015, accepted. Found on
+   re-measuring the numbers; now 15, 14 accepted, 1 proposed.
+
+## What was done
+
+**The trace's failure message** (tools/check_content.py, db055e5). The
+report opens by naming the CV file. Each NOT TRACED block is followed by
+the nearest CV line and its number, when one holds at least half the
+text's characters in runs of three or more, or by "no line of
+content/cv.md is close"; for a block the page's markup splits, the
+pointer names the piece that fails on its own. Each MISSING line carries
+its CV line number; line numbers survive the CV's comments. A failure
+ends with "What to do": the page's words come from site.json and
+items.json, so a change to either usually needs the same change in the
+CV; for each kind of failure, what to change; or turn the trace off.
+Test 5's edit now reads, in part:
+
+    NOT TRACED: Example City, Examplelund
+      nearest in content/cv.md, line 12: Example City, Exampleland
+    MISSING: Example City, Exampleland (content/cv.md, line 12)
+
+Also run: a number changed on the page points at line 31; new text with
+nothing like it in the CV says no line is close; site.json and cv.md
+changed together pass, 196 traced; a contact line changed alone passes.
+
+**Its defeat case** (tools/prove_checks.py): Test 5's edit, which passes
+only if the output names the NOT TRACED text, cv.md's line 12 for both
+directions, and what to do. Proven both ways: with this check it fails
+as built; with main's check_content.py under the new harness, the trace
+still exits 1 but the case is unproven, 1 of 55.
+
+**The rule where a user meets it.** use-this-template.md's "Write your
+content" (step 4; the chat called it step 3) says it before the field
+list, puts cv.md first in the list, and says that the browser commits one
+file at a time, so the first of two commits fails and the second goes
+green; step 5 says a failure names the nearest cv.md line. The copy's
+README, the README's step 3, content.md and cv-format.md say it too.
+
+**"Make it yours"** describes the cleanup's two commits as fact, lists
+the two workflows in the fallback with the rest, and drops the paragraph
+on files that may stay. CODE_OF_CONDUCT.md and CODEOWNERS are described
+by what they do, not by whom they name. A sweep of the 52 files a cleaned
+copy keeps found one more: tools/check_browser.py's docstring said "His
+method", naming a file a copy lacks; now neutral.
+
+**Records and guides.** ADR-0015: A3 annotated as measured, the "may
+stay" consequence annotated, Confirmation's results, a Changes row. The
+setup guide's status, Test 5's steps 2, 3 and 5, and what Test 5 proved.
+standing-checks.md's trace row names the new defeat case.
+
+**The showcase**, proposed in Report 7 with a draft record; nothing built.
+Read for it, 2026-10-19: emmabostian/developer-portfolios at its source
+(its CONTRIBUTING.md, pull request template, link-check and
+parking-redirect workflows and script), **Primary, a precedent**; GitHub
+Docs on the schedule event and on workflow permissions, **First-party
+documentation**; Mastodon's profile verification and Google's "Qualify
+your outbound links", **First-party documentation** of their own
+mechanisms.
+
+**Proofs** [VERIFIED]:
+
+- File defeat cases on the working tree: 55 failed as built and 8
+  controls passed, 96 s.
+- On a fresh clone of db055e5 with a new venv, 12:38Z to 12:49Z: `tools/ci.py checks --axe`, exit 0 in 648 s; the trace 196 blocks, 0 not traced; the cleanup's check removed 50 files in its copy and resolved its 5 links; the browser checks 0 failures in 634 s.
+- Gates, in a clone of db055e5, 12:49Z to 12:55Z: 25 of 25 as expected, 21 defeat cases refused and 4 controls passed.
+- The pre-publish search runs on the final commit after this section is
+  committed; Report 7 gives its result.
+
+## Rejected alternatives
+
+- Pointing a failed block at the CV line with the most words in common:
+  "Example City", a line of its own under Experience, beat line 12 for
+  "Example City, Examplelund". The nearest line is judged by shared
+  characters in runs, so a misspelt word still counts.
+- "Change both files in the same commit" in the message: the browser's
+  editor commits one file at a time.
+- A workflow_dispatch fallback in "Make it yours" (run the cleanup by
+  hand): plausible from the workflow's triggers, never tested; left out of
+  the user guide.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner.
+- The showcase: waiting on the owner's answers.
+- Test 1 once more, on or after 2026-11-02.
