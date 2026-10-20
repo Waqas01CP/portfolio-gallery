@@ -32,7 +32,9 @@ Or, for a showcase entry:
   - every changed path lies in showcase/<login>/, where login is the pull
     request author's GitHub login in lower case, from the event GitHub
     sends, never from anything the pull request contains;
-  - each is entry.json or screenshot.png, .jpg, .jpeg or .webp;
+  - each is entry.json or a screenshot named as its tool saved it, ending
+    .png, .jpg, .jpeg or .webp in any case, with no folder, no control
+    character, not hidden (build.py's SHOWCASE_IMAGE_RE);
   - no design folder in the same pull request.
 
 A pull request opened by the repository's owner, a member or a
@@ -66,7 +68,7 @@ DESIGN_PATH_RE = re.compile(
     r"|img/[A-Za-z0-9][A-Za-z0-9._-]{0,80}\.(?:png|webp|jpg|jpeg))$")
 SHOWCASE_PATH_RE = re.compile(
     r"^showcase/(?P<login>[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38})/"
-    r"(?:entry\.json|screenshot\.(?:png|jpg|jpeg|webp))$")
+    r"(?:entry\.json|(?i:[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)))$")
 MAINTAINED = {"default", "plain"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 AS_CONTRIBUTOR = "[scope: as contributor]"
@@ -88,7 +90,7 @@ def showcase_problems(changes: list[tuple[str, str, str | None]], author: str | 
                                 f"request carries one or the other")
             elif which.startswith("showcase/"):
                 problems.append(f"{which}: a showcase entry is showcase/<your-login>/entry.json and "
-                                f"one screenshot.png, .jpg, .jpeg or .webp, nothing else "
+                                f"one screenshot, a .png, .jpg, .jpeg or .webp file, nothing else "
                                 f"(docs/how-to/add-to-the-showcase.md)")
             else:
                 problems.append(f"{which}: outside showcase/. A showcase pull request changes its "

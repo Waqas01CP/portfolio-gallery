@@ -15,8 +15,9 @@ under their own name.
 shows templates first, designs anyone can use, then the showcase,
 contributors' own portfolio sites. A design is encouraged, and shown
 among the templates, with an optional "In use" link to your own site
-built with it. A showcase entry is your site's link and a screenshot, and
-nothing ranks it lower within the showcase:
+built with it. A showcase entry is your site's link and a screenshot as
+your tool saved it, any size and any shape, with nothing to resize or
+rename, and nothing ranks it lower within the showcase:
 [docs/how-to/add-to-the-showcase.md](docs/how-to/add-to-the-showcase.md).
 Anything else (a bug fix, a feature, a change to the page's HTML or to a
 check) starts as an issue, so it can be discussed before anyone writes
@@ -91,8 +92,9 @@ Checks cannot read intent. The maintainer reviews what they cannot:
 
 A design can be declined for these reasons, with the reason given.
 
-For a showcase entry, the checks cover its files and fetch the site
-without rendering it; the maintainer opens the site in a browser and
+For a showcase entry, the checks cover its files, draw the gallery's
+copies of its screenshot, and fetch the site without rendering it; the
+maintainer opens the site in a browser and
 checks that the screenshot shows it, that it is a portfolio, and that it
 is fit to show. Each listed site is fetched again every week; one that
 stops answering, is parked or loses its link to its author's GitHub

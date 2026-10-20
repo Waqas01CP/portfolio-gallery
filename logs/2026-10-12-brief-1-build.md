@@ -1373,3 +1373,176 @@ manual screenshot stays the default.
 - Test 6, the owner's own entry, after the merge.
 - The fork screenshot workflow: investigated only.
 - Test 1 once more, on or after 2026-11-02.
+
+---
+
+# Round 9, 2026-10-20 UTC: a showcase screenshot is any snip, as it comes
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: e904357, the website merge of pull request 10,
+whose tree is 33ab03d's (compared here); Checks and Deploy green on main,
+Template cleanup skipped (GitHub's API). The local clone was already on
+main at e904357 with the branch showcase deleted, by the owner. Work on
+the branch showcase-any-snip. HEAD at end: the commit that adds this
+section. Mode: mutating. Ran from about 10:30Z.
+
+## What was asked
+
+The portfolio architecture chat's Brief 9, stored word for word in
+briefs/implementation-seat.md in place of Brief 1, read first for what it
+still says (carried in CLAUDE.md and the handoff). The owner's aim of
+2026-10-20: contributors "just take a snip and add it". His decision that
+day: any screenshot as a tool saves it; the check keeps PNG, JPEG or WebP
+by first bytes, a still image and no location; no width, shape or
+landscape rule; the build makes the served copy; one cap, for the
+repository's history, set from measurement above any ordinary full-screen
+snip of a busy page on a 4K screen and a Retina Mac; Test 6 held until
+this merges. To work out and report: how the served copy is made and
+what a click opens; the security of decoding untrusted images; the cap's
+value; whether any floor is needed; whether HEIF is worth accepting.
+
+## Errors this seat made
+
+1. **The limits of 2026-10-19 were this seat's design**, built as
+   proposed in Report 8: the owner's Q6 said "any normal screenshot of the
+   site's first screen works" and "HD as the target, not larger"; this
+   seat read the target as a limit, chose 1,024 to 1,920 pixels and
+   500 KB, and wrote resize steps for contributors. Its own measurements
+   showed most full-HD and every Retina snip would need them. The chat
+   names its part as its E36; this is the seat's.
+2. **Round 8 left docs/deferred/showcase-of-users-sites.md open** after
+   ADR-0016 built the showcase. Found reading Brief 1; closed.
+3. **Two scratch edit scripts were written through a Git Bash heredoc**,
+   which turned escapes into real newlines; both failed to parse and
+   changed nothing. Rewritten with the file tool, as the handoff's first
+   tool trap says.
+4. **A defeat case expected the wrong words**: the check refused a copy
+   carrying Chrome's colour profile at its header flag, before naming the
+   chunk. The rule held (exit 1); the case now expects the words both
+   refusals share.
+5. **The defeat harness held its large planted snips in memory** for the
+   whole run, tens of megabytes built when the cases were listed. With the
+   machine near its memory limit (206 MB of 7.8 GB free, 1 GB of 32 GB
+   commit free, other sessions' processes), the first fresh run's
+   browser and axe controls and one axe case failed with MemoryError,
+   while the same browser checks passed in ci.py checks beside them. Each
+   snip is now made as its case plants it (fceaace), and the run repeated.
+
+## The measurements
+
+**Full-screen snips** [VERIFIED, 2026-10-20, headless Chrome 155, which
+had updated itself from 154 since Round 8]. Five screens: full HD
+(1920x1080), 4K at 150% (2560x1440 at scale 1.5), 4K at 100%
+(3840x2160), a 16-inch MacBook Pro (1728x1117 at scale 2, 3456x2234) and
+a 5K display (2560x1440 at scale 2, 5120x2880). Pages: the Default
+design, the owner's site, brittanychiang.com, and Flickr's Explore, a
+wall of photographs. Unsplash answered headless Chrome with its bot
+protection's "Access Denied", Wikimedia Commons did not resolve from this
+machine, and NASA's image page failed every capture: each was looked at
+and dropped. PNG bytes, Chrome's encoder / Windows' WIC / GDI+:
+
+| Page | Full HD | 4K 150% | 4K 100% | MBP 16" | 5K |
+|---|---|---|---|---|---|
+| Default | 575,396 / 600,067 / 481,533 | 1,507,968 / 1,564,956 / 1,387,214 | 1,067,165 / 1,119,006 / 952,840 | 1,921,589 / 1,946,917 / 1,791,819 | 2,363,844 / 2,414,117 / 2,204,865 |
+| Owner's site | 644,272 / 671,095 / 540,592 | 1,616,738 / 1,662,091 / 1,425,775 | 1,257,323 / 1,319,046 / 1,092,855 | 1,982,988 / 2,002,629 / 1,839,644 | 2,481,408 / 2,491,928 / 2,208,833 |
+| brittanychiang.com | 257,119 / 279,794 / 213,160 | 531,573 / 568,527 / 441,399 | 411,023 / 440,791 / 354,133 | 656,767 / 695,081 / 550,594 | 764,986 / 812,063 / 633,945 |
+| Flickr photos | 1,730,782 / 1,751,729 / 2,525,046 | 6,161,385 / 6,350,538 / 10,236,568 | 8,209,980 / 8,391,552 / 12,439,711 | 4,958,681 / 5,122,437 / 8,328,730 | 9,494,065 / 9,901,544 / 16,928,260 |
+
+The largest: 12,439,711 bytes at 4K and 16,928,260 at 5K, both GDI+. A
+Mac's own PNG encoder could not be measured here. GitHub takes at most
+25 MiB through a browser ("About large files on GitHub", read
+2026-10-20). **The cap: 20 MiB (20,971,520 bytes)**, above every snip
+measured and below GitHub's own limit.
+
+**The served copies** [VERIFIED]. Drawn by OffscreenCanvas from
+createImageBitmap and encoded by Chrome as WebP. With the GPU on, drawing
+a large capture hung, or came out blank: a 1366x883 card of 2,810 bytes
+from a 656,767-byte capture. With --disable-gpu, three drawing methods
+gave the same bytes five times each (55,490 bytes, 292 colours in a
+64x64 sample). At quality 0.82, from every capture above: the card,
+fitting 1366x900, at most 147,498 bytes; the full view, fitting
+2560x2560, at most 401,498; at quality 0.75 they were 110,708 and
+300,462. Chrome's encoder adds an sRGB colour profile (ICCP) to a canvas's
+WebP; the copies are rewritten to their image chunk alone, and decode to
+the same size and colours.
+
+**The gallery** [VERIFIED, 11:11Z to 11:17Z], 0, 10 and 50 entries cycling
+through the captures above (originals 0, 10,057,430 and 107,247,534
+bytes, never served): the page 4,681, 10,469 and 33,349 bytes; every card
+copy 0, 461,556 and 3,176,044 (largest 147,016); every full copy 0,
+1,037,294 and 7,348,486 (largest 401,016); the page with every card,
+scrolled to the end, 69,427, 536,771 and 3,274,139. Lighthouse 13.5.0,
+default mobile, median of five: LCP 1,128, 1,507 and 1,656 ms; CLS 0;
+TBT 33, 16 and 70 ms; 70,310, 274,900 and 297,780 bytes loaded at first,
+against 973,985 and 997,291 at 10 and 50 in Round 8. Within ADR-0009.
+
+**HEIF** [sourced]: caniuse, read 2026-10-20, lists no support in Chrome,
+Edge or Firefox, Safari only, and notes HEIC "is complex and expensive to
+license"; Apple's screenshot page says a Mac saves PNG, and HEIF only with
+its HDR option on macOS Tahoe 26 or later.
+
+## What was built
+
+- tools/check_showcase.py: no width, shape or landscape rule; the cap
+  20 MiB; a HEIF file named as such. The screenshot keeps its tool's name
+  ("Screenshot 2026-10-20 at 11.30.12.png"), any image suffix in any
+  case, no folder, no control character, not hidden: a choice of this
+  seat for the owner's aim, the same rule in build.py and the scope check.
+- tools/screenshots.py makes each entry's card.webp and full.webp with
+  Chrome, GPU off, quality 0.82, never enlarged, image chunk only; the
+  screenshot is never published. build.py no longer copies it; the
+  gallery's card shows card.webp and opens full.webp.
+- The deploy's shots job makes the previews and the copies and uploads
+  only those pictures, gathered in _shots/, as one folder; ci.py assemble
+  takes only the pictures the gallery shows, WebP within 300 KB (card) and
+  1 MB (full), image chunk only, and refuses the screenshot itself.
+  ci.py checks makes them on every pull request; ci.py pictures makes and
+  checks them alone. check_built.py allows them missing until --previews.
+- docs/how-to/add-to-the-showcase.md: snip, save, upload, under the
+  tool's own name; no sizes, no Paint, no Preview. CONTRIBUTING.md, the
+  setup guide's Test 6 (a plain snip), standing-checks.md, commands.md,
+  CLAUDE.md's runtime line; ADR-0016's Changes with A4 and A6; ADR-0010's
+  Changes (Chrome decodes contributors' screenshots); the deferred
+  showcase entry closed.
+
+## Proofs
+
+- File defeat cases on the working tree: 100 failed as built and 15
+  planted controls passed, 199 s. New: 21 MB over the cap; HEIF under
+  .heic and under .png; a GIF; a hidden file in scope; a served copy with
+  EXIF, with a colour profile, missing; the screenshot among the
+  pictures. Planted controls: snips at the largest sizes measured, a
+  Windows full-HD PNG of 2,525,046 bytes, a Retina 2560-wide PNG with Mac
+  metadata, a 4K PNG of 12,439,711, a 5K PNG of 16,928,260, a portrait
+  snip, a Mac's own file name in the check and in scope, and assemble
+  taking a gallery's four pictures. Gone: portrait, narrower, wider.
+- Browser: copies from a screenshot with EXIF and XMP, and from one under
+  a Mac's name, hold their image alone; a maker keeping Chrome's colour
+  profile, and one publishing the screenshot itself, are refused.
+- Gates, in a clone of 3020bb4, 11:28Z to 11:36Z: 27 of 27 as expected.
+- On fresh clones, 11:36Z to 12:43Z. Of 3020bb4: `tools/ci.py checks --axe`, exit 0 in 667 s, two pictures made and checked, the cleanup's check removing 55 files, the browser checks 0 failures in 642 s; then the deploy's own path with the ten largest captures (up to 9,494,065 bytes) under a Mac's file names: the check passed them, 22 pictures were made, gathered as the shots job gathers them and assembled, the built files 0 problems, and every browser check with axe on the assembled gallery 0 failures in 644 s. Every defeat case with the browser and axe: on 3020bb4, three browser runs died of MemoryError (error 5); on fceaace, 12:17Z to 12:40Z, all 112 failed as built (100 file, 12 browser), 17 planted controls and 10 of 11 controls passed, the axe control dying of MemoryError again (334 MB free); run alone at 12:43Z on the same clone, it passed, 36 runs, 0 failures in 151 s.
+- The pre-publish search runs on the final commit; Report 9 gives its
+  result.
+
+## Rejected alternatives
+
+- A new decoding library, such as Pillow: a dependency needing a record
+  (scope floor line 5); Chrome is on the runner and in the tools.
+- Serving the screenshot itself on a click: its metadata and size would
+  reach visitors, and visitors' browsers would decode a stranger's file.
+- One served copy for both the card and the click: the card's at 1366
+  wide shows little more when opened; the full copy, at most 401 KB, loads
+  only on a click.
+- A floor on size: the owner's review sees every screenshot; a tiny one is
+  declined there. Not added; offered.
+- A ceiling on pixels against a decompression bomb: Chrome decodes the
+  screenshot on the pull request, so a file it cannot draw fails there and
+  never merges. Not added; offered.
+- HEIF: a decoder would be a dependency with licensing costs, for a Mac
+  setting that is off by default.
+
+## Not done
+
+- Nothing pushed; the branch waits for the owner.
+- Test 6, the owner's own entry, after the merge: snip, save, upload.
+- Test 1 once more, on or after 2026-11-02.

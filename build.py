@@ -140,9 +140,20 @@ GRID_COLUMNS = 6
 # build: the first screen at 1366 by 900 CSS pixels, saved at half size.
 PREVIEW_FILE = "preview.webp"
 PREVIEW_SIZE = (683, 450)
-# A showcase entry's screenshot, supplied by its author (ADR-0016, D1); the
-# card shows it whole, scaled into the preview's box.
-SHOWCASE_SHOTS = ("screenshot.png", "screenshot.jpg", "screenshot.jpeg", "screenshot.webp")
+# A showcase entry's screenshot, supplied by its author as their tool saved
+# it (ADR-0016, D1; Changes, 2026-10-20). It is never published itself:
+# tools/screenshots.py makes two served copies from it, WebP with no
+# metadata, never enlarged: the card's, fitting twice the card's 683 by 450
+# box, and the full view's, which a click on the card opens.
+# The screenshot keeps the name its tool gave it, such as "Screenshot
+# 2026-10-20 at 11.30.12.png": any name ending .png, .jpg, .jpeg or .webp,
+# in any case, with no folder, no control character, not hidden, at most
+# about 120 characters. tools/check_showcase.py and tools/scope_check.py
+# hold the same rule.
+SHOWCASE_IMAGE_RE = re.compile(r"[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)", re.IGNORECASE)
+SHOWCASE_CARD, SHOWCASE_FULL = "card.webp", "full.webp"
+SHOWCASE_FITS = {SHOWCASE_CARD: (1366, 900), SHOWCASE_FULL: (2560, 2560)}
+SHOWCASE_QUALITY = 0.82
 
 
 class BuildError(Exception):
@@ -870,15 +881,17 @@ def load_showcase() -> list[dict]:
                 and urlsplit(entry["url"]).hostname):
             raise BuildError(f"{where}/entry.json needs a name and an https:// url "
                              f"(run tools/check_showcase.py for every rule)")
-        shots = [n for n in SHOWCASE_SHOTS if (folder / n).is_file() and not (folder / n).is_symlink()]
+        shots = [p.name for p in sorted(folder.iterdir())
+                 if SHOWCASE_IMAGE_RE.fullmatch(p.name) and p.is_file() and not p.is_symlink()]
         if len(shots) != 1:
-            raise BuildError(f"{where}/ needs exactly one screenshot: "
-                             f"{', '.join(SHOWCASE_SHOTS)}")
+            raise BuildError(f"{where}/ needs exactly one screenshot, a .png, .jpg, .jpeg or "
+                             f".webp file")
         description = entry.get("description")
         entries.append({"login": folder.name, "name": entry["name"], "url": entry["url"],
                         "host": urlsplit(entry["url"]).hostname,
                         "description": description if _text(description) else None,
-                        "image": f"{where}/{shots[0]}"})
+                        "screenshot": f"{where}/{shots[0]}",
+                        "card": f"{where}/{SHOWCASE_CARD}", "full": f"{where}/{SHOWCASE_FULL}"})
     return entries
 
 
@@ -1023,10 +1036,8 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
             shutil.copyfile(STATIC_SRC / "gallery.css", static / "gallery.css")
             for design in designs:
                 copy_design(design, staging / "designs" / design["slug"])
-            for entry in showcase:
-                target = staging / entry["image"]
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(ROOT / entry["image"], target)
+            # The showcase's served copies come later, from the screenshot
+            # job, as the previews do; the authors' own files stay here.
         else:
             copy_design(designs[0], staging / "design")
         if cv_pdf:

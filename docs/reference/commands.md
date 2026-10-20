@@ -58,7 +58,8 @@ python tools/check_showcase.py --fetch-url URL [--login LOGIN]   one address's r
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
 python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
-python tools/screenshots.py [_site]              the gallery's previews
+python tools/screenshots.py [_site]              the gallery's previews and showcase copies
+python tools/ci.py pictures --gallery _site      those pictures made and checked
 python tools/scope_check.py --files LIST.tsv [--author LOGIN]   a pull request's scope, locally
 ```
 

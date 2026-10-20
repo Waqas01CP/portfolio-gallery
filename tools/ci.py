@@ -7,7 +7,10 @@
       no fetching; checks.yml fetches a pull request's sites); the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
-      built files checked; the content trace; the template cleanup, while
+      built files checked; the content trace; the gallery's pictures made as
+      the deploy makes them (tools/screenshots.py: the previews, and the
+      showcase's served copies, so a screenshot Chrome cannot read fails
+      here) and held to assemble's rules; the template cleanup, while
       there is one (tools/check_template_cleanup.py); and the browser checks on
       every design's page, with axe when given axe.min.js.
       .github/workflows/checks.yml runs this, always with --axe, after
@@ -17,14 +20,20 @@
       The deploy workflow's build: the site, or the gallery, built and its
       files checked, with the content trace for a site. No browser.
 
+  python tools/ci.py pictures --gallery DIR
+      A built gallery's pictures made, as the screenshot job makes them,
+      and held to assemble's rules. Headless Chrome.
+
   python tools/ci.py assemble --site DIR --shots DIR
-      The deploy workflow's last step before publishing: takes the gallery
-      previews from the screenshot job's folder, only files at
-      <name>/preview.webp for designs the site has, each a WebP image under
-      300 KB, and refuses anything else; then checks the site with its
-      previews (ADR-0010). The folder is laid out as upload-artifact stores
-      _site/designs/*/preview.webp: the path from the first wildcard on
-      (its README at v7.0.1).
+      The deploy workflow's last step before publishing: takes from the
+      screenshot job's folder only the pictures the gallery shows, each a
+      WebP image within its limit: designs/<name>/preview.webp for each
+      design (300 KB), and showcase/<login>/card.webp (300 KB) and full.webp
+      (1 MB) for each showcase entry, which must hold their image and
+      nothing else, no EXIF, XMP or colour profile; it refuses anything
+      else, and anything missing; then checks the site with its pictures
+      (ADR-0010; ADR-0016, Changes, 2026-10-20). The folder is the screenshot
+      job's _shots/, uploaded whole, as the build job uploads _site/.
 
 Each step runs its own tool, prints what it ran, and stops the run at the
 first failure with that tool's exit code. Standard library only; the
@@ -35,7 +44,9 @@ from __future__ import annotations
 
 import argparse
 import filecmp
+import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
@@ -45,9 +56,45 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from build import PREVIEW_FILE  # noqa: E402
+from build import PREVIEW_FILE, SHOWCASE_CARD, SHOWCASE_FULL  # noqa: E402
 
 PREVIEW_LIMIT = 300 * 1024
+# A showcase entry's served copies (ADR-0016, Changes, 2026-10-20). Measured
+# that day, at quality 0.82, from full-screen captures up to 5120 by 2880:
+# the card's at most 147,498 bytes and the full view's 401,498, both for a
+# wall of photographs.
+SERVED_LIMITS = {SHOWCASE_CARD: 300 * 1024, SHOWCASE_FULL: 1024 * 1024}
+SERVED_RE = re.compile(r"showcase/([a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38})/(card|full)\.webp")
+
+
+def served_problem(path: Path, limit: int, image_only: bool) -> str | None:
+    """Why a picture from the screenshot job may not be published. A
+    showcase copy must hold its image and nothing else: no EXIF, XMP or
+    colour profile, no animation (image_only)."""
+    if path.is_symlink() or not path.is_file():
+        return "not a regular file"
+    if path.stat().st_size > limit:
+        return f"over {limit // 1024} KB"
+    data = path.read_bytes()
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+        return "not a WebP image"
+    if not image_only:
+        return None
+    pos = 12
+    while pos + 8 <= len(data):
+        kind, length = struct.unpack("<4sI", data[pos:pos + 8])
+        if kind not in (b"VP8 ", b"VP8L", b"VP8X", b"ALPH"):
+            return (f"carries a {kind.decode('latin-1').strip()} chunk: a served copy holds its "
+                    f"image and no metadata")
+        if kind == b"VP8X" and data[pos + 8] & ~0x10:
+            return "its header announces metadata or animation: a served copy holds its image only"
+        pos += 8 + length + (length & 1)
+    return None
+
+
+def showcase_logins(site: Path) -> set[str]:
+    """The entries a built gallery shows, from its own page."""
+    return {m[0] for m in SERVED_RE.findall((site / "index.html").read_text(encoding="utf-8"))}
 
 
 class Failed(Exception):
@@ -105,6 +152,12 @@ def checks(quick: bool, axe: Path | None) -> None:
     run("tools/check_content.py", "--page", site / "index.html")
     run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
     run("tools/check_built.py", gallery)
+    # The pictures, as the deploy's screenshot job makes them: so a
+    # showcase screenshot Chrome cannot read fails here, on its pull
+    # request, before it can reach main (ADR-0016, Changes, 2026-10-20).
+    run("tools/screenshots.py", gallery)
+    pictures(gallery)
+    run("tools/check_built.py", gallery, "--previews")
     # The template cleanup, while there is one (a cleaned copy has none),
     # after the checks it repeats on the cleaned copy, so a fault in the
     # tree itself is reported by the check that finds it first.
@@ -125,41 +178,56 @@ def build(mode: str, out: Path) -> None:
         run("tools/check_content.py", "--page", out / "index.html")
 
 
-def assemble(site: Path, shots: Path) -> None:
+def expected_pictures(site: Path) -> dict[str, tuple[int, bool]]:
+    """Every picture the screenshot job must supply for this gallery, with
+    its limit and whether it must be image only."""
     demos = {p.parent.name for p in (site / "designs").glob("*/index.html")}
-    if not demos:
+    wanted = {f"designs/{name}/{PREVIEW_FILE}": (PREVIEW_LIMIT, False) for name in demos}
+    for login in showcase_logins(site):
+        for name, limit in SERVED_LIMITS.items():
+            wanted[f"showcase/{login}/{name}"] = (limit, True)
+    return wanted
+
+
+def pictures(gallery: Path) -> None:
+    """The pictures the screenshot job wrote into a gallery, held to
+    assemble's rules."""
+    wanted = expected_pictures(gallery)
+    for relative, (limit, image_only) in sorted(wanted.items()):
+        problem = served_problem(gallery / relative, limit, image_only)
+        if problem:
+            print(f"=== FAILED: {relative}: {problem}")
+            raise Failed(1)
+    print(f"=== {len(wanted)} picture(s) made and checked")
+
+
+def assemble(site: Path, shots: Path) -> None:
+    if not any((site / "designs").glob("*/index.html")):
         print(f"=== FAILED: {site} is not a built gallery")
         raise Failed(1)
+    wanted = expected_pictures(site)
     taken = {}
     for path in sorted(shots.rglob("*")):
         if path.is_dir() and not path.is_symlink():
             continue
         relative = path.relative_to(shots).as_posix()
-        parts = relative.split("/")
-        problem = None
-        if path.is_symlink() or not path.is_file():
-            problem = "not a regular file"
-        elif len(parts) != 2 or parts[1] != PREVIEW_FILE:
-            problem = f"not <name>/{PREVIEW_FILE}"
-        elif parts[0] not in demos:
-            problem = "no such design in the site"
-        elif path.stat().st_size > PREVIEW_LIMIT:
-            problem = f"over {PREVIEW_LIMIT // 1024} KB"
+        if relative not in wanted:
+            problem = (f"not a picture this gallery shows: designs/<name>/{PREVIEW_FILE} or "
+                       f"showcase/<login>/{SHOWCASE_CARD} and {SHOWCASE_FULL}")
         else:
-            head = path.read_bytes()[:12]
-            if head[:4] != b"RIFF" or head[8:12] != b"WEBP":
-                problem = "not a WebP image"
+            problem = served_problem(path, *wanted[relative])
         if problem:
             print(f"=== FAILED: the screenshot job's {relative}: {problem}")
             raise Failed(1)
-        taken[parts[0]] = path
-    missing = sorted(demos - set(taken))
+        taken[relative] = path
+    missing = sorted(set(wanted) - set(taken))
     if missing:
-        print(f"=== FAILED: no preview for {', '.join(missing)}")
+        print(f"=== FAILED: the screenshot job supplied no {', '.join(missing)}")
         raise Failed(1)
-    for name, path in taken.items():
-        shutil.copyfile(path, site / "designs" / name / PREVIEW_FILE)
-    print(f"=== took {len(taken)} preview(s): {', '.join(sorted(taken))}")
+    for relative, path in taken.items():
+        (site / relative).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, site / relative)
+    print(f"=== took {len(taken)} picture(s): {', '.join(sorted(taken))}")
     run("tools/check_built.py", site, "--previews")
 
 
@@ -175,12 +243,17 @@ def main(argv: list[str]) -> int:
     a = sub.add_parser("assemble")
     a.add_argument("--site", type=Path, required=True)
     a.add_argument("--shots", type=Path, required=True)
+    p = sub.add_parser("pictures")
+    p.add_argument("--gallery", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "checks":
             checks(args.quick, args.axe)
         elif args.command == "build":
             build(args.mode, args.out.resolve())
+        elif args.command == "pictures":
+            run("tools/screenshots.py", args.gallery.resolve())
+            pictures(args.gallery.resolve())
         else:
             assemble(args.site.resolve(), args.shots.resolve())
     except Failed as failure:

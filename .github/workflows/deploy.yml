@@ -8,13 +8,16 @@
 #
 # Four jobs, each with the least it needs (ADR-0006, ADR-0010):
 #   build     builds and checks the files; read-only; no browser
-#   shots     the gallery only: takes each design's preview in headless
-#             Chrome; read-only; publishes nothing but its own artifact
-#   assemble  takes only WebP previews from shots, checks them and the
-#             site, and packages the site for Pages; read-only
+#   shots     the gallery only: takes each design's preview, and makes each
+#             showcase entry's served copies from its author's screenshot,
+#             in headless Chrome; read-only; publishes nothing but its own
+#             artifact
+#   assemble  takes only the WebP pictures the gallery shows from shots,
+#             checks them and the site, and packages the site for Pages;
+#             read-only
 #   deploy    publishes the package; the only job that can
-# Chrome parses contributed fonts and images, so it never runs in a job
-# whose output is published without being checked.
+# Chrome parses contributed fonts, images and screenshots, so it never runs
+# in a job whose output is published without being checked.
 name: Deploy
 
 on:
@@ -78,12 +81,23 @@ jobs:
         with:
           name: site
           path: _site
-      - name: Take each design's preview
+      # The previews, and each showcase entry's served copies, drawn from
+      # its author's screenshot in the repository (ADR-0016, Changes,
+      # 2026-10-20). Only those pictures leave this job, gathered into
+      # _shots/ with their paths in the site and uploaded whole, as build
+      # uploads _site/; assemble checks every one before publishing.
+      - name: Take each design's preview and make the showcase's served copies
         run: python3 tools/screenshots.py _site
+      - name: Gather only the pictures
+        run: |
+          mkdir _shots
+          cd _site
+          cp --parents designs/*/preview.webp ../_shots/
+          if [ -d showcase ]; then cp --parents showcase/*/card.webp showcase/*/full.webp ../_shots/; fi
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: shots
-          path: _site/designs/*/preview.webp
+          path: _shots
           retention-days: 1
           if-no-files-found: error
 
@@ -112,7 +126,7 @@ jobs:
         with:
           name: shots
           path: _shots
-      - name: Take only checked previews, and check the site again
+      - name: Take only checked pictures, and check the site again
         env:
           MODE: ${{ needs.build.outputs.mode }}
         run: |

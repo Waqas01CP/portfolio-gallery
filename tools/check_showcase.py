@@ -11,19 +11,24 @@
 
 The files. showcase/ holds one folder per person, named by their GitHub
 login in lower case, and nothing else. Each folder holds entry.json and
-one screenshot, screenshot.png, .jpg, .jpeg or .webp, and nothing else.
+one screenshot, named as its tool saved it and ending .png, .jpg, .jpeg
+or .webp in any case, and nothing else.
 
   - entry.json: "name" (at most 80 characters), "url" (an https:// address
     of at most 300 characters, with no user name, password or port), and
     optionally "description" (one line of at most 120 characters); no
     other field; at most 4 KB.
-  - The screenshot: its first bytes are the format its name says; one
-    frame, never animated; landscape, wider than it is tall; between
-    MIN_WIDTH and MAX_WIDTH pixels wide; at most MAX_BYTES; and no location
-    in its EXIF or XMP metadata. Other metadata passes: a Mac's own
-    screenshots carry EXIF and XMP blocks saying "Screenshot", and
-    Windows' JPEG encoder writes an EXIF block of resolution tags
-    (measured 2026-10-19).
+  - The screenshot, as the contributor's tool saved it, any size and any
+    shape (the owner's decision of 2026-10-20, ADR-0016, Changes): its
+    first bytes are the format its name says; one frame, never animated;
+    no location in its EXIF or XMP metadata; and at most MAX_BYTES, a cap
+    above every ordinary snip, since every file stays in the repository's
+    history. Other metadata passes: a Mac's own screenshots carry EXIF and
+    XMP blocks saying "Screenshot", and Windows' JPEG encoder writes an
+    EXIF block of resolution tags (measured 2026-10-19). The gallery shows
+    served copies made from it (tools/screenshots.py), never the file.
+    A HEIF file, as a Mac set to save HDR screenshots makes, is named as
+    such: no browser engine the project runs can read it.
   - No two entries list the same site; every design's "in_use" is https.
 
 The responses, with --fetch-*: each address is fetched, never rendered or
@@ -72,17 +77,20 @@ ROOT = Path(__file__).resolve().parent.parent
 SHOWCASE = ROOT / "showcase"
 DESIGNS = ROOT / "designs"
 
-# The screenshot's limits, from the measurements of 2026-10-19 (the session
-# log, Round 8): first screens of four sites at 1280x720 weighed at most
-# 477 KB as PNG and 122 KB as JPEG, and at 1920x1080 at most 657 KB as PNG
-# and 202 KB as JPEG. The owner's target is HD, about 1280x720 (2026-10-19).
-MIN_WIDTH = 1024
-MAX_WIDTH = 1920
-MAX_BYTES = 500 * 1024
+# The one cap on a screenshot, for the repository's history, not the page
+# (the owner's decision of 2026-10-20). Measured that day (the session log,
+# Round 9): full-screen captures of five busy pages, a wall of photographs
+# among them, were at most 12,439,711 bytes at 3840x2160 (4K) and
+# 16,928,260 at 5120x2880 (a 5K Retina display), both from Windows' GDI+
+# PNG encoder, the largest of the three encoders measured. 20 MiB stays
+# above them and below the 25 MiB GitHub takes through a browser.
+MAX_BYTES = 20 * 1024 * 1024
 ENTRY_BYTES = 4 * 1024
 NAME_LIMIT, URL_LIMIT, DESCRIPTION_LIMIT = 80, 300, 120
-SCREENSHOTS = {"screenshot.png": "png", "screenshot.jpg": "jpeg", "screenshot.jpeg": "jpeg",
-               "screenshot.webp": "webp"}
+# The same rule as build.py's SHOWCASE_IMAGE_RE: the name a screenshot
+# tool gave the file, ending .png, .jpg, .jpeg or .webp in any case.
+IMAGE_NAME_RE = re.compile(r"[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)", re.IGNORECASE)
+KINDS = {".png": "png", ".jpg": "jpeg", ".jpeg": "jpeg", ".webp": "webp"}
 LOGIN_RE = re.compile(r"^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$")
 ENTRY_FIELDS = {"name", "url", "description"}
 
@@ -247,27 +255,28 @@ def webp_facts(data: bytes) -> dict:
 READERS = {"png": png_facts, "jpeg": jpeg_facts, "webp": webp_facts}
 
 
+HEIF_BRANDS = {b"heic", b"heix", b"heim", b"heis", b"hevc", b"hevx", b"mif1", b"msf1"}
+HEIF_ADVICE = ("a HEIF image, which the gallery's tools cannot read: save the screenshot as PNG, "
+               "as a Mac does unless its Screenshot options are set to HDR "
+               "(docs/how-to/add-to-the-showcase.md)")
+
+
 def screenshot_problems(path: Path, kind: str) -> list[str]:
+    """What stops a screenshot being taken as its tool saved it. Any size
+    and any shape pass."""
     data = path.read_bytes()
     problems = []
     if len(data) > MAX_BYTES:
-        problems.append(f"{len(data):,} bytes, over the {MAX_BYTES // 1024} KB limit: save it as "
-                        f"JPEG, or at about 1280 pixels wide (docs/how-to/add-to-the-showcase.md)")
+        problems.append(f"{len(data):,} bytes, over the {MAX_BYTES // (1024 * 1024)} MB cap, which is "
+                        f"larger than any ordinary screenshot: snip the browser window alone")
+    if data[4:8] == b"ftyp" and data[8:12] in HEIF_BRANDS:
+        return problems + [HEIF_ADVICE]
     try:
         facts = READERS[kind](data)
     except (ImageError, struct.error) as error:
         return problems + [str(error) if isinstance(error, ImageError) else "its header cannot be read"]
-    width, height = facts["width"], facts["height"]
     if facts["animated"]:
         problems.append("it is animated; a screenshot is one still frame")
-    if width <= height:
-        problems.append(f"{width} by {height} pixels is not landscape; take the first screen "
-                        f"of a desktop browser window")
-    if width < MIN_WIDTH:
-        problems.append(f"{width} pixels wide, under the {MIN_WIDTH}-pixel minimum")
-    if width > MAX_WIDTH:
-        problems.append(f"{width} pixels wide, over the {MAX_WIDTH}-pixel maximum: make it about "
-                        f"1280 pixels wide (docs/how-to/add-to-the-showcase.md)")
     if facts["gps"]:
         problems.append("its metadata holds a location (GPS); save it again without it")
     return problems
@@ -341,20 +350,22 @@ def check_files() -> tuple[list[str], list[dict]]:
         if not LOGIN_RE.match(folder.name):
             problems.append(f"{where}/: the folder is named by your GitHub login, in lower case")
         files = sorted(p.name for p in folder.iterdir())
-        shots = [n for n in files if n in SCREENSHOTS]
+        shots = [n for n in files if IMAGE_NAME_RE.fullmatch(n)]
         for name in files:
             path = folder / name
             if path.is_symlink() or not path.is_file():
                 problems.append(f"{where}/{name}: not a regular file")
-            elif name != "entry.json" and name not in SCREENSHOTS:
+            elif name.lower().rsplit(".", 1)[-1] in ("heic", "heif"):
+                problems.append(f"{where}/{name}: {HEIF_ADVICE}")
+            elif name != "entry.json" and not IMAGE_NAME_RE.fullmatch(name):
                 problems.append(f"{where}/{name}: a showcase folder holds entry.json and one "
-                                f"screenshot.png, .jpg, .jpeg or .webp, and nothing else")
+                                f"screenshot, a .png, .jpg, .jpeg or .webp file, and nothing else")
         if len(shots) != 1:
             problems.append(f"{where}/: {len(shots)} screenshots; it needs exactly one")
         for name in shots:
             if (folder / name).is_file() and not (folder / name).is_symlink():
                 problems += [f"{where}/{name}: {p}" for p in
-                             screenshot_problems(folder / name, SCREENSHOTS[name])]
+                             screenshot_problems(folder / name, KINDS[Path(name).suffix.lower()])]
         entry = load_entry(folder, problems)
         if entry and https_address(entry.get("url")):
             key = site_key(entry["url"])

@@ -1,12 +1,15 @@
 ---
 type: deferred
-description: "A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; reopen when users ask to be listed or the gallery has designs from several contributors."
-status: open
+description: "A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; closed 2026-10-20, built as ADR-0016."
+status: closed
 ---
 
 # A showcase of users' own sites
 
-**Deferred 2026-10-12.** Not rejected. Not scheduled.
+**Deferred 2026-10-12. Closed 2026-10-20:** reopened by the owner's
+direction of 2026-10-18 and built as ADR-0016 (merged 2026-10-19,
+pull request 10); every question in "What revisiting would have to
+produce" is answered there. Kept as the record of why it waited.
 
 ## What was proposed
 

@@ -30,9 +30,9 @@ seen without running anything:
   - in the gallery, every link to another site in a showcase card or a
     design's "In use" line carries rel="ugc nofollow", and every
     showcase picture loads lazily (ADR-0016);
-  - with --previews, every design in a gallery has its preview image;
-    without it, a missing preview is not reported, because the previews
-    are taken after the build.
+  - with --previews, every design in a gallery has its preview image and
+    every showcase card its served copies; without it, a missing one is not
+    reported, because the screenshot job makes them after the build.
 
 Exit 0 when everything passes; 1 when anything fails, each printed with
 its file; 2 when the folder holds no built page. Standard library only.
@@ -49,7 +49,7 @@ from urllib.parse import unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from build import CSP, PREVIEW_FILE, PROJECT_URL  # noqa: E402
+from build import CSP, PREVIEW_FILE, PROJECT_URL, SHOWCASE_CARD, SHOWCASE_FULL  # noqa: E402
 from check_design import CSSError, tokens  # noqa: E402
 
 RESOURCE_ATTRS = {"src", "srcset", "poster", "data", "action", "formaction", "background",
@@ -254,10 +254,11 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
             problems.append("the footer credit does not link both portfolio-gallery and the "
                             "design's author (ADR-0016, D2)")
     for url in page.loads:
-        # A gallery's previews are taken after the build, by the screenshot
-        # job (tools/screenshots.py); --previews requires them, and the
-        # deploy workflow passes it once they are in.
-        if not previews and re.fullmatch(rf"designs/[a-z0-9-]+/{re.escape(PREVIEW_FILE)}", url):
+        # A gallery's previews, and its showcase's served copies, are made
+        # after the build, by the screenshot job (tools/screenshots.py);
+        # --previews requires them, and the deploy workflow passes it once
+        # they are in.
+        if not previews and later_picture(url):
             continue
         _, problem = resolve(path.parent, root, url)
         if problem:
@@ -277,11 +278,20 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
         elif parts.scheme:
             problems.append(f"the link '{href}' uses the {parts.scheme}: scheme; only http(s) "
                             f"and mailto are allowed")
+        elif not previews and later_picture(href.split("#", 1)[0]):
+            continue
         else:
             _, problem = resolve(path.parent, root, href.split("#", 1)[0])
             if problem:
                 problems.append(f"the link {problem}")
     return problems
+
+
+def later_picture(url: str) -> bool:
+    """A picture the screenshot job adds after the build."""
+    return bool(re.fullmatch(rf"designs/[a-z0-9-]+/{re.escape(PREVIEW_FILE)}", url)
+                or re.fullmatch(rf"showcase/[a-z0-9-]+/(?:{re.escape(SHOWCASE_CARD)}|"
+                                rf"{re.escape(SHOWCASE_FULL)})", url))
 
 
 def check_css(path: Path, root: Path) -> list[str]:

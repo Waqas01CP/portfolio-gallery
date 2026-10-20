@@ -1,6 +1,6 @@
 ---
 type: how-to
-description: "A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, the screenshot and how to make it small enough, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery."
+description: "A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, a screenshot as their tool saves it, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery."
 status: current
 ---
 
@@ -25,44 +25,27 @@ that only a script adds is not seen.
 
 ## 2. Take the screenshot
 
-1. Open your site in a desktop browser, in a window about 1280 pixels wide
-   and 720 tall, and wait for it to finish loading.
-2. Capture the first screen, not the whole page:
-   - Windows: press the Windows logo key, Shift and S together, then drag
-     over the page (Microsoft, "Use Snipping Tool to capture screenshots").
-   - Mac: press Shift, Command and 4 together, then drag over the page
-     (Apple, "How to take a screenshot on your Mac").
-3. Check it against the rules:
-   - a PNG, JPEG or WebP file;
-   - wider than it is tall;
-   - between 1,024 and 1,920 pixels wide;
-   - at most 500 KB;
-   - no location in its metadata. A screenshot has none unless a program
-     added it; a photo from a phone often does.
+Snip your site's first screen, save it, and upload it as your tool saved
+it. There is no size to check and nothing to resize.
 
-The card shows your screenshot whole, scaled to fit, never cropped, and a
-click opens it full size; any shape of a normal first screen works.
+- Windows: press the Windows logo key, Shift and S together, then drag
+  over the page (Microsoft, "Use Snipping Tool to capture screenshots").
+- Mac: press Shift, Command and 4 together, then drag over the page
+  (Apple, "How to take a screenshot on your Mac").
 
-### If it is too large
+Any size and any shape work, a phone's tall screen too: the gallery makes
+its own smaller copies of your screenshot, without its metadata, and the
+card shows a copy whole, never cropped, with bands where the shapes
+differ; a click opens a larger copy. The checks take PNG, JPEG or WebP, as
+screenshot tools save them. Two things they refuse, neither of which an
+ordinary snip has:
 
-A Mac screen, and many laptop screens, take screenshots at two or more
-pixels to each point, so a 1280-wide window can become a 2560-pixel
-image. Make it smaller, and save it as JPEG if it is still over 500 KB:
+- a location in the file's metadata, which a photo from a phone may carry;
+- a file over 20 MB, larger than any screenshot measured, even of a wall
+  of photographs on a 5K screen.
 
-- **Windows, in Paint:** open the screenshot in Paint. On the Home tab,
-  choose Resize, choose pixels, keep the proportions, and set the width to
-  1280. Then save it with Save as, choosing JPEG (Microsoft, "Draw,
-  Create, and Edit with Paint").
-- **Mac, in Preview:** open the screenshot in Preview. Choose Tools, then
-  Adjust Size, tick Scale proportionally, and set the width to 1280. Then
-  choose File, then Export, and in Format choose JPEG (Apple, "Resize,
-  rotate, or flip an image in Preview on Mac" and "Convert image file
-  types in Preview on Mac"). A Mac that saves screenshots as HEIF needs this step
-  too: the check takes PNG, JPEG or WebP.
-
-Measured on 2026-10-19, first screens of four sites at 1280 by 720 were
-at most 477 KB as PNG and 122 KB as JPEG; at 1920 by 1080, PNG reached
-657 KB, over the limit, while JPEG stayed at 202 KB at most.
+A Mac set to save screenshots in HDR saves HEIF, which the gallery's tools
+cannot read; its usual setting saves PNG.
 
 ## 3. Open the pull request
 
@@ -78,10 +61,9 @@ at most 477 KB as PNG and 122 KB as JPEG; at 1920 by 1080, PNG reached
 
    The description is optional, one line of at most 120 characters; the
    name at most 80. Click **Commit changes**.
-3. Rename your screenshot `screenshot.png`, `screenshot.jpg`,
-   `screenshot.jpeg` or `screenshot.webp`, as its format is. In your fork,
-   open the `showcase/<your-login>/` folder, click **Add file**, then
-   **Upload files**, add the screenshot, and **Commit changes**.
+3. In your fork, open the `showcase/<your-login>/` folder, click **Add
+   file**, then **Upload files**, add your screenshot as your tool saved
+   it, under the name it was given, and **Commit changes**.
 4. Click **Contribute**, then **Open pull request**, and **Create pull
    request**.
 
@@ -95,8 +77,10 @@ On the pull request:
 - **Scope**: every file is in `showcase/<your-login>/`, your own login as
   GitHub reports it for the pull request.
 - **The files**: the fields of `entry.json`; the screenshot's format, by
-  its first bytes, its shape, its width, its size and its metadata; and
-  that no other entry lists the same site.
+  its first bytes, that it is one still image, that its metadata holds no
+  location, and the 20 MB cap; and that no other entry lists the same
+  site. Then Chrome reads the screenshot and draws the gallery's copies of
+  it, so a file it cannot read is found here.
 - **Your site**, fetched and never rendered: `https://` at every step, a
   certificate that verifies, a web page answering 200, no domain parking
   or sale service on the way, and the link to your GitHub profile. A site
