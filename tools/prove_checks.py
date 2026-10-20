@@ -115,11 +115,14 @@ def webp(width: int, height: int, animated: bool = False) -> bytes:
     return b"RIFF" + struct.pack("<I", len(body)) + body
 
 
-def padded(width: int, height: int, total: int, *chunks: tuple[bytes, bytes]) -> bytes:
+def padded(width: int, height: int, total: int, *chunks: tuple[bytes, bytes]):
     """A real PNG brought to a measured snip's byte count by a private
-    ancillary chunk, which readers skip."""
-    base = png(width, height, *chunks)
-    return png(width, height, *chunks, (b"pdAt", b"\0" * max(0, total - len(base) - 12)))
+    ancillary chunk, which readers skip. Made when its case plants it, not
+    when the cases are listed: together they are tens of megabytes."""
+    def make() -> bytes:
+        base = png(width, height, *chunks)
+        return png(width, height, *chunks, (b"pdAt", b"\0" * max(0, total - len(base) - 12)))
+    return make
 
 
 def riff_chunk(kind: bytes, data: bytes) -> bytes:
@@ -156,7 +159,7 @@ def plant_entry(copy: Path, login: str = "tester", entry: dict | None = None,
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "entry.json").write_text(json.dumps(GOOD_ENTRY if entry is None else entry), encoding="utf-8")
     for name, data in ({"screenshot.png": png(1280, 720)} if files is None else files).items():
-        (folder / name).write_bytes(data)
+        (folder / name).write_bytes(data() if callable(data) else data)
     return folder
 
 
