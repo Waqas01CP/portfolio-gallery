@@ -115,6 +115,29 @@ def webp(width: int, height: int, animated: bool = False) -> bytes:
     return b"RIFF" + struct.pack("<I", len(body)) + body
 
 
+def padded(width: int, height: int, total: int, *chunks: tuple[bytes, bytes]) -> bytes:
+    """A real PNG brought to a measured snip's byte count by a private
+    ancillary chunk, which readers skip."""
+    base = png(width, height, *chunks)
+    return png(width, height, *chunks, (b"pdAt", b"\0" * max(0, total - len(base) - 12)))
+
+
+def riff_chunk(kind: bytes, data: bytes) -> bytes:
+    return kind + struct.pack("<I", len(data)) + data + b"\0" * (len(data) & 1)
+
+
+def served_webp(*chunks: tuple[bytes, bytes]) -> bytes:
+    """A WebP as a served copy is written, its image chunk only, then any
+    chunk planted."""
+    body = b"WEBP" + riff_chunk(b"VP8 ", b"\0\0\0\x9d\x01\x2a" + b"\0" * 58)
+    body += b"".join(riff_chunk(kind, data) for kind, data in chunks)
+    return b"RIFF" + struct.pack("<I", len(body)) + body
+
+
+# The start of a HEIF file, as a Mac set to HDR screenshots saves one.
+HEIF = b"\0\0\0\x18ftypheic\0\0\0\0mif1heic" + b"\0" * 64
+
+
 def xmp(text: str) -> tuple[bytes, bytes]:
     return b"iTXt", b"XML:com.adobe.xmp\0\0\0\0\0" + text.encode()
 
@@ -122,6 +145,8 @@ def xmp(text: str) -> tuple[bytes, bytes]:
 MAC_XMP = ('<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF><rdf:Description>'
            "<exif:PixelXDimension>1280</exif:PixelXDimension><exif:UserComment>Screenshot"
            "</exif:UserComment></rdf:Description></rdf:RDF></x:xmpmeta>")
+# A Mac's own name for a screenshot, its narrow no-break space included.
+MAC_NAME = "Screenshot 2026-10-20 at 11.30.12\u202fAM.png"
 GOOD_ENTRY = {"name": "Test Person", "url": "https://example.com/", "description": "A sample entry."}
 
 
@@ -275,6 +300,8 @@ def file_cases():
         "showcase/other/ is not the author's own entry")
     yield ("scope: a script in a showcase entry", scope(["added\tshowcase/tester/run.js"], "tester"),
            "nothing else (docs/how-to/add-to-the-showcase.md)")
+    yield ("scope: a hidden file in a showcase entry", scope(["added\tshowcase/tester/.x.png"], "tester"),
+           "nothing else (docs/how-to/add-to-the-showcase.md)")
 
     def built(old, new, page="index.html"):
         def plant(copy):
@@ -338,24 +365,43 @@ def file_cases():
             "MISSING: Example City, Exampleland (content/cv.md, line 12)",
             "Add the text to content/cv.md, or change site.json or items.json to match the CV line shown"))
 
-    def assemble(extra=None, big=False):
+    def assemble(extra=None, big=False, entry=False, served=None):
         def plant(copy):
+            if entry:
+                plant_entry(copy)
             site = build_site(copy, "--gallery")
             shots = copy / "_shots"
             for name in ("default", "plain"):
-                (shots / name).mkdir(parents=True)
+                (shots / "designs" / name).mkdir(parents=True)
                 data = b"RIFF\0\0\0\0WEBPVP8 " + (b"\0" * (310_000 if big and name == "plain" else 64))
-                (shots / name / "preview.webp").write_bytes(data)
+                (shots / "designs" / name / "preview.webp").write_bytes(data)
+            for name, data in (served or {}).items():
+                (shots / "showcase" / "tester").mkdir(parents=True, exist_ok=True)
+                (shots / "showcase" / "tester" / name).write_bytes(data)
             if extra:
                 (shots / extra[0]).parent.mkdir(parents=True, exist_ok=True)
                 (shots / extra[0]).write_bytes(extra[1])
             return ["tools/ci.py", "assemble", "--site", site, "--shots", shots]
         return plant
 
-    yield "assemble: a script among the previews", assemble(("default/site.js", b"alert(1)")), "not <name>/preview.webp"
+    yield ("assemble: a script among the previews", assemble(("designs/default/site.js", b"alert(1)")),
+           "not a picture this gallery shows")
     yield "assemble: a preview over 300 KB", assemble(big=True), "over 300 KB"
-    yield ("assemble: a fake image", assemble(("plain/preview.webp", b"<svg onload=alert(1)>")),
+    yield ("assemble: a fake image", assemble(("designs/plain/preview.webp", b"<svg onload=alert(1)>")),
            "not a WebP image")
+    clean = {"card.webp": served_webp(), "full.webp": served_webp()}
+    yield ("assemble: a served copy carrying metadata", assemble(entry=True, served={
+        **clean, "card.webp": served_webp((b"EXIF", b"Exif\0\0" + tiff(0x0112)))}),
+        "showcase/tester/card.webp: carries a EXIF chunk")
+    yield ("assemble: a served copy carrying a colour profile", assemble(entry=True, served={
+        **clean, "full.webp": served_webp((b"ICCP", b"\0" * 64))}),
+        "showcase/tester/full.webp: carries a ICCP chunk")
+    yield ("assemble: a served copy missing", assemble(entry=True, served={"card.webp": served_webp()}),
+           "supplied no showcase/tester/full.webp")
+    yield ("assemble: the screenshot itself among the pictures", assemble(entry=True, served={
+        **clean, "screenshot.png": png(1280, 720)}), "not a picture this gallery shows")
+    yield ("control: assemble takes a gallery's previews and served copies",
+           assemble(entry=True, served=clean), Passes("took 4 picture(s)"))
 
     def build_case(old, new):
         def plant(copy):
@@ -449,15 +495,12 @@ def file_cases():
     yield "showcase: no screenshot", showcase(files={}), "0 screenshots; it needs exactly one"
     yield ("showcase: a screenshot that is not what its name says",
            showcase(files={"screenshot.png": jpeg(1280, 720)}), "its bytes are not a PNG image")
-    yield ("showcase: a portrait screenshot", showcase(files={"screenshot.png": png(1080, 1920)}),
-           "is not landscape")
-    yield ("showcase: narrower than the minimum", showcase(files={"screenshot.png": png(1000, 600)}),
-           "under the 1024-pixel minimum")
-    yield ("showcase: wider than the maximum", showcase(files={"screenshot.png": png(2560, 1440)}),
-           "over the 1920-pixel maximum")
-    yield ("showcase: over the byte limit",
-           showcase(files={"screenshot.png": png(1280, 720, (b"tEXt", b"Comment\0" + b"x" * 520_000))}),
-           "over the 500 KB limit")
+    yield ("showcase: over the 20 MB cap", showcase(files={"screenshot.png": padded(1920, 1080, 21_000_000)}),
+           "over the 20 MB cap")
+    yield ("showcase: a HEIF screenshot", showcase(files={"screenshot.heic": HEIF}),
+           "a HEIF image, which the gallery's tools cannot read")
+    yield ("showcase: HEIF bytes under a PNG's name", showcase(files={"screenshot.png": HEIF}),
+           "a HEIF image, which the gallery's tools cannot read")
     yield ("showcase: a JPEG whose EXIF holds a location",
            showcase(files={"screenshot.jpg": jpeg(1280, 720, tiff(0x0112, 0x8825))}),
            "its metadata holds a location (GPS)")
@@ -535,10 +578,29 @@ def file_cases():
            Passes("PASS"))
     yield ("control: a JPEG with Windows' EXIF resolution tags passes",
            showcase(files={"screenshot.jpg": jpeg(1920, 1080, tiff(0x5110, 0x5111, 0x5112))}), Passes("PASS"))
+    # Raw snips as tools save them, each at the largest size measured on
+    # 2026-10-20 for its screen (the session log, Round 9).
+    yield ("control: a Windows full-HD PNG snip passes", showcase(files={"screenshot.png": padded(
+        1920, 1080, 2_525_046, (b"sRGB", b"\0"), (b"gAMA", struct.pack(">I", 45455)))}), Passes("PASS"))
+    yield ("control: a Retina 2560-wide PNG snip passes", showcase(files={"screenshot.png": padded(
+        2560, 1600, 1_399_366, (b"eXIf", tiff(0x0112, 0x011A)), xmp(MAC_XMP), (b"iDOT", b"\0" * 28))}),
+        Passes("PASS"))
+    yield ("control: a 4K PNG snip passes", showcase(files={"screenshot.png": padded(3840, 2160, 12_439_711)}),
+           Passes("PASS"))
+    yield ("control: a 5K Retina PNG snip, the largest measured, passes",
+           showcase(files={"screenshot.png": padded(5120, 2880, 16_928_260)}), Passes("PASS"))
+    yield "control: a portrait snip passes", showcase(files={"screenshot.png": png(1170, 2532)}), Passes("PASS")
+    yield ("control: a snip under its tool's own name passes", showcase(files={MAC_NAME: png(1280, 720)}),
+           Passes("PASS"))
+    yield ("showcase: a GIF", showcase(files={"Screenshot.gif": b"GIF89a" + b"\0" * 32}),
+           "a showcase folder holds entry.json and one screenshot")
     yield "control: a WebP screenshot passes", showcase(files={"screenshot.webp": webp(1280, 720)}), Passes("PASS")
     yield ("control: the author's own showcase entry is in scope", scope(
         ["added\tshowcase/tester/entry.json", "added\tshowcase/tester/screenshot.png"], "Tester"),
         Passes("all in showcase/tester/"))
+    yield ("control: a snip under its tool's own name is in scope", scope(
+        ["added\tshowcase/tester/entry.json", "added\tshowcase/tester/Screenshot 2026-10-20 113012.PNG"],
+        "tester"), Passes("all in showcase/tester/"))
     yield "control: a page linking its author's profile passes", fetch("/ok"), Passes("ok   ")
     yield "control: bot protection's 403 is not a failure", fetch("/blocked"), Passes("CANNOT CHECK")
     yield "control: a gallery with a showcase entry passes its file checks", gallery_built(), Passes("0 problem(s)")
@@ -609,6 +671,28 @@ def browser_cases(axe: Path | None):
         return ["tools/check_browser.py", build_site(copy, "--gallery"), "--only", "anchors"]
 
     yield "anchors: base.css without its :target rule", anchors_full, "[anchors]"
+    # The showcase's served copies (ADR-0016, Changes, 2026-10-20): drawn by
+    # Chrome from a screenshot carrying EXIF and XMP, they hold their image
+    # alone; a maker that keeps the encoder's colour profile, or publishes
+    # the screenshot itself, is refused.
+    def served(old=None, new=None, name="screenshot.png"):
+        def plant(copy):
+            plant_entry(copy, files={name: png(
+                1920, 1080, (b"eXIf", tiff(0x0112, 0x011A)), xmp(MAC_XMP))})
+            if old is not None:
+                edit(copy / "tools/screenshots.py", old, new)
+            return ["tools/ci.py", "pictures", "--gallery", build_site(copy, "--gallery")]
+        return plant
+
+    yield ("control: served copies from a screenshot with EXIF and XMP hold their image alone",
+           served(), Passes("picture(s) made and checked"))
+    yield ("control: served copies from a snip under its tool's own name",
+           served(name=MAC_NAME), Passes("picture(s) made and checked"))
+    yield ("pictures: a maker that keeps the encoder's colour profile", served(
+        "                        data = image_only(data)\n", ""), "a served copy holds its image")
+    yield ("pictures: a maker that publishes the screenshot itself", served(
+        "                        data = image_only(data)\n",
+        "                        data = (SHOWCASE / source).read_bytes()\n"), "not a WebP image")
     yield ("joins: the hidden spaces removed", gallery(lambda c: edit(
         c / "src/templates/macros.html.j2", '{% macro sp() %}<span class="vh"> </span>{% endmacro %}',
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")
@@ -655,8 +739,8 @@ def main(argv: list[str]) -> int:
         (copy / "_scope.tsv").write_text("added\tdesigns/probe/design.css\nadded\tdesigns/probe/design.json\n")
         shots = copy / "_shots"
         for name in ("default", "plain"):
-            (shots / name).mkdir(parents=True)
-            (shots / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+            (shots / "designs" / name).mkdir(parents=True)
+            (shots / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
         controls = [("workflows", ["tools/check_workflows.py"]),
                     ("template cleanup", ["tools/check_template_cleanup.py"]),
                     ("design", ["tools/check_design.py"]),

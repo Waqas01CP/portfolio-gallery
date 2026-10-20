@@ -65,14 +65,14 @@ Decision records have no `type`; their `topic` is shown.
 | File | Type | Status | Description |
 |---|---|---|---|
 | `docs/deferred/more-than-one-degree.md` | deferred | open | More than one degree on a site: the timeline draws one degree band, and the build refuses a second. Deferred 2026-10-12; reopen when a user needs two degrees or a design needs them. |
-| `docs/deferred/showcase-of-users-sites.md` | deferred | open | A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; reopen when users ask to be listed or the gallery has designs from several contributors. |
+| `docs/deferred/showcase-of-users-sites.md` | deferred | closed | A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; closed 2026-10-20, built as ADR-0016. |
 
 ## docs/how-to
 
 | File | Type | Status | Description |
 |---|---|---|---|
 | `docs/how-to/add-a-design.md` | how-to | current | A contributor's journey, step by step. Fork, create a design folder, build and check it locally, and open a pull request that passes the checks. Read to add a design to the gallery. |
-| `docs/how-to/add-to-the-showcase.md` | how-to | current | A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, the screenshot and how to make it small enough, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery. |
+| `docs/how-to/add-to-the-showcase.md` | how-to | current | A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, a screenshot as their tool saves it, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery. |
 | `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address and the checks. Read to make your own site. |
 
 ## docs/reference

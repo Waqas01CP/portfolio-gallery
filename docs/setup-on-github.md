@@ -445,13 +445,14 @@ each run of step 5; then that the copy is deleted.
 
 The first real showcase entry, yours, made as any contributor would make
 one (ADR-0016) and merged, unlike the tests above. It needs the showcase
-on main. Your site already links to https://github.com/Waqas01CP (checked
-2026-10-19).
+on main, and screenshots taken as they come (ADR-0016, Changes,
+2026-10-20): it proves the easy path, snip, save, upload. Your site
+already links to https://github.com/Waqas01CP (checked 2026-10-19).
 
-1. Take the screenshot of https://waqas01cp.github.io/ as
-   docs/how-to/add-to-the-showcase.md, step 2, says: PNG, JPEG or WebP,
-   1,024 to 1,920 pixels wide, at most 500 KB. Name it `screenshot.png`,
-   `.jpg` or `.webp` as its format is.
+1. Open https://waqas01cp.github.io/ in your browser and snip its first
+   screen as you normally would: on Windows, the Windows logo key, Shift
+   and S, then drag over the page. Save it where your tool offers, under
+   the name it gives. Check nothing about its size, and do not rename it.
 2. On https://github.com/Waqas01CP/portfolio-gallery, **Add file**,
    **Create new file**, named `showcase/waqas01cp/entry.json`, holding:
 
@@ -463,8 +464,8 @@ on main. Your site already links to https://github.com/Waqas01CP (checked
    `showcase-waqas01cp`, **Propose changes**. Do not create the pull
    request yet.
 3. Switch to the `showcase-waqas01cp` branch, open `showcase/waqas01cp/`,
-   **Add file**, **Upload files**, add the screenshot, and commit it
-   directly to that branch.
+   **Add file**, **Upload files**, add the screenshot as saved, and commit
+   it directly to that branch.
 4. Open https://github.com/Waqas01CP/portfolio-gallery/compare/main...showcase-waqas01cp,
    **Create pull request**, write `[scope: as contributor]` in the
    description, and **Create pull request**.
@@ -473,11 +474,13 @@ You should see **scope** pass, its summary "In scope: 2 file(s), all in
 showcase/waqas01cp/.", and **checks** pass, its step "Fetch the showcase
 sites this pull request adds or changes" saying "ok
 https://waqas01cp.github.io/ answers 200 with a web page linking to
-github.com/waqas01cp".
+github.com/waqas01cp", and its step "Run every check" making the
+showcase's served copies: "card.webp" and "full.webp" for
+showcase/waqas01cp, with their sizes.
 
 5. Merge. When Deploy is green, open
    https://waqas01cp.github.io/portfolio-gallery/#showcase: one site, your
-   card, the screenshot whole; a click on it opens it full size.
+   card, the screenshot whole; a click on it opens the larger copy.
 6. **Actions**, **Showcase links**, **Run workflow**, branch `main`, **Run
    workflow**. You should see it pass, its log listing one entry and its
    response.

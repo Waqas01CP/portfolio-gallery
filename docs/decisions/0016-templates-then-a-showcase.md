@@ -45,13 +45,18 @@ rendering their sites, and with a review load the owner can carry?
   few phrases once the host has changed, without rendering. **Sourced**:
   emmabostian/developer-portfolios' parking check, read at its source
   2026-10-19, a precedent; it misses parking pages its list does not know.
-- A4. Ordinary screenshots fit the limits. **Measured** 2026-10-19:
-  first screens of the gallery's two designs and two live portfolio
-  sites, captured by headless Chrome and re-encoded by Windows' own GDI+
-  and WIC encoders, were at 1280 by 720 at most 477 KB as PNG, 122 KB as
-  JPEG and 68 KB as WebP; at 1920 by 1080 at most 657 KB as PNG, 202 KB as
-  JPEG and 108 KB as WebP; at 2560 by 1440, a Retina Mac's density, 158 KB
-  to 1.40 MB as PNG.
+- A4. No ordinary snip meets the cap of 20 MiB. **Measured** 2026-10-20
+  (updated that day; it read "Ordinary screenshots fit the limits",
+  measured 2026-10-19 on first screens up to 1920 by 1080, the largest a
+  PNG of 657 KB): full-screen captures of five busy pages, a wall of
+  photographs among them, by headless Chrome 155 at full HD, at 4K at 100%
+  and 150% scaling, on a 16-inch MacBook Pro's Retina screen and on a 5K
+  display, re-encoded by Windows' WIC and GDI+ encoders too, were at most
+  12,439,711 bytes at 4K and 16,928,260 at 5K, both PNGs from GDI+, the
+  largest of the three encoders; GitHub takes at most 25 MiB through a
+  browser (GitHub Docs, "About large files on GitHub", read
+  2026-10-20). The served copies made from them, WebP at quality 0.82,
+  were at most 147,498 bytes for the card and 401,498 for the full view.
 - A5. Ordinary screenshots carry metadata. **Measured** 2026-10-19:
   Windows' GDI+ JPEG encoder writes an EXIF block of three resolution
   tags; two Mac screenshots from public repositories carry an eXIf chunk
@@ -59,6 +64,12 @@ rendering their sites, and with a review load the owner can carry?
   rule against all EXIF and XMP would refuse them; a location is what
   could harm a contributor.
 - A6. The gallery stays within ADR-0009's limits with a full showcase.
+  **Re-measured** 2026-10-20 with served copies made from full-screen
+  captures of up to 9.5 MB: with 0, 10 and 50 cards, LCP 1,128, 1,507 and
+  1,656 ms, CLS 0, TBT 33, 16 and 70 ms, 70,310, 274,900 and 297,780 bytes
+  loaded at first; every card at 50, scrolled to the end, 3,274,139 bytes.
+  As first measured, on 2026-10-19, with the screenshots served as
+  supplied:
   **Measured** 2026-10-19, Lighthouse 13.5.0, default mobile, median of
   five, served from 127.0.0.1: with 0, 10 and 50 showcase cards, LCP
   1,113, 1,149 and 1,662 ms, CLS 0, TBT 71, 54 and 38 ms; 70, 974 and
@@ -85,6 +96,9 @@ We will check the screenshot's format by its first bytes, still,
 landscape, between MIN_WIDTH 1,024 and MAX_WIDTH 1,920 pixels wide, at
 most MAX_BYTES 500 KB, with no location in its metadata; any normal
 screenshot of a first screen passes, with HD the target (Q6, A4, A5).
+(Changed by the owner on 2026-10-20: any screenshot as its tool saved
+it, no width, shape or name rule, a cap of 20 MiB, and served copies
+made from it; see Changes.)
 We will fetch each site, never render it (Q4): https with a verified
 certificate at every hop, never an IP address or a private host, a 200
 web page, no parking host or sale phrase, and for an entry a link from
@@ -114,7 +128,8 @@ the template cleanup (ADR-0015, Changes; Q3).
 - Negative: a weekly network check that can be wrong both ways, and that
   GitHub stops after 60 quiet days (A1).
 - Negative: about 1 MB loads with the gallery once the showcase has a
-  few entries (A6), within ADR-0009's limits.
+  few entries (A6), within ADR-0009's limits. (2026-10-20: about 0.3 MB,
+  with served copies.)
 - Neutral: real names, links and screenshots in the repository and its
   history, though not in any copy.
 
@@ -170,3 +185,7 @@ request, as an outsider's, then the weekly workflow run by hand.
   fork to take the screenshot there (the session log, Round 8).
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-20 | **A showcase screenshot is any snip, as its tool saved it.** The check keeps what every ordinary snip meets: PNG, JPEG or WebP by its first bytes, a still image, no location in its metadata; MIN_WIDTH, MAX_WIDTH and the landscape rule are gone, and the file keeps the name its tool gave it ("Screenshot 2026-10-20 at 11.30.12.png"), a choice of the implementing seat for the same aim. One cap stays, for the repository's history alone: 20 MiB, above every ordinary snip measured (A4). **The screenshot is never published:** the deploy's screenshot job decodes it in headless Chrome 155 with the GPU off, in a job with no write token, and draws two served copies, WebP at quality 0.82, never enlarged: card.webp fitting 1366 by 900 and full.webp fitting 2560 by 2560, which a click opens; each holds its image chunk alone, no EXIF, XMP or colour profile, which tools/ci.py assemble checks before anything is published. The pull request's checks make the same copies, so a file Chrome cannot read fails there. HEIF is named and refused: no browser engine the project runs reads it, and a decoder would be a dependency (scope floor line 5). No floor on size is set; the owner's review sees each screenshot. A6 re-measured. | The owner's decision of 2026-10-20 UTC, approved as proposed through the portfolio architecture chat (its Brief 9), from his aim: contributors "just take a snip and add it". The limits of 2026-10-19 asked most contributors to resize: a full-HD PNG snip of a busy page is 517 to 657 KB, and a Retina capture 2560 pixels wide. |

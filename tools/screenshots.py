@@ -1,4 +1,5 @@
-"""Take each design's preview for the gallery, from its live demo.
+"""Take each design's preview for the gallery, from its live demo, and make
+each showcase entry's served copies from its author's screenshot.
 
   python tools/screenshots.py [_site]
 
@@ -13,23 +14,145 @@ contributor, so a preview cannot misrepresent its design (ADR-0006). The
 workflow runs this in a job of its own that holds no write token, and the
 next job takes only the .webp files from it (ADR-0010).
 
-Exit 0 when every design has its preview; 1 when one failed, named; 2 when
-the folder is not a built gallery. Chrome missing is exit 1, naming where
-it was looked for (ADR-0008, gate D).
+Then the showcase (ADR-0016; Changes, 2026-10-20): each entry's screenshot,
+as its author's tool saved it, is decoded once by a second headless Chrome
+with the GPU off, and drawn into two served copies, WebP at quality
+SHOWCASE_QUALITY, never enlarged: card.webp, fitting 1366 by 900, and
+full.webp, fitting 2560 by 2560, written to showcase/<login>/ in the built
+folder. A canvas holds pixels only, so the copies carry none of the
+screenshot's metadata, and the copy's container is rewritten to hold its
+image chunks alone, without even the colour profile Chrome's encoder
+adds; the next job checks that too (tools/ci.py assemble). The
+screenshot itself is never published. With the GPU on,
+drawing a large capture in headless Chrome hung or came out blank on the
+seat's machine (2026-10-20); with it off, five runs of each method gave
+the same bytes.
+
+Exit 0 when every design has its preview and every entry its copies; 1
+when one failed, named; 2 when the folder is not a built gallery. Chrome
+missing is exit 1, naming where it was looked for (ADR-0008, gate D).
 """
 
 from __future__ import annotations
 
+import base64
+import json
+import struct
 import sys
+import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from cdp import CDPError, Chrome, MissingTool, Server  # noqa: E402
-from build import PREVIEW_FILE, PREVIEW_SIZE  # noqa: E402
+from build import (PREVIEW_FILE, PREVIEW_SIZE, SHOWCASE, SHOWCASE_FITS,  # noqa: E402
+                   SHOWCASE_QUALITY, BuildError, load_showcase)
 
 WIDTH, HEIGHT = 1366, 900
 SCALE = PREVIEW_SIZE[0] / WIDTH
+
+# Decode once, then draw each copy: scaled to fit its box, never enlarged.
+SERVE = """async (src, fits, quality) => {
+  const response = await fetch(src);
+  if (!response.ok) throw new Error('could not read the file, ' + response.status);
+  const bitmap = await createImageBitmap(await response.blob());
+  const copies = {};
+  for (const [name, [maxWidth, maxHeight]] of Object.entries(fits)) {
+    const scale = Math.min(1, maxWidth / bitmap.width, maxHeight / bitmap.height);
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = new OffscreenCanvas(width, height);
+    const context = canvas.getContext('2d');
+    context.imageSmoothingQuality = 'high';
+    context.drawImage(bitmap, 0, 0, width, height);
+    const blob = await canvas.convertToBlob({type: 'image/webp', quality: quality});
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let text = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+      text += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    }
+    copies[name] = {width: width, height: height, data: btoa(text)};
+  }
+  return {width: bitmap.width, height: bitmap.height, copies: copies};
+}"""
+
+
+IMAGE_CHUNKS = (b"VP8 ", b"VP8L", b"ALPH")
+
+
+def image_only(data: bytes) -> bytes:
+    """The WebP with its image chunks and nothing else. Chrome's encoder
+    adds its own sRGB colour profile (ICCP) to what a canvas holds; the
+    pixels are sRGB already, which browsers assume without a profile."""
+    chunks, pos = [], 12
+    while pos + 8 <= len(data):
+        kind, length = struct.unpack("<4sI", data[pos:pos + 8])
+        chunks.append((kind, data[pos + 8:pos + 8 + length]))
+        pos += 8 + length + (length & 1)
+    kept = [(kind, body) for kind, body in chunks if kind in IMAGE_CHUNKS]
+    header = next((body for kind, body in chunks if kind == b"VP8X"), None)
+    if header and any(kind == b"ALPH" for kind, _ in kept):
+        # An alpha channel needs the extended header; keep its alpha flag only.
+        kept.insert(0, (b"VP8X", bytes([header[0] & 0x10]) + header[1:]))
+    body = b"WEBP" + b"".join(kind + struct.pack("<I", len(part)) + part + b"\0" * (len(part) & 1)
+                              for kind, part in kept)
+    return b"RIFF" + struct.pack("<I", len(body)) + body
+
+
+def previews(folder: Path, demos: list[Path], failed: list[str]) -> None:
+    with Server(folder) as server, Chrome() as chrome:
+        print(f"{chrome.version()}: {len(demos)} demo(s)")
+        for demo in demos:
+            page = chrome.new_page(WIDTH, HEIGHT, reduced=True)
+            try:
+                page.goto(f"{server.origin}/designs/{demo.name}/index.html", settle=1.0)
+                page.evaluate("document.fonts.ready.then(() => true)", await_promise=True)
+                chrome.drain(1.0)
+                image = page.screenshot(WIDTH, HEIGHT, SCALE)
+                if image[:4] != b"RIFF" or image[8:12] != b"WEBP":
+                    raise CDPError("the capture is not a WebP image")
+                (demo / PREVIEW_FILE).write_bytes(image)
+                print(f"  {demo.name}: {len(image)} bytes")
+            except CDPError as error:
+                failed.append(f"{demo.name}: {error}")
+            finally:
+                page.close()
+
+
+def served_copies(folder: Path, entries: list[dict], failed: list[str]) -> None:
+    with Server(SHOWCASE) as server, Chrome(flags=("--disable-gpu",)) as chrome:
+        print(f"{chrome.version()}, GPU off: {len(entries)} showcase entr{'y' if len(entries) == 1 else 'ies'}")
+        page = chrome.new_page(800, 600)
+        try:
+            # A page of the same origin, so the canvas may be read back.
+            page.goto(f"{server.origin}/", settle=0.2)
+            for entry in entries:
+                source = urllib.parse.quote(entry["screenshot"].removeprefix("showcase/"))
+                fits = {Path(name).stem: list(size) for name, size in SHOWCASE_FITS.items()}
+                try:
+                    result = page.send("Runtime.evaluate", {
+                        "expression": f"({SERVE})({json.dumps(source)}, {json.dumps(fits)}, {SHOWCASE_QUALITY})",
+                        "awaitPromise": True, "returnByValue": True}, timeout=120)
+                    if "exceptionDetails" in result:
+                        details = result["exceptionDetails"]
+                        raise CDPError((details.get("exception") or {}).get("description") or details.get("text"))
+                    value = result["result"]["value"]
+                    sizes = []
+                    for name in SHOWCASE_FITS:
+                        copy = value["copies"][Path(name).stem]
+                        data = base64.b64decode(copy["data"])
+                        if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+                            raise CDPError(f"the {name} drawn is not a WebP image")
+                        data = image_only(data)
+                        target = folder / entry["card"].rsplit("/", 1)[0] / name
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.write_bytes(data)
+                        sizes.append(f"{name} {copy['width']}x{copy['height']} {len(data)} bytes")
+                    print(f"  {entry['screenshot']} ({value['width']}x{value['height']}): {'; '.join(sizes)}")
+                except CDPError as error:
+                    failed.append(f"{entry['screenshot']}: Chrome could not read it as an image ({error})")
+        finally:
+            page.close()
 
 
 def main(argv: list[str]) -> int:
@@ -39,27 +162,17 @@ def main(argv: list[str]) -> int:
         print(f"{folder} is not a built gallery; run python build.py --gallery first",
               file=sys.stderr)
         return 2
-    failed = []
+    failed: list[str] = []
     try:
-        with Server(folder) as server, Chrome() as chrome:
-            print(f"{chrome.version()}: {len(demos)} demo(s)")
-            for demo in demos:
-                page = chrome.new_page(WIDTH, HEIGHT, reduced=True)
-                try:
-                    page.goto(f"{server.origin}/designs/{demo.name}/index.html", settle=1.0)
-                    page.evaluate("document.fonts.ready.then(() => true)", await_promise=True)
-                    chrome.drain(1.0)
-                    image = page.screenshot(WIDTH, HEIGHT, SCALE)
-                    if image[:4] != b"RIFF" or image[8:12] != b"WEBP":
-                        raise CDPError("the capture is not a WebP image")
-                    (demo / PREVIEW_FILE).write_bytes(image)
-                    print(f"  {demo.name}: {len(image)} bytes")
-                except CDPError as error:
-                    failed.append(f"{demo.name}: {error}")
-                finally:
-                    page.close()
+        previews(folder, demos, failed)
+        entries = load_showcase()
+        if entries:
+            served_copies(folder, entries, failed)
     except MissingTool as error:
         print(f"missing tool: {error}", file=sys.stderr)
+        return 1
+    except BuildError as error:
+        print(f"the showcase cannot be read: {error}", file=sys.stderr)
         return 1
     for failure in failed:
         print(f"  FAILED {failure}", file=sys.stderr)
