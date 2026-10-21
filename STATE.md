@@ -6,13 +6,14 @@ status: current
 
 # STATE
 
-**Verified against commit fceaace, the last commit before this file's
-update, 2026-10-20 UTC, by the Brief 1 implementing session's ninth round,
-under Brief 9**: a fresh clone of it run through every defeat case with
-the browser and axe; a fresh clone of 3020bb4, which differs from it only
-in the defeat harness, through every check with axe and the deploy's own
-path with ten real snips, then the browser checks on what it assembled; the gates proven on a clone of 3020bb4
-(logs/2026-10-12-brief-1-build.md, Round 9). This is the only line in
+**Verified against commit ba93032, the last commit before this file's
+update, 2026-10-21 UTC, by the Brief 1 implementing session's tenth round,
+under Brief 10**: a fresh clone of it through every defeat case with the
+browser and axe; a fresh clone of b17d883, which differs from it only in
+the defeat harness and the screenshot maker's console output, through
+every check with axe and the deploy's own path with 13 real snips, then
+every browser check on what it assembled; the gates proven on a clone of
+234ad59 (logs/2026-10-12-brief-1-build.md, Round 10). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -38,26 +39,28 @@ clears, remove it from Blocked and record the clearing in its row.
 ## Headline
 
 Public, set up and tested; main changes only by pull request. The
-showcase merged on 2026-10-19 (pull request 10) and is live with no
-entry. On the branch showcase-any-snip, not yet pushed: a showcase
-screenshot is any snip as its tool saved it, and the deploy draws the
-gallery's copies from it (ADR-0016, Changes, 2026-10-20). After its merge,
-setup Test 6, the owner's own entry. Waiting: step 5's policy, provable
-only on or after 2026-11-02; ADR-0012, held.
+showcase is live with the owner's own entry, made from a plain snip in
+setup Test 6, which passed on 2026-10-20. On the branch showcase-shapes,
+not yet pushed: one pull request template for a design or a showcase
+entry; showcase cards in their pictures' own shapes, packed as on
+Pinterest (ADR-0016, Changes, 2026-10-20); the briefs folder off the
+repository (ADR-0008, Changes, 2026-10-21). Waiting: the chat's check of
+the shape limits, then the owner's merge; step 5's policy, provable only
+on or after 2026-11-02; ADR-0012, held.
 
 ## Publishing
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | The Actions policy allowing `pull_request_target` (step 5) | PARTIAL | [BELIEVED] set by the owner (the chat's report); until 2026-11-02 GitHub runs the scope check without the policy too | 2026-10-18 | ADR-0006, A2; setup Test 1 |
-| This branch, showcase-any-snip, merged to main | PENDING | the owner pushes it and opens the pull request; checks and scope must pass | 2026-10-20 | 3020bb4, fceaace |
+| This branch, showcase-shapes, merged to main | PENDING | the owner pushes it and opens the pull request; checks and scope must pass | 2026-10-21 | 56c6dc3, d8ccfce, b17d883, 234ad59, ba93032 |
 
 ## Decisions waiting on the owner
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | Lighthouse in CI | PENDING | held as proposed by the owner; speed measured locally | 2026-10-15 | ADR-0012 |
-| A floor or a pixel ceiling for showcase screenshots | PENDING | offered, neither built: the review sees every screenshot, and a file Chrome cannot draw fails on its pull request | 2026-10-20 | ADR-0016, Changes |
+| The showcase's shape limits, 2.4 either way | PENDING | proposed from measurement; the chat checks them against the owner's aim before he merges | 2026-10-21 | ADR-0016, Changes |
 
 ## Built, not yet complete
 
@@ -66,25 +69,26 @@ DONE rows are in docs/reference/completed.md.
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | CODEOWNERS and the issue templates | PARTIAL | [BELIEVED] written; not exercised until an outside contribution arrives | 2026-10-18 | b798834 |
-| The showcase: files, scope, responses, served copies, gallery, weekly check, credit, cleanup | PARTIAL | [VERIFIED] its defeat cases and planted controls, the deploy's path rehearsed with ten real snips, on a fresh clone; live on GitHub with no entry; [BELIEVED] for an entry until setup Test 6 | 2026-10-20 | 5a7cecf, 3020bb4, fceaace; ADR-0016 |
+| The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-21 | b17d883, ba93032; ADR-0016, Changes |
 
 ## Blocked, and on whom
 
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging this branch, then Test 6 | The owner's push, pull request, merge and his own entry | The owner | 2026-10-20 |
+| Merging this branch | The chat's check of the shape limits; the owner's push, pull request and merge | The chat, then the owner | 2026-10-21 |
 
 ## Known unverified
 
-- Whether the deploy's shots job gathers and uploads its pictures on
-  GitHub's runner as rehearsed here; the first deploy after the merge
-  shows it.
+- Whether the runner's Chrome lays out grid-lanes with its experimental
+  features on, as Chrome 155 and 156 do here; the packing check fails, not
+  skips, if it does not, and this branch's pull request shows it.
+- How Safari 26.4 and later, the one browser shipping grid-lanes, packs
+  the cards; Chrome's own grid-lanes, behind its flag, matched the
+  script's places within 1 px on 2026-10-21.
 - Whether a Mac's own PNG encoder stays under the 20 MiB cap for a 5K
   wall of photographs; Chrome's encoder gave 9.5 MB and Windows' up to
   16.9 MB.
-- Whether the weekly showcase workflow's anonymous clone and fetches run
-  on GitHub's runner as they do here; Test 6, step 6, shows it.
 - Whether listed sites answer GitHub's runner as they answer this
   machine; bot protection answers some datacenter addresses with 403,
   which the check reports for a check by hand.

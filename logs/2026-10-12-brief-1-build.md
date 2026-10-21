@@ -1546,3 +1546,243 @@ its HDR option on macOS Tahoe 26 or later.
 - Nothing pushed; the branch waits for the owner.
 - Test 6, the owner's own entry, after the merge: snip, save, upload.
 - Test 1 once more, on or after 2026-11-02.
+
+---
+
+# Round 10, 2026-10-21 UTC: the template for both kinds, cards in their own shapes, briefs off the repository
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: fa2a687, the website merge of pull request 13,
+whose tree is ca4dfa0's; 4562645, the merge of pull request 11, has
+a8ad6e3's tree (both compared here). Commits not made by this seat:
+be09e43 and ca4dfa0, the owner's own entry made on GitHub's website, and
+the merges of pull requests 11 and 13. Work on the branch showcase-shapes.
+HEAD at end: the commit that adds this section. Mode: mutating. Ran on
+2026-10-21 UTC, the fresh-clone proofs from 12:19Z.
+
+## What was asked
+
+The portfolio architecture chat's Brief 10, stored word for word in
+briefs/implementation-seat.md in place of Brief 9, read first for what it
+still says (the owner's aim for the showcase, in his words, carried). The
+owner's answers to Report 9: keep the tool's own file name, no pixel
+ceiling, no floor. Three parts. One: the pull request template covers a
+showcase entry as well as a design, one template, after checking GitHub's
+documentation that a contributor reaches any but the default only by a
+link with a template query. Two: each showcase card takes its picture's
+shape, at the card's full width, whole, and the cards are packed as on
+Pinterest, in an order a keyboard and a screen reader share; limits on
+shape both ways, set from measurement, in the display only, never a
+refusal; each picture's space reserved; the gallery re-measured at 0, 10
+and 50 entries. Three: the briefs folder leaves the repository, its
+README with it, as on his site that day. Record Test 6, which passed.
+
+## Checked before starting
+
+[VERIFIED] from GitHub's public API: pull request 11 merged as 4562645 on
+2026-10-20 at 19:47Z; Checks and Deploy green on main, Deploy's jobs
+build, shots, assemble and deploy each success, so the shots job's new
+gathering into _shots/ ran on GitHub's runner; Template cleanup skipped.
+Pull request 12, entry.json alone at f791ea8, closed unmerged: Scope
+success, Checks failed at step 4, "Fetch the showcase sites this pull
+request adds or changes"; its message is in a log that needs a signed-in
+read [BELIEVED: the files' check, which that step runs first, refusing an
+entry with no screenshot]. Pull request 13 at ca4dfa0: Scope and Checks
+success; merged as fa2a687 at 21:56Z; Checks and Deploy success on main,
+Deploy's four jobs each success; Template cleanup skipped; Showcase links
+by hand, run 39507307570, success. His snip: a PNG of 1077x1713 pixels,
+762,666 bytes, under the name his tool gave it.
+
+## Errors this seat made
+
+1. **CAPABILITIES.md's "Current as of" line stayed at 2026-10-18** through
+   Rounds 7 to 9, each of which changed the file. Found this round;
+   corrected to 2026-10-21.
+2. **One more scratch edit script went through a Git Bash heredoc** and
+   failed to parse; nothing changed; rewritten with the file tool. In a
+   second, a Python string's escaped newline became a real one; caught on
+   reading the result and fixed before it ran.
+3. **The card copy of a picture beyond the tall limit came out 1,025
+   pixels wide**, one over the card's 1,024, from rounding the height cap
+   up. Seen in the first build's copies, before any commit; the cap is now
+   whole pixels.
+4. **Two of this round's own test inputs were wrong**: the WebP for the
+   orientation test carried a second header, so Chrome could not decode
+   it; and a planted control failed because the owner's real entry, now
+   on main, needed copies too. Each fixed in the test, not the code.
+5. **The defeat harnesses assumed an empty showcase on main.** Since
+   fa2a687 main holds the owner's entry. On the first fresh run of
+   b17d883, tools/prove_checks.py stopped at a case that creates
+   showcase/, its assemble and browser controls failed for want of his
+   served copies and pictures, and the scratch gate harness's control
+   for his name in his own entry was refused for two screenshots. Every
+   check behaved; the harnesses did not. Fixed in 234ad59 and in the
+   scratch harness. The rerun found one more of the kind: the case for a
+   maker publishing the screenshot itself read the file by its
+   URL-quoted name, and on his name, which holds spaces, it crashed
+   instead of proving the refusal. Fixed in ba93032, with
+   tools/screenshots.py now writing a name the console cannot, as a
+   Mac's narrow no-break space on Windows, escaped rather than stopping.
+
+## The measurements
+
+**Browser support for native masonry** [sourced, read 2026-10-21]:
+caniuse, "CSS Grid Lanes": supported by default only in Safari and Safari
+on iOS 26.4 and later, 12.49% of users; Chrome 140 to 158, Edge 140 to
+155 and Firefox 77 to 161 have it disabled by default; Samsung Internet
+none. WebKit, "Introducing CSS Grid Lanes" (2025-12-19): each item goes
+to the lane that places it closest to the top; `fit-tolerance`, default
+1em, ignores smaller differences; the layout lets a keyboard "tab across
+the lanes to all currently-visible content". Chrome Platform Status had
+no entry found. [VERIFIED] Chrome 155 with
+--enable-experimental-web-platform-features supports `display:
+grid-lanes` and places six test items as WebKit describes; without the
+flag, and with the older CSSMasonryLayout flag, it does not.
+
+**Shapes of real snips** [VERIFIED, 2026-10-21, headless Chrome 155, GPU
+off, PNG]: first screens of portfolio sites and a photo wall at
+1920x1080 (0.56 times as tall as wide), 1366x768 (0.56), a Retina
+1440x900 at scale 2 (2880x1800, 0.62); phones at 390x844 and 360x800 at
+scale 3 (1170x2532, 2.16; 1080x2400, 2.22); ultrawides at 3440x1440
+(2.39 times as wide as tall) and 5120x1440 (3.56); whole pages at 1366
+and 1920 wide (2.83, 2.01, 3.47). Common screens [sourced, StatCounter,
+June to August 2026]: desktop 1920x1080, 1536x864, 1366x768, 1280x720
+(all 0.56); mobile 414x896 (2.16), 360x800 (2.22), 390x844 (2.16),
+393x873 (2.22). Whole pages [VERIFIED] of eight portfolio sites, the
+owner's among them, at 1366, 1920 and 390 CSS pixels wide: 0.56 to 10.21
+times as tall as wide at the desktop widths (the owner's 10.21 at 1366)
+and 2.16 to 34.76 at 390; a one-screen site is 0.56. The owner's own snip
+is 1.59. So no limit separates a page from a screen; a limit caps how
+tall a card grows, and how short. **Proposed: 2.4 either way**, a 21:9
+screen's shape: every phone's first screen (at most 2.22; 21:9 phones
+2.33) and a 3440x1440 ultrawide (2.39) show at their own shape; a whole
+page, a 5120x1440 monitor and a strip are shown within 2.4, with bands.
+
+**EXIF orientation in Chrome** [VERIFIED, Chrome 156, which had updated
+itself during the round]: a 40x20 picture with Orientation 6 is shown
+20x40 from PNG (eXIf) and JPEG, and 40x20 from WebP, by createImageBitmap
+and by an img alike.
+
+**Served copies** [VERIFIED] from the 13 snips, card.webp at most 1,024
+wide: largest 128,784 bytes (a phone's photo wall), banded copies 4,234
+to 109,214; full.webp largest 180,682.
+
+**The gallery** [VERIFIED, Lighthouse 13.5.0, default mobile, median of
+five, served uncompressed from 127.0.0.1], with 0, 10 and 50 cards drawn
+from the 13 snips, the owner's entry among the 10 and 50: page 4,729,
+10,383 and 32,599 bytes, gallery.js 3,094; LCP 1,075, 1,504 and 1,654 ms;
+CLS 0 in every run; TBT 38, 0 and 0 ms; 74,587, 309,817 and 330,177
+bytes loaded at first; every card at 50, scrolled to the end, 2,964,813
+bytes. With the desktop preset, where three columns are packed, at 10
+and 50: LCP 365 and 406 ms, CLS 0 in every run, TBT 0, 728,686 and
+802,861 bytes at first. Within ADR-0009.
+
+## What was built
+
+**Part 3, the briefs folder** (56c6dc3). briefs/README.md untracked,
+kept on disk; .gitignore ignores briefs/ whole; gate A refuses any path
+in briefs/, its docstring and message reworded; CLAUDE.md's gate row and
+Briefs section, which now carries what the README said: working space,
+never committed, one file per seat, the box and tick, the brief's rank,
+and where the durable trace lives. MAP.md regenerated. ADR-0008, Changes.
+remove.txt still lists briefs; kept, since the cleanup skips a listed
+path that is absent (below).
+
+**Part 1, the template** (d8ccfce). GitHub's documentation, read
+2026-10-21, "Creating a pull request template for your repository":
+contributors "will automatically see the template's contents in the pull
+request body"; others sit in a PULL_REQUEST_TEMPLATE/ folder and are
+reached only with the `template` query parameter. So one template: the
+opening comment names both kinds and says to delete the other section;
+"A design" holds main's checklist line for line; "A showcase entry"
+three lines. The showcase how-to's step 4, add-a-design's step 3,
+CONTRIBUTING's step 5 and setup Test 6's step 4 say which section to
+keep. It is still in remove.txt.
+
+**Part 2, the cards** (b17d883). build.py: SHOWCASE_TALL and
+SHOWCASE_WIDE, 2.4; showcase_shapes() gives each copy's size and the
+picture's place in it; the size comes from the screenshot's header,
+turned for an EXIF quarter turn in PNG and JPEG (check_showcase's
+readers, which now read Orientation; WebP's is left, as Chrome leaves
+it). The gallery's img carries that size. screenshots.py draws each copy
+at it, with transparent bands beyond the limits, and fails an entry
+Chrome reads at another size. gallery.css: the showcase list a grid of
+the same columns, `display: grid-lanes` inside @supports; gallery.js,
+new, same origin, packs where grid-lanes is missing. check_built: each
+showcase picture's width and height, within the limits; with --previews,
+each card's copy the size reserved. check_browser: the packing check.
+prove_checks: the cases below. ADR-0016, Changes; standing-checks.md;
+the how-to.
+
+**The harness** (234ad59, ba93032): allows for entries on main (error 5).
+
+## Proofs
+
+All on 2026-10-21, one browser job at a time, Chrome 156.
+
+- **Part 1** [VERIFIED]: nothing in the repository checks a template's
+  text, so a scratch script read it against the documents: the comment
+  closes before the first section; the two sections are named as each
+  guide says to keep them; the design checklist is main's line for line;
+  the showcase section names no tool, size or rename; every path it names
+  and the how-to heading it quotes exist; remove.txt lists it. 0 problems.
+- **Every check with axe**, `tools/ci.py checks --axe`, on a fresh clone
+  of b17d883: exit 0 in 643 s, the browser checks 621 s (tree 48 runs,
+  keyboard 8, joins 4, anchors 136, words 4, motion 3, packing 12, axe
+  36), 0 failures; the cleanup's check 0 problems.
+- **The deploy's own path** on that clone with the 13 real snips under a
+  Mac's file names, the owner's entry beside them: the files' check
+  passed; build, screenshots.py, the shots job's gathering (30 pictures),
+  assemble exit 0, check_built --previews on the assembled gallery 0
+  problems; every browser check with axe on it, the packing check on 14
+  cards among them, 0 failures in 622 s.
+- **Every defeat case with the browser and axe**, on a fresh clone of
+  ba93032: exit 0 in 1,673 s; 121 defeat cases (104 file, 17 browser)
+  fail as built, naming what failed; 11 controls and 21 planted controls
+  pass. New this round: a showcase picture without its width and height;
+  a picture beyond the tall limit and one beyond the wide limit shown at
+  their own shape; a card's copy not the size reserved; a build that
+  ignores a PNG's EXIF turn; and, in the browser on nine planted shapes,
+  CSS columns filling down (a card above the one before it), a picture
+  without its reserved size, the tall limit taken out, and the script
+  taken out (gaps). Controls: a copy at its reserved
+  size; a JPEG turned by its EXIF; copies from a PNG turned by its EXIF;
+  the packed showcase with nine shapes. The run on 234ad59 had 120 of 121,
+  the 121st crashing in the harness (error 5).
+- **The gates**, on a scratch clone of 234ad59: 23 defeat cases refused
+  (briefs/README.md staged with -f among them, "briefs/ is working space
+  and is never committed, its README with it") and 5 controls passed.
+- **The cleanup with a listed path absent** [VERIFIED]: cleanup.py skips
+  a listed path that does not exist and prints nothing for it; its check
+  fails only on a listed path still present afterwards. On the fresh
+  clone, which has no briefs folder, the check passed: guards hold, 56
+  files removed, a later run changes nothing, the cleaned copy builds and
+  checks, its 5 links resolve.
+- **The pre-publish search** at this section's commit: see Report 10, 5;
+  it finds the owner's name in the messages of two of his own website
+  commits, be09e43 and f791ea8, and nothing else.
+
+## Rejected alternatives
+
+- **CSS columns** (`columns: 3`): fills down each column while focus runs
+  across; its defeat case is the check's.
+- **Grid rows spanned by script**: every gap rounds to the row unit, and
+  fine units mean thousands of rows; the script places cards absolutely
+  instead, reading the columns from the grid itself, exact to the pixel.
+- **Bands as a CSS box around the image**: needs each card's ratio in a
+  style attribute or attr(), which the policy refuses or browsers lack;
+  bands drawn into the copy as transparent pixels need neither.
+- **A tall limit near 2.0, below phones**: would band every phone snip,
+  the hassle the owner's aim rules out.
+- **srcset with two card widths**: fewer bytes on desktops, at the cost
+  of a third copy per entry; 1,024 wide kept every card under 130 KB.
+
+## Not done
+
+- Nothing pushed. The chat checks the limits against the owner's aim
+  before he merges.
+- No issue form for a showcase entry; the seat's view is in Report 10.
+- The "add-ons" Pinterest's look implies: reported, not built.
+- Safari's own grid-lanes, the one shipped, not run; Chrome's flagged one
+  stands in.
+- Test 1 once more, on or after 2026-11-02.

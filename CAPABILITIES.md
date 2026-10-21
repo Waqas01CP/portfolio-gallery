@@ -11,7 +11,7 @@ place, for a reader who will open nothing else: any chat that needs to know
 the project, and any person who reads README.md to use it and this file
 for the nuance.
 
-**Current as of 2026-10-18 UTC**, written by the implementing seat in its
+**Current as of 2026-10-21 UTC**, written by the implementing seat in its
 lane: what the system does and how, the stack, the qualities, the numbers,
 the limits, and the timeline's rows for what was built. **The architecture
 chat's lane is kept privately**: the problem the project solves, where it
@@ -54,7 +54,9 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    design's files into `_site/` (ADR-0004). In gallery mode it builds every
    design on the same content, each at `designs/<name>/`, and a gallery
    page: templates first, each with an optional "In use" link to its
-   author's own site, then the showcase from `showcase/` (ADR-0016). The
+   author's own site, then the showcase from `showcase/` (ADR-0016),
+   each card's picture in its screenshot's own shape within 2.4 either
+   way, its size reserved in the HTML from the screenshot's header. The
    footer's credit names the project, the design and its author.
 3. **Checks before publishing.** The built files (no load from another
    origin, the policy tag, links resolve letter for letter) and the content
@@ -68,7 +70,10 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    section menu, the progress marker, a Dark switch for the visit when
    the design offers dark, and the effects a design turns on: a 3D knot drawn in a worker,
    card tilt, a moving strip with a pause control, scroll effects. Under
-   reduced motion nothing moves.
+   reduced motion nothing moves. On the gallery, the showcase's cards are
+   packed as on Pinterest: by CSS grid-lanes where the browser has it,
+   else by gallery.js, each card in turn in the column whose bottom is
+   highest, so they run in folder order; without either, in rows.
 7. **Contributions.** A design pull request passes the scope check (from
    the default branch, reading only the file list), the design checks and
    the browser checks on every design, then the owner's review (ADR-0006).
@@ -136,11 +141,12 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 | Gallery page | 3,778 bytes (1,485 gzipped); plain design.css 11,678 bytes | 2026-10-12 | same |
 | Builds | site in each design and the gallery: exit 0, twice each, byte-identical (default 14 files, plain 8, gallery 18), from a fresh clone | 2026-10-12 | the session log |
 | Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-19 | tools/check_content.py |
-| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures. On a fresh clone of db055e5, 2026-10-19: exit 0 in 648 s, the browser checks 634 s, 0 failures. On a fresh clone of 5a7cecf, 2026-10-19: exit 0 in 642 s, the browser checks 627 s, 0 failures; and every browser check with axe on a gallery holding ten showcase entries, 0 failures in 620 s. On a fresh clone of 3020bb4, 2026-10-20: exit 0 in 667 s, the browser checks 642 s, 0 failures; and every browser check with axe on a gallery assembled from ten real snips, 0 failures in 644 s | 2026-10-12 to 20 | the session log; GitHub's API |
-| Defeat cases | 112 (100 file, 12 browser) fail as built, naming what failed; 11 controls and 17 planted controls pass; on a fresh clone of fceaace, the axe control, killed by the machine's low memory in the full run, passing alone on the same clone. Gates: 22 defeat cases refused, 5 controls passed, on a clone of 3020bb4 | 2026-10-20 | tools/prove_checks.py; the session log |
+| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures. On a fresh clone of db055e5, 2026-10-19: exit 0 in 648 s, the browser checks 634 s, 0 failures. On a fresh clone of 5a7cecf, 2026-10-19: exit 0 in 642 s, the browser checks 627 s, 0 failures; and every browser check with axe on a gallery holding ten showcase entries, 0 failures in 620 s. On a fresh clone of 3020bb4, 2026-10-20: exit 0 in 667 s, the browser checks 642 s, 0 failures; and every browser check with axe on a gallery assembled from ten real snips, 0 failures in 644 s. On a fresh clone of b17d883, 2026-10-21: exit 0 in 643 s, the browser checks 621 s (packing 12 runs), 0 failures; and every browser check with axe on a gallery assembled from 13 real snips of every shape, 0 failures in 622 s | 2026-10-12 to 21 | the session log; GitHub's API |
+| Defeat cases | 121 (104 file, 17 browser) fail as built, naming what failed; 11 controls and 21 planted controls pass, on a fresh clone of ba93032. Gates: 23 defeat cases refused, 5 controls passed, on a clone of 234ad59 | 2026-10-21 | tools/prove_checks.py; the session log |
 | Speed, sample site | Lighthouse 13.5.0, default mobile, median of five, served uncompressed from 127.0.0.1 (GitHub Pages compresses), Chrome 154 on the seat's Windows machine. Default design with font-display: optional (as committed), 2026-10-13: LCP 2,108 ms, CLS 0, TBT 40 ms (runs 174, 37, 40, 46, 25), 197,433 bytes. The same design with swap, 2026-10-12: LCP 2,179 ms, CLS 0, TBT 195 ms (runs 195, 248, 280, 22, 64). Plain, 2026-10-12: LCP 1,389 ms, CLS 0.048, TBT 0 ms, 79,399 bytes. ADR-0009's limits: 2,500 ms, 0.1, 200 ms | 2026-10-12 and 13 | the session log |
 | Showcase screenshots | Full-screen snips of four pages, a wall of photographs among them, by headless Chrome 155 and re-encoded by Windows' WIC and GDI+: at full HD up to 2,525,046 bytes, at 4K up to 12,439,711, on a 5K display up to 16,928,260 (all the photo wall, GDI+); the cap is 20 MiB. Their served copies, WebP at 0.82: the card at most 147,498 bytes, the full view 401,498 | 2026-10-20 | the session log, Round 9 |
-| Gallery with a showcase | 0, 10 and 50 cards, served copies drawn from snips of up to 9.5 MB: page 4,681, 10,469 and 33,349 bytes; Lighthouse 13.5.0 default mobile, median of five: LCP 1,128, 1,507 and 1,656 ms, CLS 0, TBT 33, 16 and 70 ms, 70,310, 274,900 and 297,780 bytes loaded at first; every card, scrolled to the end, 3,274,139 bytes at 50 | 2026-10-20 | the session log, Round 9 |
+| Gallery with a showcase | 0, 10 and 50 cards packed in their pictures' shapes, copies drawn from 13 real snips of every shape, the owner's among them: page 4,729, 10,383 and 32,599 bytes, gallery.js 3,094; Lighthouse 13.5.0 default mobile, median of five: LCP 1,075, 1,504 and 1,654 ms, CLS 0 in every run, TBT 38, 0 and 0 ms, 74,587, 309,817 and 330,177 bytes loaded at first; desktop preset, three columns packed, at 10 and 50: LCP 365 and 406 ms, CLS 0 in every run, TBT 0; every card, scrolled to the end, 2,964,813 bytes at 50 | 2026-10-21 | the session log, Round 10 |
+| Showcase shapes | First screens 0.56 to 0.62 times as tall as wide on desktops and laptops, 2.16 to 2.22 on phones; ultrawide monitors 2.39 and 3.56 times as wide as tall; whole pages of eight portfolio sites 0.56 to 10.21 at desktop widths, 2.16 to 34.76 at a phone's; the owner's snip 1.59. Limits set at 2.4 either way. Card copies at most 1,024 wide: the largest 128,784 bytes | 2026-10-21 | the session log, Round 10 |
 | Decision records | 16: 15 accepted, 1 proposed (ADR-0012, held by the owner) | 2026-10-19 | docs/decisions/ |
 
 ## How it was built
@@ -159,6 +165,7 @@ is in logs/.
 | 2026-10-19 | A failed content trace names the CV's line and what to do; the user guide puts the CV first |
 | 2026-10-19 | The gallery's templates first, then a showcase of contributors' own sites, checked as files and by response, never rendered, on each pull request and weekly; the footer credit names the design and its author |
 | 2026-10-20 | A showcase screenshot is any snip, as its tool saved it; the deploy draws small copies from it, with no metadata, and never publishes the file |
+| 2026-10-21 | Showcase cards in their pictures' own shapes, packed as on Pinterest; one pull request template for a design or a showcase entry; the briefs folder off the repository |
 
 ## What it does not do, and its limits
 
@@ -195,9 +202,15 @@ dependency without a record; designs are CSS only (ADR-0006).
   median; under ADR-0009 a fail on any machine is a fail.
 - **One degree on the timeline**; English labels; eight sections in a
   fixed order (docs/reference/content.md).
-- **Tested in Chrome 154 on Windows only.** No other browser, and no
-  screen reader by ear: the joins check is a model of NVDA, validated on
-  the owner's site's known-bad page.
+- **Tested in Chrome on Windows only**, 154 to 156. No other browser, and
+  no screen reader by ear: the joins check is a model of NVDA, validated
+  on the owner's site's known-bad page.
+- **The showcase's packing, 2026-10-21.** Only Safari 26.4 and later
+  ships CSS grid-lanes (caniuse: 12.49% of users); Chrome's own, behind
+  its experimental flag, is what the checks run, and it placed the cards
+  as gallery.js does, within 1 px. Elsewhere gallery.js packs them; with
+  scripts off and no grid-lanes, the cards sit in rows, with gaps under
+  the shorter ones, in the same order.
 - **Speed is checked locally, not in CI**, while ADR-0012 is proposed.
   Contrast is checked in CI by axe-core (ADR-0011).
 
