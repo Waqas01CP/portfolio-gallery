@@ -467,8 +467,9 @@ already links to https://github.com/Waqas01CP (checked 2026-10-19).
    **Add file**, **Upload files**, add the screenshot as saved, and commit
    it directly to that branch.
 4. Open https://github.com/Waqas01CP/portfolio-gallery/compare/main...showcase-waqas01cp,
-   **Create pull request**, write `[scope: as contributor]` in the
-   description, and **Create pull request**.
+   **Create pull request**. The description opens with two sections: keep
+   **A showcase entry**, tick its three lines, delete **A design**, write
+   `[scope: as contributor]` below them, and **Create pull request**.
 
 You should see **scope** pass, its summary "In scope: 2 file(s), all in
 showcase/waqas01cp/.", and **checks** pass, its step "Fetch the showcase

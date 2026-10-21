@@ -105,7 +105,9 @@ catch most problems first.
 
 1. Commit only `designs/dusk/` to your branch, and push it to your fork.
 2. On your fork's page, click **Contribute**, then **Open pull request**.
-3. Fill in the checklist in the description, and create the pull request.
+3. The description opens with two sections: keep **A design**, fill in
+   its checklist, and delete **A showcase entry**. Then create the pull
+   request.
 
 Two checks run: **scope**, at once, and **checks**, once the maintainer
 approves a first-time contributor's run. If one fails, open it from the

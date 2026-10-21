@@ -64,8 +64,9 @@ cannot read; its usual setting saves PNG.
 3. In your fork, open the `showcase/<your-login>/` folder, click **Add
    file**, then **Upload files**, add your screenshot as your tool saved
    it, under the name it was given, and **Commit changes**.
-4. Click **Contribute**, then **Open pull request**, and **Create pull
-   request**.
+4. Click **Contribute**, then **Open pull request**. The description
+   opens with two sections: keep **A showcase entry**, tick its three
+   lines, and delete **A design**. Then click **Create pull request**.
 
 The pull request may hold your folder and nothing else: `entry.json` and
 the one screenshot.

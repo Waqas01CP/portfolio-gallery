@@ -50,8 +50,9 @@ and one setting swaps it for another. What the HTML offers you is in
 4. Build and look at it locally, and run the checks if you can:
    [docs/how-to/add-a-design.md](docs/how-to/add-a-design.md) has every
    command.
-5. Open a pull request from your branch. Fill in the checklist in the
-   pull request's description.
+5. Open a pull request from your branch. Its description opens with two
+   sections, one for a design and one for a showcase entry: keep **A
+   design**, fill in its checklist, and delete the other.
 
 ## What the checks enforce
 
