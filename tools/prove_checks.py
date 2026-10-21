@@ -135,10 +135,10 @@ def riff_chunk(kind: bytes, data: bytes) -> bytes:
     return kind + struct.pack("<I", len(data)) + data + b"\0" * (len(data) & 1)
 
 
-def served_webp(*chunks: tuple[bytes, bytes]) -> bytes:
+def served_webp(*chunks: tuple[bytes, bytes], size: tuple[int, int] = (1024, 576)) -> bytes:
     """A WebP as a served copy is written, its image chunk only, then any
-    chunk planted."""
-    body = b"WEBP" + riff_chunk(b"VP8 ", b"\0\0\0\x9d\x01\x2a" + b"\0" * 58)
+    chunk planted. Its size is a 1280x720 screenshot's card unless given."""
+    body = b"WEBP" + riff_chunk(b"VP8 ", b"\0\0\0\x9d\x01\x2a" + struct.pack("<HH", *size) + b"\0" * 54)
     body += b"".join(riff_chunk(kind, data) for kind, data in chunks)
     return b"RIFF" + struct.pack("<I", len(body)) + body
 
@@ -226,6 +226,19 @@ def local_site(path: str) -> str:
         threading.Thread(target=server.serve_forever, daemon=True).start()
         _server.append(server)
     return f"http://127.0.0.1:{_server[0].server_address[1]}{path}"
+
+
+def entry_copies(site: Path, shots: Path, skip: tuple[str, ...] = ()) -> None:
+    """Served copies, as the screenshot job writes them, for every entry the
+    built gallery shows but those skipped: the showcase on main has entries
+    of its own, the owner's since fa2a687."""
+    page = (site / "index.html").read_text(encoding="utf-8")
+    for login, width, height in re.findall(
+            r'src="showcase/([a-z0-9-]+)/card\.webp" width="(\d+)" height="(\d+)"', page):
+        if login not in skip:
+            (shots / "showcase" / login).mkdir(parents=True, exist_ok=True)
+            (shots / "showcase" / login / "card.webp").write_bytes(served_webp(size=(int(width), int(height))))
+            (shots / "showcase" / login / "full.webp").write_bytes(served_webp())
 
 
 def build_site(copy: Path, *mode: str) -> Path:
@@ -384,6 +397,7 @@ def file_cases():
                 (shots / "designs" / name).mkdir(parents=True)
                 data = b"RIFF\0\0\0\0WEBPVP8 " + (b"\0" * (310_000 if big and name == "plain" else 64))
                 (shots / "designs" / name / "preview.webp").write_bytes(data)
+            entry_copies(site, shots, skip=("tester",))
             for name, data in (served or {}).items():
                 (shots / "showcase" / "tester").mkdir(parents=True, exist_ok=True)
                 (shots / "showcase" / "tester" / name).write_bytes(data)
@@ -410,7 +424,7 @@ def file_cases():
     yield ("assemble: the screenshot itself among the pictures", assemble(entry=True, served={
         **clean, "screenshot.png": png(1280, 720)}), "not a picture this gallery shows")
     yield ("control: assemble takes a gallery's previews and served copies",
-           assemble(entry=True, served=clean), Passes("took 4 picture(s)"))
+           assemble(entry=True, served=clean), Passes("showcase/tester/full.webp"))
 
     def build_case(old, new):
         def plant(copy):
@@ -523,7 +537,7 @@ def file_cases():
         c, "other", {**GOOD_ENTRY, "url": "https://www.example.com"})), "lists the same site as")
 
     def loose(copy):
-        (copy / "showcase").mkdir()
+        (copy / "showcase").mkdir(exist_ok=True)
         (copy / "showcase" / "README.md").write_text("x", encoding="utf-8")
         return ["tools/check_showcase.py"]
 
@@ -839,6 +853,7 @@ def main(argv: list[str]) -> int:
         for name in ("default", "plain"):
             (shots / "designs" / name).mkdir(parents=True)
             (shots / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+        entry_copies(gallery_out, shots)
         controls = [("workflows", ["tools/check_workflows.py"]),
                     ("template cleanup", ["tools/check_template_cleanup.py"]),
                     ("design", ["tools/check_design.py"]),
@@ -849,7 +864,12 @@ def main(argv: list[str]) -> int:
                     ("built, gallery", ["tools/check_built.py", gallery_out]),
                     ("trace", ["tools/check_content.py", "--page", out / "index.html"])]
         if "--browser" in argv:
-            controls.append(("browser", ["tools/check_browser.py", gallery_out, "--quick"]))
+            # The browser checks load the showcase's pictures, so this
+            # gallery has them made, as the deploy makes them.
+            pictured = copy / "_gallery_pictured"
+            run(copy, "build.py", "--as-of", "2026-10", "--gallery", "--out", pictured)
+            run(copy, "tools/screenshots.py", pictured)
+            controls.append(("browser", ["tools/check_browser.py", pictured, "--quick"]))
             if axe:
                 controls.append(("axe", ["tools/check_browser.py", gallery_out, "--only", "axe", "--axe", axe]))
         for label, args in controls:
