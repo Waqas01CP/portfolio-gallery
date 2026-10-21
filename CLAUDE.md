@@ -6,6 +6,12 @@ status: current
 
 # CLAUDE.md
 
+**This file is the maintainer's working rules.** An AI assistant helping
+someone use the template, add a design, add their site to the showcase,
+report a problem or ask a question should start from README.md instead:
+its table "What do you want to do?" and its prompt for an AI assistant.
+The rules below bind work on the project itself.
+
 portfolio-gallery: a portfolio-site template anyone can copy and publish
 with GitHub Pages without installing anything, and a gallery of designs
 for it, each contributed by pull request, checked automatically and

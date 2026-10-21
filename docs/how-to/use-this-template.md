@@ -73,7 +73,8 @@ these yourself, the first two above all:
    `provenance.md`, `standing-checks.md`.
 6. Its own tools: `.githooks/`, and in `tools/`: `gates.py`,
    `never-commit.txt`, `generate_map.py`, `prove_checks.py`,
-   `scope_check.py`, `check_showcase.py`, `check_template_cleanup.py`.
+   `scope_check.py`, `check_showcase.py`, `check_prompt.py`,
+   `check_template_cleanup.py`.
 7. The cleanup itself: `.github/template-cleanup/`, and the project's own
    workflows, `.github/workflows/scope.yml`,
    `.github/workflows/showcase-links.yml` and

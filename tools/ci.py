@@ -4,7 +4,9 @@
       Everything a pull request must pass: the workflows' job conditions
       (tools/check_workflows.py); every design checked; the showcase's
       files checked, while the project has the tool (tools/check_showcase.py,
-      no fetching; checks.yml fetches a pull request's sites); the site
+      no fetching; checks.yml fetches a pull request's sites); the
+      README's prompt for an AI assistant against the repository, while
+      the project has it (tools/check_prompt.py); the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; the gallery's pictures made as
@@ -144,6 +146,10 @@ def checks(quick: bool, axe: Path | None) -> None:
     # and not this tool (ADR-0016).
     if (ROOT / "tools" / "check_showcase.py").is_file():
         run("tools/check_showcase.py")
+    # The README's prompt for an AI assistant against what it restates;
+    # a cleaned copy has neither the prompt nor this tool (ADR-0017).
+    if (ROOT / "tools" / "check_prompt.py").is_file():
+        run("tools/check_prompt.py")
     twice(as_of)
     twice(as_of, "--gallery")
     site, gallery = ROOT / "_site", ROOT / "_gallery"
