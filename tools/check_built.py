@@ -30,9 +30,15 @@ seen without running anything:
   - in the gallery, every link to another site in a showcase card or a
     design's "In use" line carries rel="ugc nofollow", and every
     showcase picture loads lazily (ADR-0016);
+  - every showcase picture has its width and height in the HTML, so its
+    box is reserved before it loads (ADR-0009), and that shape is within
+    the limits, at most SHOWCASE_TALL times as tall as it is wide and
+    SHOWCASE_WIDE times as wide as it is tall: a screenshot beyond them is
+    shown within them, with bands (ADR-0016, Changes, 2026-10-20);
   - with --previews, every design in a gallery has its preview image and
-    every showcase card its served copies; without it, a missing one is not
-    reported, because the screenshot job makes them after the build.
+    every showcase card its served copies, each card's copy the very size
+    its HTML reserves; without it, a missing one is not reported, because
+    the screenshot job makes them after the build.
 
 Exit 0 when everything passes; 1 when anything fails, each printed with
 its file; 2 when the folder holds no built page. Standard library only.
@@ -42,6 +48,7 @@ from __future__ import annotations
 
 import os
 import re
+import struct
 import sys
 from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
@@ -49,7 +56,8 @@ from urllib.parse import unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from build import CSP, PREVIEW_FILE, PROJECT_URL, SHOWCASE_CARD, SHOWCASE_FULL  # noqa: E402
+from build import (CSP, PREVIEW_FILE, PROJECT_URL, SHOWCASE_CARD, SHOWCASE_FULL,  # noqa: E402
+                   SHOWCASE_TALL, SHOWCASE_WIDE)
 from check_design import CSSError, tokens  # noqa: E402
 
 RESOURCE_ATTRS = {"src", "srcset", "poster", "data", "action", "formaction", "background",
@@ -82,6 +90,7 @@ class Page(HTMLParser):
         self.credit_links: list[list[str]] = []
         self.in_credit = False
         self.contributed: str | None = None  # "site" in a showcase card, "in_use" in its line
+        self.sized: list[tuple[str, int, int]] = []  # each showcase picture's src and reserved size
 
     VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
             "source", "track", "wbr"}
@@ -160,6 +169,8 @@ class Page(HTMLParser):
         if self.contributed == "site" and tag == "img" and a.get("loading") != "lazy":
             self.problems.append(f"the showcase picture {a.get('src')} does not load lazily "
                                  f"(loading=\"lazy\")")
+        if self.contributed == "site" and tag == "img":
+            self._sized(a)
         if inside and "hidden" in a and a.get("aria-hidden") != "true":
             name = a.get("id") or a.get("class") or tag
             self.problems.append(f"<{tag}> '{name}' is hidden inside a section but not "
@@ -179,6 +190,20 @@ class Page(HTMLParser):
             self.in_section.pop()
             if open_tag == tag:
                 break
+
+    def _sized(self, a: dict) -> None:
+        src = a.get("src", "")
+        if not (a.get("width", "").isdigit() and a.get("height", "").isdigit()
+                and int(a["width"]) and int(a["height"])):
+            self.problems.append(f"the showcase picture {src} has no width and height, so the page "
+                                 f"would shift as it loads (ADR-0009)")
+            return
+        width, height = int(a["width"]), int(a["height"])
+        if height > width * SHOWCASE_TALL or width > height * SHOWCASE_WIDE:
+            self.problems.append(f"the showcase picture {src} is {width}x{height}, beyond the shape "
+                                 f"limits of {SHOWCASE_TALL} either way: a screenshot beyond them is shown "
+                                 f"within them, with bands (build.py, showcase_shapes)")
+        self.sized.append((src, width, height))
 
     def _load(self, url: str) -> None:
         if self.first_load_at is None:
@@ -263,6 +288,22 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
         _, problem = resolve(path.parent, root, url)
         if problem:
             problems.append(problem)
+    if previews and page.sized:
+        # The card's copy is the size its box was reserved at; the reader
+        # is the showcase check's, which exists while the showcase does.
+        from check_showcase import ImageError, webp_facts
+        for src, width, height in page.sized:
+            file, problem = resolve(path.parent, root, src)
+            if problem:
+                continue
+            try:
+                facts = webp_facts(file.read_bytes())
+            except (ImageError, struct.error) as error:
+                problems.append(f"the showcase picture {src} cannot be read: {error or 'its header'}")
+                continue
+            if (facts["width"], facts["height"]) != (width, height):
+                problems.append(f"the showcase picture {src} is reserved at {width}x{height} but is "
+                                f"{facts['width']}x{facts['height']}, so the page would shift as it loads")
     ids = set(page.ids)
     for duplicate in sorted({i for i in page.ids if page.ids.count(i) > 1}):
         problems.append(f"id '{duplicate}' is used more than once")

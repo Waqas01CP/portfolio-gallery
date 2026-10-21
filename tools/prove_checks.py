@@ -102,6 +102,12 @@ def tiff(*tags: int) -> bytes:
     return b"MM\0*" + struct.pack(">I", 8) + ifd + struct.pack(">I", 0)
 
 
+def turned(value: int) -> bytes:
+    """A TIFF block whose Orientation is value: 6 turns a picture a quarter."""
+    ifd = struct.pack(">H", 1) + struct.pack(">HHIHH", 0x0112, 3, 1, value, 0)
+    return b"MM\0*" + struct.pack(">I", 8) + ifd + struct.pack(">I", 0)
+
+
 def jpeg(width: int, height: int, exif: bytes | None = None) -> bytes:
     segment = lambda marker, body: b"\xff" + marker + struct.pack(">H", len(body) + 2) + body  # noqa: E731
     app1 = segment(b"\xe1", b"Exif\0\0" + exif) if exif is not None else b""
@@ -568,6 +574,50 @@ def file_cases():
         ', design {{ design.name }} by <a href="{{ design.author_url }}">{{ design.author }}</a>', "",
         "footer.html.j2"), "the footer credit does not link both")
 
+    # Each card's picture keeps its shape within the limits, and its box is
+    # reserved at the size of its copy (ADR-0016, Changes, 2026-10-20).
+    def shaped(files, old=None, new=None, where="build.py"):
+        def plant(copy):
+            plant_entry(copy, files=files)
+            if old is not None:
+                edit(copy / where, old, new)
+            return ["tools/check_built.py", build_site(copy, "--gallery")]
+        return plant
+
+    yield ("built: a showcase picture without its reserved size", shaped(
+        {"screenshot.png": png(1280, 720)}, ' width="{{ e.card_size[0] }}" height="{{ e.card_size[1] }}"', "",
+        "src/templates/gallery.html.j2"), "has no width and height")
+    yield ("built: a picture taller than the limit shown at its own shape", shaped(
+        {"screenshot.png": png(600, 2000)}, "    if picture[1] > picture[0] * SHOWCASE_TALL:",
+        "    if False:"), "beyond the shape limits")
+    yield ("built: a picture wider than the limit shown at its own shape", shaped(
+        {"screenshot.png": png(2000, 400)}, "    elif picture[0] > picture[1] * SHOWCASE_WIDE:",
+        "    elif False:"), "beyond the shape limits")
+
+    def copies(card, files=None):
+        def plant(copy):
+            plant_entry(copy, files=files)
+            out = build_site(copy, "--gallery")
+            for name in ("default", "plain"):
+                (out / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+            # Every other entry's copies at the size its card reserves.
+            page = (out / "index.html").read_text(encoding="utf-8")
+            for login, width, height in re.findall(
+                    r'src="showcase/([a-z0-9-]+)/card\.webp" width="(\d+)" height="(\d+)"', page):
+                (out / "showcase" / login).mkdir(parents=True, exist_ok=True)
+                size = card if login == "tester" else (int(width), int(height))
+                (out / "showcase" / login / "card.webp").write_bytes(webp(*size))
+                (out / "showcase" / login / "full.webp").write_bytes(webp(1280, 720))
+            return ["tools/check_built.py", out, "--previews"]
+        return plant
+
+    yield ("built: a card's copy not the size its box reserves, with --previews", copies((1024, 600)),
+           "is reserved at 1024x576 but is 1024x600")
+    yield ("control: a card's copy the size its box reserves passes, with --previews", copies((1024, 576)),
+           Passes("0 problem(s)"))
+    yield ("control: a JPEG turned by its EXIF is reserved at its turned size", copies(
+        (720, 1280), {"screenshot.jpg": jpeg(1280, 720, turned(6))}), Passes("0 problem(s)"))
+
     def no_shot(copy):
         plant_entry(copy, files={})
         return ["build.py", "--as-of", "2026-10", "--gallery", "--out", copy / "_out"]
@@ -678,12 +728,12 @@ def browser_cases(axe: Path | None):
     # Chrome from a screenshot carrying EXIF and XMP, they hold their image
     # alone; a maker that keeps the encoder's colour profile, or publishes
     # the screenshot itself, is refused.
-    def served(old=None, new=None, name="screenshot.png"):
+    def served(old=None, new=None, name="screenshot.png", where="tools/screenshots.py", exif=None):
         def plant(copy):
             plant_entry(copy, files={name: png(
-                1920, 1080, (b"eXIf", tiff(0x0112, 0x011A)), xmp(MAC_XMP))})
+                1920, 1080, (b"eXIf", exif or tiff(0x0112, 0x011A)), xmp(MAC_XMP))})
             if old is not None:
-                edit(copy / "tools/screenshots.py", old, new)
+                edit(copy / where, old, new)
             return ["tools/ci.py", "pictures", "--gallery", build_site(copy, "--gallery")]
         return plant
 
@@ -696,6 +746,51 @@ def browser_cases(axe: Path | None):
     yield ("pictures: a maker that publishes the screenshot itself", served(
         "                        data = image_only(data)\n",
         "                        data = (SHOWCASE / source).read_bytes()\n"), "not a WebP image")
+    # Chrome turns a PNG by its EXIF orientation, as the build sizes it; a
+    # build that did not would reserve the wrong shape, and is refused.
+    yield ("control: served copies from a PNG turned by its EXIF", served(exif=turned(6)),
+           Passes("picture(s) made and checked"))
+    yield ("pictures: a build that ignores a PNG's EXIF turn", served(
+        '    if facts["orientation"] >= 5:', "    if False:", where="tools/check_showcase.py", exif=turned(6)),
+        "Chrome reads it as 1080x1920, the build as 1920x1080")
+
+    # The showcase packed (ADR-0016, Changes, 2026-10-20), with snips of
+    # every shape measured on 2026-10-21, scaled down: desktop, Retina,
+    # his own portrait snip, a phone, a whole page and a 32:9 monitor, both
+    # beyond the limits, and an ultrawide.
+    MIX = [(960, 540), (1440, 900), (1077, 1713), (390, 844), (683, 2000), (1280, 360), (860, 360),
+           (1366, 768), (585, 1266)]
+
+    def packed(*edits):
+        def plant(copy):
+            for i, (w, h) in enumerate(MIX):
+                plant_entry(copy, f"person-{i + 1}", {**GOOD_ENTRY, "url": f"https://example.com/{i}",
+                                                     "description": "A sample entry. " * (i % 4)},
+                            files={"screenshot.png": png(w, h)})
+            for rel, old, new in edits:
+                edit(copy / rel, old, new)
+            out = build_site(copy, "--gallery")
+            code, text = run(copy, "tools/screenshots.py", out)
+            if code:
+                raise SystemExit(f"prove_checks: the packed gallery's pictures were not made:\n{text}")
+            return ["tools/check_browser.py", out, "--only", "packing"]
+        return plant
+
+    yield "control: the packed showcase, a mix of shapes", packed(), Passes("PASS")
+    yield ("packing: CSS columns, which fill down, out of focus order", packed(
+        ("src/static/gallery.css", "  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));\n"
+         "  gap: 24px;\n  align-items: start;", "  display: block;\n  columns: 3 300px;\n  column-gap: 24px;"),
+        ("src/static/gallery.css", "  .g-pack { display: grid-lanes; }", "  .g-pack { }")),
+        "px above")
+    yield ("packing: a showcase picture without its reserved size", packed(
+        ("src/templates/gallery.html.j2", ' width="{{ e.card_size[0] }}" height="{{ e.card_size[1] }}"', "")),
+        "not its reserved")
+    yield ("packing: a picture beyond the tall limit shown at its own shape", packed(
+        ("build.py", "    if picture[1] > picture[0] * SHOWCASE_TALL:", "    if False:")),
+        "beyond the shape limits")
+    yield ("packing: no script, so gaps under short cards", packed(
+        ("src/static/gallery.js", '  const list = document.querySelector("[data-pack]");',
+         '  const list = null;')), "px gap")
     yield ("joins: the hidden spaces removed", gallery(lambda c: edit(
         c / "src/templates/macros.html.j2", '{% macro sp() %}<span class="vh"> </span>{% endmacro %}',
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")

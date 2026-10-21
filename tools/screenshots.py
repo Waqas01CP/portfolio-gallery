@@ -17,9 +17,14 @@ next job takes only the .webp files from it (ADR-0010).
 Then the showcase (ADR-0016; Changes, 2026-10-20): each entry's screenshot,
 as its author's tool saved it, is decoded once by a second headless Chrome
 with the GPU off, and drawn into two served copies, WebP at quality
-SHOWCASE_QUALITY, never enlarged: card.webp, fitting 1366 by 900, and
-full.webp, fitting 2560 by 2560, written to showcase/<login>/ in the built
-folder. A canvas holds pixels only, so the copies carry none of the
+SHOWCASE_QUALITY, never enlarged, each the size build.py's
+showcase_shapes() gives and the gallery's HTML reserves: card.webp, the
+picture in its own shape at most SHOWCASE_CARD_WIDTH wide, with
+transparent bands beyond the shape limits, and full.webp, fitting 2560 by
+2560, written to showcase/<login>/ in the built folder. When Chrome reads
+the screenshot at another size than the build did, as a quarter turn in
+its EXIF that one of them ignores would give, the copies are not made and
+the entry fails, named. A canvas holds pixels only, so the copies carry none of the
 screenshot's metadata, and the copy's container is rewritten to hold its
 image chunks alone, without even the colour profile Chrome's encoder
 adds; the next job checks that too (tools/ci.py assemble). The
@@ -45,26 +50,28 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from cdp import CDPError, Chrome, MissingTool, Server  # noqa: E402
-from build import (PREVIEW_FILE, PREVIEW_SIZE, SHOWCASE, SHOWCASE_FITS,  # noqa: E402
-                   SHOWCASE_QUALITY, BuildError, load_showcase)
+from build import (PREVIEW_FILE, PREVIEW_SIZE, SHOWCASE, SHOWCASE_CARD,  # noqa: E402
+                   SHOWCASE_FULL, SHOWCASE_QUALITY, BuildError, load_showcase)
 
 WIDTH, HEIGHT = 1366, 900
 SCALE = PREVIEW_SIZE[0] / WIDTH
 
-# Decode once, then draw each copy: scaled to fit its box, never enlarged.
-SERVE = """async (src, fits, quality) => {
+# Decode once, then draw each copy at the size and place the build gave it;
+# what the picture leaves of the canvas stays transparent.
+SERVE = """async (src, shown, shapes, quality) => {
   const response = await fetch(src);
   if (!response.ok) throw new Error('could not read the file, ' + response.status);
   const bitmap = await createImageBitmap(await response.blob());
+  if (bitmap.width !== shown[0] || bitmap.height !== shown[1]) {
+    throw new Error('Chrome reads it as ' + bitmap.width + 'x' + bitmap.height + ', the build as ' +
+                    shown[0] + 'x' + shown[1]);
+  }
   const copies = {};
-  for (const [name, [maxWidth, maxHeight]] of Object.entries(fits)) {
-    const scale = Math.min(1, maxWidth / bitmap.width, maxHeight / bitmap.height);
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
+  for (const [name, {size: [width, height], at: [x, y, w, h]}] of Object.entries(shapes)) {
     const canvas = new OffscreenCanvas(width, height);
     const context = canvas.getContext('2d');
     context.imageSmoothingQuality = 'high';
-    context.drawImage(bitmap, 0, 0, width, height);
+    context.drawImage(bitmap, x, y, w, h);
     const blob = await canvas.convertToBlob({type: 'image/webp', quality: quality});
     const bytes = new Uint8Array(await blob.arrayBuffer());
     let text = '';
@@ -128,17 +135,18 @@ def served_copies(folder: Path, entries: list[dict], failed: list[str]) -> None:
             page.goto(f"{server.origin}/", settle=0.2)
             for entry in entries:
                 source = urllib.parse.quote(entry["screenshot"].removeprefix("showcase/"))
-                fits = {Path(name).stem: list(size) for name, size in SHOWCASE_FITS.items()}
+                shapes = {Path(name).stem: shape for name, shape in entry["shapes"].items()}
                 try:
                     result = page.send("Runtime.evaluate", {
-                        "expression": f"({SERVE})({json.dumps(source)}, {json.dumps(fits)}, {SHOWCASE_QUALITY})",
+                        "expression": f"({SERVE})({json.dumps(source)}, {json.dumps(entry['shown'])}, "
+                                      f"{json.dumps(shapes)}, {SHOWCASE_QUALITY})",
                         "awaitPromise": True, "returnByValue": True}, timeout=120)
                     if "exceptionDetails" in result:
                         details = result["exceptionDetails"]
                         raise CDPError((details.get("exception") or {}).get("description") or details.get("text"))
                     value = result["result"]["value"]
                     sizes = []
-                    for name in SHOWCASE_FITS:
+                    for name in (SHOWCASE_CARD, SHOWCASE_FULL):
                         copy = value["copies"][Path(name).stem]
                         data = base64.b64decode(copy["data"])
                         if data[:4] != b"RIFF" or data[8:12] != b"WEBP":

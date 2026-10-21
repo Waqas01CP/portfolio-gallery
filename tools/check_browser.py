@@ -32,6 +32,17 @@ docs/reference/standing-checks.md with the case built to defeat it.
               thrown. Checked on every load the other checks make.
   motion      Under reduced motion, no animation frame is requested and no
               animation runs, over 3 seconds.
+  packing     Gallery only, the showcase's cards (ADR-0016, Changes,
+              2026-10-20), at 390 and 1366 px, light and dark, packed by
+              static/gallery.js, by Chrome's own grid-lanes (switched on
+              with its experimental features, as Safari ships them), and
+              with scripts off: every picture's box is its reserved size
+              before it loads and stays so after, within the shape limits;
+              no card sits above the one before it by more than 1em, the
+              tolerance grid-lanes itself allows, so the eye meets the
+              cards in folder order; Tab reaches them in folder order; and,
+              packed, no gap is left under a card. With scripts off and no
+              grid-lanes the cards sit in rows, gaps allowed.
   axe         With --axe FILE, axe-core's default rules at 360 and 1366 px,
               light, device dark and switched dark, panels closed and open.
               The checks workflow fetches axe.min.js by exact version and
@@ -60,6 +71,8 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from build import SHOWCASE_TALL, SHOWCASE_WIDE  # noqa: E402
 from cdp import CDPError, Chrome, MissingTool, Server  # noqa: E402
 
 WIDTHS = ((360, 780), (1366, 900))
@@ -556,6 +569,118 @@ def check_motion(pages, origin, report) -> None:
             page.close()
 
 
+# The showcase's cards as laid out, relative to the list's top.
+PACKING = """(() => {
+  const list = document.querySelector('[data-pack]');
+  if (!list) return null;
+  const style = getComputedStyle(list);
+  const top = list.getBoundingClientRect().top;
+  return { display: style.display, em: parseFloat(style.fontSize), rowGap: parseFloat(style.rowGap) || 0,
+    cards: [...list.children].map((li) => {
+      const b = li.getBoundingClientRect();
+      const img = li.querySelector('img');
+      const i = img ? img.getBoundingClientRect() : { width: 0, height: 0 };
+      return { name: (li.querySelector('h3') || li).textContent.trim().slice(0, 40),
+               left: b.left, top: b.top - top, bottom: b.bottom - top, iw: i.width, ih: i.height,
+               aw: img ? Number(img.getAttribute('width')) : 0, ah: img ? Number(img.getAttribute('height')) : 0 };
+    }) };
+})()"""
+LOAD_ALL = """Promise.all([...document.querySelectorAll('[data-pack] img')].map((img) => {
+  img.loading = 'eager';
+  return img.decode().then(() => true, () => false);
+})).then((done) => done.every(Boolean))"""
+FOCUSED_CARD = """(() => { const a = document.activeElement;
+  const li = a && a.closest('[data-pack] > li');
+  return { card: li ? [...li.parentNode.children].indexOf(li) : -1, footer: !!(a && a.closest('footer')) };
+})()"""
+PACKING_MODES = (("script", (), True), ("grid-lanes", ("--enable-experimental-web-platform-features",), True),
+                 ("scripts off", (), False))
+PACKING_WIDTHS = ((390, 844), (1366, 900))
+
+
+def packing_problems(state: dict, packed: bool) -> list[str]:
+    """What is wrong with the cards' places and pictures, as laid out."""
+    problems = []
+    cards = state["cards"]
+    for card in cards:
+        if not (card["aw"] and card["ah"]) or abs(card["ih"] - card["iw"] * card["ah"] / card["aw"]) > 1:
+            problems.append(f"{card['name']}: its picture's box is {card['iw']:.0f}x{card['ih']:.0f}, not "
+                            f"its reserved {card['aw']}x{card['ah']} shape")
+        elif card["ih"] > card["iw"] * SHOWCASE_TALL + 1 or card["iw"] > card["ih"] * SHOWCASE_WIDE + 1:
+            problems.append(f"{card['name']}: its picture is shown {card['iw']:.0f}x{card['ih']:.0f}, beyond "
+                            f"the shape limits of {SHOWCASE_TALL} either way")
+    for before, after in zip(cards, cards[1:]):
+        if after["top"] < before["top"] - state["em"]:
+            problems.append(f"{after['name']} sits {before['top'] - after['top']:.0f} px above "
+                            f"{before['name']}, before it in folder order and in focus order")
+    if packed:
+        columns: dict[int, list[dict]] = {}
+        for card in cards:
+            columns.setdefault(round(card["left"]), []).append(card)
+        for column in columns.values():
+            column.sort(key=lambda c: c["top"])
+            if column[0]["top"] > 1:
+                problems.append(f"{column[0]['name']}: a gap of {column[0]['top']:.0f} px above it")
+            for above, below in zip(column, column[1:]):
+                gap = below["top"] - above["bottom"]
+                if abs(gap - state["rowGap"]) > 1:
+                    problems.append(f"{below['name']}: {gap:.0f} px below {above['name']}, not the "
+                                    f"{state['rowGap']:.0f} px gap")
+    return problems
+
+
+def check_packing(origin, report) -> None:
+    for mode, flags, scripts in PACKING_MODES:
+        with Chrome(flags=flags) as chrome:
+            for width, height in PACKING_WIDTHS:
+                for dark in (False, True):
+                    cell = f"{mode}, {width}px {'dark' if dark else 'light'}"
+                    page = open_page(chrome, origin, "index.html", width, height, dark=dark, scripts=scripts)
+                    before = page.evaluate(PACKING)
+                    if before is None:
+                        report.notes.append("packing: the gallery has no showcase cards to check")
+                        page.close()
+                        return
+                    report.ran("packing")
+                    if mode == "grid-lanes" and before["display"] != "grid-lanes":
+                        report.fail("packing", "index.html", f"{cell}: Chrome laid the showcase out as "
+                                    f"'{before['display']}', not grid-lanes")
+                    # Every column runs without gaps, but where rows of several
+                    # columns are left with neither grid-lanes nor the script.
+                    packed = scripts or width == PACKING_WIDTHS[0][0]
+                    for problem in packing_problems(before, packed):
+                        report.fail("packing", "index.html", f"{cell}, before the pictures load: {problem}")
+                    if not page.evaluate(LOAD_ALL, await_promise=True):
+                        report.fail("packing", "index.html", f"{cell}: a showcase picture did not load")
+                    chrome.drain(0.5)
+                    after = page.evaluate(PACKING)
+                    for problem in packing_problems(after, packed):
+                        report.fail("packing", "index.html", f"{cell}, loaded: {problem}")
+                    moved = [a["name"] for a, b in zip(after["cards"], before["cards"])
+                             if abs(a["top"] - b["top"]) > 1 or abs(a["bottom"] - b["bottom"]) > 1
+                             or abs(a["left"] - b["left"]) > 1]
+                    if moved:
+                        report.fail("packing", "index.html", f"{cell}: cards moved as their pictures "
+                                    f"loaded: {', '.join(moved)}")
+                    # Tab, from the top, meets the cards in folder order.
+                    page.evaluate("document.activeElement && document.activeElement.blur(); "
+                                  "window.scrollTo(0, 0); true")
+                    met: list[int] = []
+                    for _ in range(600):
+                        page.key("Tab")
+                        state = page.evaluate(FOCUSED_CARD)
+                        if state["footer"]:
+                            break
+                        if state["card"] >= 0 and (not met or met[-1] != state["card"]):
+                            met.append(state["card"])
+                    if met != list(range(len(after["cards"]))):
+                        report.fail("packing", "index.html", f"{cell}: Tab met the cards in the order "
+                                    f"{[i + 1 for i in met]}, not 1 to {len(after['cards'])}")
+                    for problem in page_errors(chrome, page, origin):
+                        report.fail("requests", "index.html", f"{cell}: {problem}")
+                    page.close()
+
+
 AXE_RUN = """axe.run(document, { resultTypes: ['violations'] }).then((r) =>
   r.violations.map((v) => v.id + ' (' + v.nodes.length + '): ' + v.nodes[0].target.join(' ')))"""
 
@@ -606,7 +731,7 @@ def main(argv: list[str]) -> int:
     gallery = bool(demos)
     sites = demos if gallery else ["index.html"]
     chosen = set(args.only.split(",")) if args.only else {
-        "tree", "keyboard", "joins", "anchors", "words", "motion", "axe"}
+        "tree", "keyboard", "joins", "anchors", "words", "motion", "packing", "axe"}
     loads = 1 if args.quick else args.loads
     report = Report()
     started = time.monotonic()
@@ -630,6 +755,8 @@ def main(argv: list[str]) -> int:
                 check_words(demos, origins, report)
             if "motion" in chosen:
                 check_motion(sites + (["index.html"] if gallery else []), origins["built"], report)
+            if "packing" in chosen and gallery:
+                check_packing(origins["built"], report)
             if "axe" in chosen:
                 if args.axe:
                     check_axe(sites + (["index.html"] if gallery else []), origins["built"], report,

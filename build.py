@@ -35,9 +35,11 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import math
 import os
 import re
 import shutil
+import struct
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -143,8 +145,8 @@ PREVIEW_SIZE = (683, 450)
 # A showcase entry's screenshot, supplied by its author as their tool saved
 # it (ADR-0016, D1; Changes, 2026-10-20). It is never published itself:
 # tools/screenshots.py makes two served copies from it, WebP with no
-# metadata, never enlarged: the card's, fitting twice the card's 683 by 450
-# box, and the full view's, which a click on the card opens.
+# metadata, never enlarged, each shaped by showcase_shapes() below: the
+# card's and the full view's, which a click on the card opens.
 # The screenshot keeps the name its tool gave it, such as "Screenshot
 # 2026-10-20 at 11.30.12.png": any name ending .png, .jpg, .jpeg or .webp,
 # in any case, with no folder, no control character, not hidden, at most
@@ -152,8 +154,44 @@ PREVIEW_SIZE = (683, 450)
 # hold the same rule.
 SHOWCASE_IMAGE_RE = re.compile(r"[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)", re.IGNORECASE)
 SHOWCASE_CARD, SHOWCASE_FULL = "card.webp", "full.webp"
-SHOWCASE_FITS = {SHOWCASE_CARD: (1366, 900), SHOWCASE_FULL: (2560, 2560)}
 SHOWCASE_QUALITY = 0.82
+# A card's picture takes its screenshot's own shape, at the card's full
+# width, whole, between two limits (the owner's decision of 2026-10-20,
+# ADR-0016, Changes): at most SHOWCASE_TALL times as tall as it is wide,
+# and at most SHOWCASE_WIDE times as wide as it is tall. Both are 2.4, a
+# 21:9 screen's shape, the most elongated first screen measured on
+# 2026-10-21 either way: an ultrawide monitor's 3440x1440 is 2.39 wide,
+# and the tallest common phones, 20:9 at 2.22 and 21:9 at 2.33, are below
+# it. Beyond a limit, as a whole page or a 32:9 monitor's snip is, the
+# picture box stops at the limit and shows the picture whole inside it,
+# shrunk, with bands: transparent pixels in card.webp, so the card's own
+# colour shows through them in either theme. Nothing is refused for its
+# shape. The card's copy is at most SHOWCASE_CARD_WIDTH pixels wide, three
+# times a desktop column's 345 CSS pixels; the full view's fits 2560 by
+# 2560 with no bands.
+SHOWCASE_TALL = 2.4
+SHOWCASE_WIDE = 2.4
+SHOWCASE_CARD_WIDTH = 1024
+SHOWCASE_FULL_FIT = 2560
+
+
+def showcase_shapes(width: int, height: int) -> dict[str, dict]:
+    """Each served copy's size and the rectangle its picture is drawn in
+    (x, y, width, height), from the screenshot's size as a browser shows
+    it. Never enlarged; the card's bands, if any, split evenly."""
+    full = min(1.0, SHOWCASE_FULL_FIT / width, SHOWCASE_FULL_FIT / height)
+    full_size = (max(1, round(width * full)), max(1, round(height * full)))
+    # The height whole, so a box at the tall limit is no wider than the card.
+    scale = min(1.0, SHOWCASE_CARD_WIDTH / width, math.floor(SHOWCASE_CARD_WIDTH * SHOWCASE_TALL) / height)
+    picture = (max(1, round(width * scale)), max(1, round(height * scale)))
+    box = picture
+    if picture[1] > picture[0] * SHOWCASE_TALL:
+        box = (math.ceil(picture[1] / SHOWCASE_TALL), picture[1])
+    elif picture[0] > picture[1] * SHOWCASE_WIDE:
+        box = (picture[0], math.ceil(picture[0] / SHOWCASE_WIDE))
+    return {SHOWCASE_CARD: {"size": box, "at": ((box[0] - picture[0]) // 2, (box[1] - picture[1]) // 2,
+                                                *picture)},
+            SHOWCASE_FULL: {"size": full_size, "at": (0, 0, *full_size)}}
 
 
 class BuildError(Exception):
@@ -869,6 +907,11 @@ def load_showcase() -> list[dict]:
     would stop it rendering a card."""
     if not SHOWCASE.is_dir():
         return []
+    # Each screenshot's header gives its size, so the page reserves each
+    # picture's box before it loads (ADR-0009). The reader is the showcase
+    # check's, which the template cleanup removes with showcase/.
+    sys.path.insert(0, str(ROOT / "tools"))
+    from check_showcase import ImageError, shown_size
     entries = []
     for folder in sorted(p for p in SHOWCASE.iterdir() if p.is_dir() and not p.is_symlink()):
         where = f"showcase/{folder.name}"
@@ -886,12 +929,19 @@ def load_showcase() -> list[dict]:
         if len(shots) != 1:
             raise BuildError(f"{where}/ needs exactly one screenshot, a .png, .jpg, .jpeg or "
                              f".webp file")
+        try:
+            width, height = shown_size(folder / shots[0])
+        except (ImageError, KeyError, struct.error) as error:
+            raise BuildError(f"{where}/{shots[0]} gives no size a browser would show: {error} "
+                             f"(run tools/check_showcase.py for every rule)") from None
+        shapes = showcase_shapes(width, height)
         description = entry.get("description")
         entries.append({"login": folder.name, "name": entry["name"], "url": entry["url"],
                         "host": urlsplit(entry["url"]).hostname,
                         "description": description if _text(description) else None,
-                        "screenshot": f"{where}/{shots[0]}",
-                        "card": f"{where}/{SHOWCASE_CARD}", "full": f"{where}/{SHOWCASE_FULL}"})
+                        "screenshot": f"{where}/{shots[0]}", "shown": (width, height), "shapes": shapes,
+                        "card": f"{where}/{SHOWCASE_CARD}", "full": f"{where}/{SHOWCASE_FULL}",
+                        "card_size": shapes[SHOWCASE_CARD]["size"]})
     return entries
 
 
@@ -1033,7 +1083,8 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
         (static / "layout.css").write_text(layout_css(by_lane["builds"], timeline),
                                            encoding="utf-8", newline="\n")
         if gallery:
-            shutil.copyfile(STATIC_SRC / "gallery.css", static / "gallery.css")
+            for name in ("gallery.css", "gallery.js"):
+                shutil.copyfile(STATIC_SRC / name, static / name)
             for design in designs:
                 copy_design(design, staging / "designs" / design["slug"])
             # The showcase's served copies come later, from the screenshot
