@@ -1786,3 +1786,150 @@ All on 2026-10-21, one browser job at a time, Chrome 156.
 - Safari's own grid-lanes, the one shipped, not run; Chrome's flagged one
   stands in.
 - Test 1 once more, on or after 2026-11-02.
+
+---
+
+# Round 11, 2026-10-22 UTC: his answers, the forms and add-ons, documents a person and an AI can both follow, the README's prompt
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: aaa6757, the website merge of pull request 14,
+whose tree is d9e0e6a's (compared here); Scope and Checks success on the
+pull request, Checks and Deploy success on main, Template cleanup skipped
+(GitHub's API). The owner had ticked Brief 10 and Report 10. Work on the
+branch guides-and-prompt. HEAD at end: the commit that adds this
+section. Mode: mutating.
+
+## What was asked
+
+The portfolio architecture chat's Brief 11, of 2026-10-21, stored word for
+word in place of Brief 10, read first for what it still says (the owner's
+aim for the showcase, carried). His answers to Report 10: the limits of
+2.4 accepted; his name in his own commit messages fine, to be recorded and
+allowed by the pre-publish search, with a defeat for another account's;
+a Showcase entry issue form; the light add-ons; briefs off the cleanup's
+list. Part 1: audit how a person and an AI arriving cold enter and
+navigate the documents for each purpose, research the conventions for
+agent instructions from first-party sources, build the clear
+improvements, propose any new file or convention, and say what a copy's
+owner and their AI start from. Part 2: a self-contained, comprehensive
+prompt for an AI in the README, which asks the person what they want to
+do and guides them, kept accurate by a check in ci.py and the gates,
+safe, easy to copy; a better README with pictures that stay current; a
+view on a copy's own prompt.
+
+## Errors this seat made
+
+1. **docs/decisions/README.md said his name appears "only in LICENSE and
+   README.md"** since his showcase entry made it untrue (Round 8).
+   Corrected.
+2. **A first version of the search's allowance would have let the seat's
+   own commits name him**, since they carry his no-reply address under
+   the handle. Caught reading it, before any run; his own commits are
+   now those under his profile's name, and a defeat case covers the
+   seat's identity.
+3. **Gate C refused a commit once**: MAP.md had been regenerated before the
+   new record was staged, and the map is made from staged files.
+4. **A defeat case looked for text across a line break**, and was fixed in
+   the case.
+5. **The first README floated the showcase picture beside its paragraph**,
+   which at 390 px squeezed the text to a few words a line; seen in the
+   rendered look before any commit, and unfloated.
+
+## Research
+
+First-party sources on instructions for AI agents, read 2026-10-21 and
+22; only two pages carry a date. agents.md: AGENTS.md is "a simple, open
+format for guiding coding agents", stewarded by the Agentic AI Foundation
+under the Linux Foundation, read by Codex, Jules, Cursor, Gemini CLI,
+GitHub Copilot's coding agent and others; the nearest file wins. OpenAI's
+Codex documentation: reads AGENTS.md from the project root down, one per
+folder, AGENTS.override.md first, 32 KiB combined by default. Cursor's
+documentation: supports AGENTS.md at the root and in subfolders. GitHub's
+Copilot support table: AGENTS.md, CLAUDE.md or GEMINI.md read by the cloud
+agent, code review, VS Code chat (AGENTS.md only) and the CLI. Claude
+Code's documentation: reads CLAUDE.md, or AGENTS.md when there is none;
+with both, only CLAUDE.md. Gemini CLI's (updated 2026-06-18): GEMINI.md
+by default, AGENTS.md if configured. llmstxt.org (2024-09-03, modified
+2026-08-10): a proposal for websites. Repository settings, from GitHub's
+API: issues on, Discussions off, labels without "showcase".
+
+## What was built
+
+- **Forms** (b77f3e0): Showcase entry (removal, impersonation, an entry
+  gone bad) and Question; the how-to names the form.
+- **Add-ons** (2b641d4): showcase cards without border or panel, the
+  picture's corners rounded on the card colour with a hairline edge.
+- **His answers** (495a2ba): no briefs in remove.txt or the user guide;
+  ADR-0002, Changes, and CLAUDE.md: his own commit messages may name him.
+  The pre-publish search, a scratch tool, allows exactly that.
+- **The README and its prompt** (3fed37d): "What do you want to do?",
+  nine rows; pictures by their live addresses (both design previews and
+  the owner's showcase card); "Ask an AI assistant to guide you", a closed
+  details section holding the prompt, about 220 lines: how to behave,
+  what the project is, how it is organised, seven paths (A to G) each
+  with steps, rules, checks and review, and a maintainer-only note.
+  tools/check_prompt.py, in ci.py checks and gate B, holds its 24 paths,
+  23 facts, 7 commands and 5 safety rules to their sources; on the
+  cleanup's list. CLAUDE.md opens by sending any other AI to the README.
+  ADR-0017; ADR-0015, Changes; standing-checks.md; commands.md;
+  docs/decisions/README.md.
+
+## Proofs
+
+All on 2026-10-22, one browser job at a time, Chrome 156, on a fresh
+clone of 3fed37d unless named.
+
+- **Every check with axe**, `tools/ci.py checks --axe`: exit 0 in 665 s,
+  the prompt check among them; the browser checks 638 s (tree 48 runs,
+  keyboard 8, joins 4, anchors 136, words 4, motion 3, packing 12, axe 36),
+  0 failures, the borderless cards included, light and dark, 390 and
+  1366 px.
+- **The deploy's own path** with the 13 real snips under a Mac's file
+  names, the owner's entry beside them: 30 pictures gathered and
+  assembled, check_built --previews 0 problems; every browser check with
+  axe on the assembled gallery, 0 failures in 629 s.
+- **Every defeat case with the browser and axe**: exit 0 in 1,627 s; 129
+  defeat cases (112 file, 17 browser) fail as built, naming what failed;
+  12 controls and 21 planted controls pass. New: the prompt naming a path
+  that does not exist; the cap stated as 25 MB; SHOWCASE_TALL changed to
+  3.0 in build.py; the scope marker changed in scope_check.py; an issue
+  form the prompt does not name; a command in no guide; a safety rule taken
+  out; a fact reworded out of the check's sight. Control: the prompt check
+  on the unchanged copy.
+- **The gates**, on a scratch clone of 3fed37d: 24 defeat cases refused,
+  the README's prompt naming a missing path among them (gate B, naming
+  check_prompt.py); 5 controls passed.
+- **The cleanup**, on the fresh clone, which has no briefs folder: guards
+  hold, 60 files removed, a later run changes nothing, the cleaned copy
+  builds and checks, its 5 links resolve.
+- **The pre-publish search's new allowance**, in a scratch clone: the
+  owner's name in a commit message by another account, found; under the
+  seat's identity, the handle with his no-reply address, found; written as
+  his website commits are, passes.
+- **The README as rendered**: GitHub's Markdown API, in a README's mode,
+  rendered the draft; headless Chrome showed it with GitHub's styles at
+  1012 and 390 px, light and dark: the table, the closed section, the
+  prompt as a text block, the three pictures loaded through GitHub's image
+  proxy (200, WebP). The owner reads it on the branch, where GitHub adds
+  the copy button.
+- **The issue forms** parse as YAML with the fields GitHub's form schema
+  expects (PyYAML in a scratch folder, not the project).
+
+## Rejected alternatives
+
+- **AGENTS.md now**: proposed, not added (Brief 11: propose any new
+  convention). Claude Code would keep reading CLAUDE.md, so it reaches
+  other agents only; a copy would need its own or the cleanup's removal.
+- **A prompt in its own file**: an AI given the README would have to
+  fetch it, against "self contained".
+- **llms.txt**: a proposal for websites.
+- **Pictures committed to the repository**: they go stale; the live
+  ones are rewritten by every deploy.
+- **A gallery overview picture**: needs one more deploy capture and shows
+  on a branch only after a merge; proposed.
+
+## Not done
+
+- Nothing pushed.
+- AGENTS.md, a copy's own prompt, a gallery picture: proposals.
+- Test 1 once more, on or after 2026-11-02.
