@@ -34,11 +34,13 @@ it. There is no size to check and nothing to resize.
   (Apple, "How to take a screenshot on your Mac").
 
 Any size and any shape work, a phone's tall screen too: the gallery makes
-its own smaller copies of your screenshot, without its metadata, and the
-card shows a copy whole, never cropped, with bands where the shapes
-differ; a click opens a larger copy. The checks take PNG, JPEG or WebP, as
-screenshot tools save them. Two things they refuse, neither of which an
-ordinary snip has:
+its own smaller copies of your screenshot, without its metadata, and your
+card shows a copy whole, never cropped, at the card's full width in your
+screenshot's own shape; a click opens a larger copy. A shape longer than
+a 21:9 screen either way, as a whole page or a very wide monitor gives,
+is shown whole within that shape, with bands. The checks take PNG, JPEG
+or WebP, as screenshot tools save them. Two things they refuse, neither
+of which an ordinary snip has:
 
 - a location in the file's metadata, which a photo from a phone may carry;
 - a file over 20 MB, larger than any screenshot measured, even of a wall
@@ -64,8 +66,9 @@ cannot read; its usual setting saves PNG.
 3. In your fork, open the `showcase/<your-login>/` folder, click **Add
    file**, then **Upload files**, add your screenshot as your tool saved
    it, under the name it was given, and **Commit changes**.
-4. Click **Contribute**, then **Open pull request**, and **Create pull
-   request**.
+4. Click **Contribute**, then **Open pull request**. The description
+   opens with two sections: keep **A showcase entry**, tick its three
+   lines, and delete **A design**. Then click **Create pull request**.
 
 The pull request may hold your folder and nothing else: `entry.json` and
 the one screenshot.

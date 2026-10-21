@@ -13,10 +13,15 @@ portfolio architecture chat has checked these steps** (the brief's
 Addendum 1). Where a screen differs from what a step says you should see,
 stop and send what you see instead; GitHub changes its settings pages.
 
-**Status, 2026-10-19 UTC:** the owner followed every step and Tests 1 to
+**Status, 2026-10-21 UTC:** the owner followed every step and Tests 1 to
 5 between 2026-10-16 and 18, and the steps below carry what that showed.
-Two proofs wait: Test 6, the first showcase entry, once the showcase is
-on main; and Test 1 again on or after 2026-11-02 (below).
+Test 6 passed on 2026-10-20: his own entry, from a plain snip of
+1077x1713 pixels saved as his tool named it, passed scope and checks on
+pull request 13 and merged; Deploy, with its shots and assemble jobs,
+passed on main; Showcase links, run by hand, passed (run 39507307570).
+An earlier head of that branch, entry.json alone, failed checks at the
+fetch step, as an entry without a screenshot should. One proof waits:
+Test 1 again on or after 2026-11-02 (below).
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
@@ -467,8 +472,9 @@ already links to https://github.com/Waqas01CP (checked 2026-10-19).
    **Add file**, **Upload files**, add the screenshot as saved, and commit
    it directly to that branch.
 4. Open https://github.com/Waqas01CP/portfolio-gallery/compare/main...showcase-waqas01cp,
-   **Create pull request**, write `[scope: as contributor]` in the
-   description, and **Create pull request**.
+   **Create pull request**. The description opens with two sections: keep
+   **A showcase entry**, tick its three lines, delete **A design**, write
+   `[scope: as contributor]` below them, and **Create pull request**.
 
 You should see **scope** pass, its summary "In scope: 2 file(s), all in
 showcase/waqas01cp/.", and **checks** pass, its step "Fetch the showcase

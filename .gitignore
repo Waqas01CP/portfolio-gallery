@@ -1,7 +1,6 @@
-# Briefs are working space and can carry private paths; never committed.
-# Only the folder's README is tracked.
-briefs/*
-!briefs/README.md
+# Briefs are working space and can carry private paths; the whole folder,
+# its README with it, is never committed (CLAUDE.md, Briefs).
+briefs/
 
 # The architecture chat's ledger, once there is one, is never committed.
 CHAT_STATE.md

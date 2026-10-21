@@ -64,7 +64,15 @@ rendering their sites, and with a review load the owner can carry?
   rule against all EXIF and XMP would refuse them; a location is what
   could harm a contributor.
 - A6. The gallery stays within ADR-0009's limits with a full showcase.
-  **Re-measured** 2026-10-20 with served copies made from full-screen
+  **Re-measured** 2026-10-21, the cards packed in their pictures' shapes,
+  copies drawn from 13 real snips of every shape measured, the owner's
+  among them: with 0, 10 and 50 cards, Lighthouse default mobile, median
+  of five, LCP 1,075, 1,504 and 1,654 ms, CLS 0 in every run, TBT 38, 0
+  and 0 ms, 74,587, 309,817 and 330,177 bytes loaded at first; with the
+  desktop preset, where the cards are packed in three columns, at 10 and
+  50 cards LCP 365 and 406 ms, CLS 0 in every run, TBT 0, 728,686 and
+  802,861 bytes at first; every card at 50, scrolled to the end,
+  2,964,813 bytes. As re-measured on 2026-10-20 with served copies made from full-screen
   captures of up to 9.5 MB: with 0, 10 and 50 cards, LCP 1,128, 1,507 and
   1,656 ms, CLS 0, TBT 33, 16 and 70 ms, 70,310, 274,900 and 297,780 bytes
   loaded at first; every card at 50, scrolled to the end, 3,274,139 bytes.
@@ -109,7 +117,9 @@ site and in_use link, from a workflow that holds no permissions and
 reports by failing (Q2).
 We will show templates first, then the showcase, each with a count and in
 folder order; a showcase card shows its screenshot whole, scaled to fit
-with bands in the card's colour, loading as it scrolls into view, and
+with bands in the card's colour (since 2026-10-20 in its own shape, the
+cards packed; bands only beyond the shape limits: Changes), loading as it
+scrolls into view, and
 opening full size on a click; contributors' links carry rel="ugc
 nofollow".
 We will name the design and its author in the default-on footer credit,
@@ -189,3 +199,4 @@ request, as an outsider's, then the weekly workflow run by hand.
 | Date | Change | Why |
 |---|---|---|
 | 2026-10-20 | **A showcase screenshot is any snip, as its tool saved it.** The check keeps what every ordinary snip meets: PNG, JPEG or WebP by its first bytes, a still image, no location in its metadata; MIN_WIDTH, MAX_WIDTH and the landscape rule are gone, and the file keeps the name its tool gave it ("Screenshot 2026-10-20 at 11.30.12.png"), a choice of the implementing seat for the same aim. One cap stays, for the repository's history alone: 20 MiB, above every ordinary snip measured (A4). **The screenshot is never published:** the deploy's screenshot job decodes it in headless Chrome 155 with the GPU off, in a job with no write token, and draws two served copies, WebP at quality 0.82, never enlarged: card.webp fitting 1366 by 900 and full.webp fitting 2560 by 2560, which a click opens; each holds its image chunk alone, no EXIF, XMP or colour profile, which tools/ci.py assemble checks before anything is published. The pull request's checks make the same copies, so a file Chrome cannot read fails there. HEIF is named and refused: no browser engine the project runs reads it, and a decoder would be a dependency (scope floor line 5). No floor on size is set; the owner's review sees each screenshot. A6 re-measured. | The owner's decision of 2026-10-20 UTC, approved as proposed through the portfolio architecture chat (its Brief 9), from his aim: contributors "just take a snip and add it". The limits of 2026-10-19 asked most contributors to resize: a full-HD PNG snip of a busy page is 517 to 657 KB, and a Retina capture 2560 pixels wide. |
+| 2026-10-20 | **Each showcase card takes its picture's shape, and the cards are packed as on Pinterest.** The picture is shown at the card's full width in its own proportions, whole, never cropped, and the card grows to fit it; the cards run in columns with no gap left under a short one, in folder order. "Shown whole" stays; "scaled to fit, with bands" is now the behaviour beyond two shape limits only: at most 2.4 times as tall as wide and 2.4 times as wide as tall, a 21:9 screen's shape, the most elongated first screen measured either way (below). Beyond them the picture box stops at the limit and shows the picture whole inside it, shrunk, with bands: transparent pixels in card.webp, so the card's colour shows through in either theme. Nothing is refused for its shape. **Measured 2026-10-21:** first screens are 0.56 to 0.62 times as tall as wide on desktops and laptops (StatCounter's commonest, June to August 2026: 1920x1080, 1536x864, 1366x768, 1280x720; a 1440x900 Retina), 2.16 to 2.22 on phones (414x896, 360x800, 390x844, 393x873), 2.33 on 21:9 phones; ultrawide monitors are 2.39 (3440x1440) and 3.56 (5120x1440) times as wide as tall; whole pages of eight portfolio sites, the owner's among them, run 0.56 to 10.21 times as tall as wide at desktop widths and 2.16 to 34.76 at a phone's, so no limit separates a page from a screen; it caps how tall a card grows. The owner's own snip is 1.59. **Built:** build.py reads each screenshot's size from its header, turned a quarter where its EXIF says so in PNG and JPEG, as Chrome turns them (and not in WebP, which Chrome does not turn), and reserves the card's picture at its copy's size, so the page does not shift (CLS 0, ADR-0009); card.webp is at most 1,024 pixels wide; tools/screenshots.py draws each copy at the size the build gave it and fails an entry Chrome reads at another size. The packing: CSS grid-lanes where the browser has it, which only Safari 26.4 and later ships (caniuse, 12.49% of users, read 2026-10-21; Chrome 140 to 158, Edge and Firefox behind a flag; WebKit, "Introducing CSS Grid Lanes", 2025-12-19); else static/gallery.js, which places each card in turn in the column whose bottom is highest, as grid-lanes does; with neither, rows of the same columns. Every way, no card sits above the one before it, so the eye, the keyboard and a screen reader meet the cards in folder order (scope floor line 3: every word in the HTML, the script only places). A CSS column layout was rejected: it fills down each column while focus runs across. A6 re-measured. | The owner's decision of 2026-10-20 UTC, through the portfolio architecture chat (its Brief 10), after he saw his own 1077x1713 snip shrunk narrow in the fixed box, its text unreadable: "the pinterest idea ... option A but with more add ons". The limits are the implementing seat's proposal from measurement, for the chat to check against his aim before he merges. |

@@ -141,11 +141,32 @@ def exif_has_gps(block: bytes) -> bool:
     return tiff_has_gps(block[6:] if block.startswith(b"Exif\0\0") else block)
 
 
+def exif_orientation(block: bytes) -> int:
+    """The EXIF Orientation tag, 1 to 8, or 1 when there is none: 5 to 8
+    turn the picture a quarter, so a browser shows it with its width and
+    height swapped."""
+    tiff = block[6:] if block.startswith(b"Exif\0\0") else block
+    order = {b"II": "<", b"MM": ">"}.get(tiff[:2])
+    if order is None or len(tiff) < 8:
+        raise ImageError("its EXIF block cannot be read")
+    offset = struct.unpack(order + "I", tiff[4:8])[0]
+    if offset + 2 > len(tiff):
+        raise ImageError("its EXIF block cannot be read")
+    for k in range(struct.unpack(order + "H", tiff[offset:offset + 2])[0]):
+        entry = offset + 2 + 12 * k
+        if entry + 12 > len(tiff):
+            raise ImageError("its EXIF block cannot be read")
+        if struct.unpack(order + "H", tiff[entry:entry + 2])[0] == 0x0112:
+            value = struct.unpack(order + "H", tiff[entry + 8:entry + 10])[0]
+            return value if 1 <= value <= 8 else 1
+    return 1
+
+
 def png_facts(data: bytes) -> dict:
     if data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
         raise ImageError("its bytes are not a PNG image")
     width, height = struct.unpack(">II", data[16:24])
-    facts = {"width": width, "height": height, "animated": False, "gps": False}
+    facts = {"width": width, "height": height, "animated": False, "gps": False, "orientation": 1}
     pos = 8
     while pos + 8 <= len(data):
         length, kind = struct.unpack(">I4s", data[pos:pos + 8])
@@ -156,6 +177,7 @@ def png_facts(data: bytes) -> dict:
             facts["animated"] = True
         elif kind == b"eXIf":
             facts["gps"] |= exif_has_gps(body)
+            facts["orientation"] = exif_orientation(body)
         elif kind in (b"tEXt", b"zTXt", b"iTXt"):
             keyword, _, rest = body.partition(b"\0")
             try:
@@ -190,7 +212,7 @@ SOF = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0
 def jpeg_facts(data: bytes) -> dict:
     if data[:3] != b"\xff\xd8\xff":
         raise ImageError("its bytes are not a JPEG image")
-    facts = {"width": None, "height": None, "animated": False, "gps": False}
+    facts = {"width": None, "height": None, "animated": False, "gps": False, "orientation": 1}
     pos = 2
     while pos + 4 <= len(data):
         if data[pos] != 0xFF:
@@ -211,6 +233,7 @@ def jpeg_facts(data: bytes) -> dict:
         elif marker == 0xE1:
             if body.startswith(b"Exif\0\0"):
                 facts["gps"] |= exif_has_gps(body)
+                facts["orientation"] = exif_orientation(body)
             facts["gps"] |= bool(GPS_XMP.search(body))
         if marker == 0xDA:
             break
@@ -223,7 +246,7 @@ def jpeg_facts(data: bytes) -> dict:
 def webp_facts(data: bytes) -> dict:
     if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
         raise ImageError("its bytes are not a WebP image")
-    facts = {"width": None, "height": None, "animated": False, "gps": False}
+    facts = {"width": None, "height": None, "animated": False, "gps": False, "orientation": 1}
     canvas = None
     pos = 12
     while pos + 8 <= len(data):
@@ -241,6 +264,9 @@ def webp_facts(data: bytes) -> dict:
         elif kind in (b"ANIM", b"ANMF"):
             facts["animated"] = True
         elif kind == b"EXIF":
+            # Its orientation is left at 1: Chrome, which draws the served
+            # copies, turns PNG and JPEG by it but not WebP (Chrome 156,
+            # 2026-10-21).
             facts["gps"] |= exif_has_gps(body)
         elif kind == b"XMP ":
             facts["gps"] |= bool(GPS_XMP.search(body))
@@ -253,6 +279,16 @@ def webp_facts(data: bytes) -> dict:
 
 
 READERS = {"png": png_facts, "jpeg": jpeg_facts, "webp": webp_facts}
+
+
+def shown_size(path: Path) -> tuple[int, int]:
+    """The screenshot's width and height as a browser shows it, turned a
+    quarter when its EXIF orientation says so. build.py sizes each card's
+    picture from this; tools/screenshots.py checks Chrome reads the same."""
+    facts = READERS[KINDS[path.suffix.lower()]](path.read_bytes())
+    if facts["orientation"] >= 5:
+        return facts["height"], facts["width"]
+    return facts["width"], facts["height"]
 
 
 HEIF_BRANDS = {b"heic", b"heix", b"heim", b"heis", b"hevc", b"hevx", b"mif1", b"msf1"}

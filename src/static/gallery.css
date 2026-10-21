@@ -113,11 +113,34 @@ img { display: block; max-width: 100%; height: auto; }
   background: var(--surface);
 }
 .g-shot { width: 100%; aspect-ratio: 683 / 450; object-fit: cover; border-bottom: 1px solid var(--line); background: var(--bg); }
-/* A showcase screenshot: whole, scaled to fit the same box, never cropped;
-   what it leaves shows as bands in the card's own colour, in either theme. */
+/* The showcase, packed as on Pinterest (ADR-0016, Changes, 2026-10-20):
+   each card as tall as its picture and text, in columns with no gap left
+   under a short card. A browser with grid-lanes places each card in turn
+   where it sits highest; static/gallery.js does the same in one without;
+   with neither, the cards sit in rows of the same columns. Each way, a
+   card never sits above the one before it, so the eye, the keyboard and a
+   screen reader meet them in one order. */
+.g-pack {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 24px;
+  align-items: start;
+}
+@supports (display: grid-lanes) {
+  .g-pack { display: grid-lanes; }
+}
+.g-pack.is-packed { position: relative; }
+.g-pack.is-packed > li { position: absolute; }
+/* A showcase screenshot: whole, never cropped, at the card's full width in
+   its own shape. card.webp carries the shape and any bands beyond the
+   limits, as transparent pixels, so the card's own colour shows through
+   them in either theme; the img's width and height reserve its box. */
 .g-frame { display: block; border-bottom: 1px solid var(--line); }
 .g-frame:focus-visible { outline-offset: -3px; }
-.g-full { width: 100%; aspect-ratio: 683 / 450; object-fit: contain; background: var(--surface); }
+.g-full { width: 100%; height: auto; }
 .g-body { display: flex; flex-direction: column; gap: 8px; flex: 1; padding: 18px 20px 20px; }
 .g-name { font-size: 22px; line-height: 1.2; }
 .g-name a { color: var(--ink); text-decoration: none; }
