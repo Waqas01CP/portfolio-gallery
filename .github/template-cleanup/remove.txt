@@ -17,7 +17,6 @@ showcase
 docs/decisions
 docs/deferred
 logs
-briefs
 STATE.md
 CAPABILITIES.md
 MAP.md

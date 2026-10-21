@@ -64,7 +64,7 @@ these yourself, the first two above all:
    `"in_use"` line in each `designs/*/design.json`, a link to a design
    author's own site.
 4. The project's records and rules: `docs/decisions/`, `docs/deferred/`,
-   `logs/`, `briefs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
+   `logs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
    `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`,
    `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`.
 5. Its own guides: `docs/setup-on-github.md`,
