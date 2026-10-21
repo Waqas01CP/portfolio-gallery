@@ -1,0 +1,33 @@
+name: Showcase entry
+description: Ask for your own showcase entry to be removed, or report an entry that impersonates you or has gone bad.
+title: "Showcase: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The maintainer opens the site and acts on it; a removal takes the
+        entry off the gallery, not out of the repository's public history.
+        You can also remove your own entry yourself, by a pull request
+        that deletes your folder (docs/how-to/add-to-the-showcase.md).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is this about
+      options:
+        - Remove my own entry
+        - An entry impersonates me or someone else
+        - An entry has gone bad (parked, broken, harmful or not a portfolio)
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: The entry
+      description: Its folder, showcase/<login>/, or the site's address.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What you see
+      description: For your own entry, nothing more is needed. Otherwise, what is wrong. Leave out anything private.
