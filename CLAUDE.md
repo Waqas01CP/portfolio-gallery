@@ -140,7 +140,7 @@ Five, ADR-0008, in tools/gates.py, called by .githooks/. Active only once
 
 | Gate | When | Blocks |
 |---|---|---|
-| A | pre-commit | CHAT_STATE.md and CAPABILITIES-PRIVATE.md at any path; briefs/ but its README; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
+| A | pre-commit | CHAT_STATE.md and CAPABILITIES-PRIVATE.md at any path; anything in briefs/, its README among it; paths in tools/never-commit.txt; drive-letter paths and climbs out of the repository; private patterns from .git/info/never-commit, in files and in the commit identity |
 | B | pre-commit | A staged tree whose workflows' job conditions or scheduled permissions, template cleanup, designs, showcase files, site build, gallery build, built files or content trace fail |
 | C | pre-commit | A stale MAP.md, or a Markdown header GitHub cannot read |
 | D | every hook | A missing tool: a refusal naming it, never a skip |
@@ -164,11 +164,20 @@ only.
 
 ## Briefs
 
-briefs/, gitignored, one file per receiving seat: implementation-seat.md,
-the brief to this seat; architecture.md, this seat's report;
-implementing.md, this seat's handoff. Unexecuted with an empty box on the
-first line and addenda appended; ticked with the date when the owner says
-so; replaced only after the old one is read for what it still says.
+briefs/ is working space, not a record, and is never committed: the whole
+folder, its README with it (the owner's decision of 2026-10-21; gate A
+refuses any path in it). A brief can carry private paths and wording not
+yet approved. One file per receiving seat, each overwritten by the next:
+implementation-seat.md, the architecture chat's brief to this seat;
+architecture.md, this seat's report to the chat; implementing.md, this
+seat's handoff to its own next session. Unexecuted with an empty box on
+the first line and addenda appended; ticked with the date when the owner
+says so; replaced only after the old one is read for what it still says.
+A brief ranks as "When documents disagree" says. Since briefs are not
+kept, the durable trace is elsewhere: why, in docs/decisions/; what was
+asked and what happened, in the session log, which carries each brief's
+substance; what is true now, in STATE.md. Their format is the owner's
+Working Method, named only.
 
 ## CAPABILITIES.md
 

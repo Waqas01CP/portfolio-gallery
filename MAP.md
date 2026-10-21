@@ -26,12 +26,6 @@ Decision records have no `type`; their `topic` is shown.
 | `SECURITY.md` | reference | current | How to report a security problem in portfolio-gallery privately, what counts as one, and what happens next. |
 | `STATE.md` | state | current | What exists right now in portfolio-gallery, what is blocked and on whom, and where the proof is. Where to start, then checked against the code. |
 
-## briefs
-
-| File | Type | Status | Description |
-|---|---|---|---|
-| `briefs/README.md` | reference | current | What the briefs folder is and how it behaves. Working space, not a record; briefs and reports are overwritten and never committed. The durable trace is the session log. |
-
 ## docs
 
 | File | Type | Status | Description |

@@ -8,23 +8,25 @@ in the session log that built them; docs/reference/standing-checks.md):
 
   A  Never commit, pre-commit. Refuses CHAT_STATE.md and
      CAPABILITIES-PRIVATE.md, the architecture chat's own files, at any
-     path and in any letter case; anything
-     under briefs/ but briefs/README.md; any staged path matching a pattern
-     in tools/never-commit.txt; and any staged text file holding a
-     drive-letter absolute path or a climb out of the repository. Also
-     refuses, in any staged text file and in the commit's author and
-     committer, each private pattern in .git/info/never-commit, a file in
-     git's own folder that is never committed: so a maintainer can keep his
-     name, his email or a private folder name out of the history without
-     writing them into this public repository (format below). Prints the
-     file, line and matched text, so a false positive can be seen for what
-     it is. Defeated by staging CHAT_STATE.md with -f, and
+     path and in any letter case; anything under briefs/, its README
+     among it (the owner's decision of 2026-10-21); any staged path
+     matching a pattern in tools/never-commit.txt; and any staged text
+     file holding a drive-letter absolute path or a climb out of the
+     repository. Also refuses, in any staged text file and in the
+     commit's author and committer, each private pattern in
+     .git/info/never-commit, a file in git's own folder that is never
+     committed: so a maintainer can keep his name, his email or a
+     private folder name out of the history without writing them into
+     this public repository (format below). Prints the file, line and
+     matched text, so a false positive can be seen for what it is.
+     Defeated by staging CHAT_STATE.md with -f, and
      CAPABILITIES-PRIVATE.md with -f at the root and as
-     docs/capabilities-private.md, a planted absolute
-     path, a planted private pattern, a commit under a refused identity,
-     an allowed text in a file it is not allowed in, and a refused name
-     beside an allowed text that holds it. Controls: prose naming a folder
-     passes; an allowed text in its own file passes.
+     docs/capabilities-private.md, a brief and briefs/README.md each
+     with -f, a planted absolute path, a planted private pattern, a
+     commit under a refused identity, an allowed text in a file it is
+     not allowed in, and a refused name beside an allowed text that
+     holds it. Controls: prose naming a folder passes; an allowed text
+     in its own file passes.
   B  The staged tree builds, pre-commit. Copies the staged tree to a
      temporary folder and runs, there: the workflows' job conditions
      (tools/check_workflows.py); every design checked; the showcase's
@@ -172,8 +174,8 @@ def never_commit_reason(path: str, globs: list[str]) -> str | None:
     if lowered.rsplit("/", 1)[-1] == "capabilities-private.md":
         return ("CAPABILITIES-PRIVATE.md is the architecture chat's lane of CAPABILITIES.md "
                 "and is never committed: every copy of the template inherits what is")
-    if lowered.startswith("briefs/") and lowered != "briefs/readme.md":
-        return "briefs are working space and are never committed (briefs/README.md)"
+    if lowered.startswith("briefs/"):
+        return "briefs/ is working space and is never committed, its README with it (CLAUDE.md, Briefs)"
     for glob in globs:
         if fnmatch.fnmatchcase(path, glob):
             return f"matches '{glob}' in {NEVER_COMMIT_LIST}"
