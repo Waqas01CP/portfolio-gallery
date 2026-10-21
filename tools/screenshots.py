@@ -164,6 +164,10 @@ def served_copies(folder: Path, entries: list[dict], failed: list[str]) -> None:
 
 
 def main(argv: list[str]) -> int:
+    # A screenshot's name can hold characters the console cannot write, as
+    # a Mac's narrow no-break space on Windows; write them escaped.
+    sys.stdout.reconfigure(errors="backslashreplace")
+    sys.stderr.reconfigure(errors="backslashreplace")
     folder = Path(argv[0] if argv else "_site").resolve()
     demos = sorted(p.parent for p in (folder / "designs").glob("*/index.html"))
     if not (folder / "index.html").is_file() or not demos:

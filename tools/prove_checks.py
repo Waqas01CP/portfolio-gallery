@@ -759,7 +759,8 @@ def browser_cases(axe: Path | None):
         "                        data = image_only(data)\n", ""), "a served copy holds its image")
     yield ("pictures: a maker that publishes the screenshot itself", served(
         "                        data = image_only(data)\n",
-        "                        data = (SHOWCASE / source).read_bytes()\n"), "not a WebP image")
+        "                        data = (SHOWCASE / entry[\"screenshot\"].removeprefix(\"showcase/\")).read_bytes()\n"),
+        "not a WebP image")
     # Chrome turns a PNG by its EXIF orientation, as the build sizes it; a
     # build that did not would reserve the wrong shape, and is refused.
     yield ("control: served copies from a PNG turned by its EXIF", served(exif=turned(6)),
