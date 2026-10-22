@@ -6,6 +6,12 @@ status: current
 
 # CLAUDE.md
 
+**This file is the maintainer's working rules.** An AI assistant helping
+someone use the template, add a design, add their site to the showcase,
+report a problem or ask a question should start from README.md instead:
+its table "What do you want to do?" and its prompt for an AI assistant.
+The rules below bind work on the project itself.
+
 portfolio-gallery: a portfolio-site template anyone can copy and publish
 with GitHub Pages without installing anything, and a gallery of designs
 for it, each contributed by pull request, checked automatically and
@@ -84,7 +90,8 @@ ADR-0002). No path into his folders appears, nor anything from his site
 but the engine. That rule covers files. Commits made on GitHub's website,
 his merges among them, are authored with his GitHub profile's name and
 his no-reply address: GitHub's doing, permanent once made (ADR-0002,
-Changes, 2026-10-18). Commits made in a clone use the handle.
+Changes, 2026-10-18); the messages of his own commits may name him
+(ADR-0002, Changes, 2026-10-21). Commits made in a clone use the handle.
 Refer to his Working Method by name only. Gate A enforces this on his
 machine from .git/info/never-commit, which is never committed.
 

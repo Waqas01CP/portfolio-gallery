@@ -141,6 +141,15 @@ img { display: block; max-width: 100%; height: auto; }
 .g-frame { display: block; border-bottom: 1px solid var(--line); }
 .g-frame:focus-visible { outline-offset: -3px; }
 .g-full { width: 100%; height: auto; }
+/* As on Pinterest (the owner's word of 2026-10-21): a showcase card has no
+   border or panel of its own; its picture has rounded corners, on the
+   card colour, so any bands read as part of the picture, and its name
+   sits beneath it on the page. */
+.g-site { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.g-site .g-frame { border-bottom: 0; border-radius: 14px; }
+.g-site .g-frame:focus-visible { outline-offset: 3px; }
+.g-site .g-full { border-radius: 14px; background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
+.g-site .g-body { padding: 12px 4px 4px; }
 .g-body { display: flex; flex-direction: column; gap: 8px; flex: 1; padding: 18px 20px 20px; }
 .g-name { font-size: 22px; line-height: 1.2; }
 .g-name a { color: var(--ink); text-decoration: none; }

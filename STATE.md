@@ -6,14 +6,12 @@ status: current
 
 # STATE
 
-**Verified against commit ba93032, the last commit before this file's
-update, 2026-10-21 UTC, by the Brief 1 implementing session's tenth round,
-under Brief 10**: a fresh clone of it through every defeat case with the
-browser and axe; a fresh clone of b17d883, which differs from it only in
-the defeat harness and the screenshot maker's console output, through
-every check with axe and the deploy's own path with 13 real snips, then
-every browser check on what it assembled; the gates proven on a clone of
-234ad59 (logs/2026-10-12-brief-1-build.md, Round 10). This is the only line in
+**Verified against commit 3fed37d, the last commit before this file's
+update, 2026-10-22 UTC, by the Brief 1 implementing session's eleventh
+round, under Brief 11**: a fresh clone of it through every check with axe,
+every defeat case with the browser and axe, the deploy's own path with 13
+real snips and every browser check on what it assembled; the gates proven
+on a clone of it (logs/2026-10-12-brief-1-build.md, Round 11). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -39,28 +37,29 @@ clears, remove it from Blocked and record the clearing in its row.
 ## Headline
 
 Public, set up and tested; main changes only by pull request. The
-showcase is live with the owner's own entry, made from a plain snip in
-setup Test 6, which passed on 2026-10-20. On the branch showcase-shapes,
-not yet pushed: one pull request template for a design or a showcase
-entry; showcase cards in their pictures' own shapes, packed as on
-Pinterest (ADR-0016, Changes, 2026-10-20); the briefs folder off the
-repository (ADR-0008, Changes, 2026-10-21). Waiting: the chat's check of
-the shape limits, then the owner's merge; step 5's policy, provable only
-on or after 2026-11-02; ADR-0012, held.
+showcase is live with the owner's own entry, its cards in their pictures'
+own shapes, packed (pull request 14). On the branch guides-and-prompt,
+not yet pushed: the README routes every kind of visitor and carries a
+checked, self-contained prompt for their AI assistant (ADR-0017); issue
+forms for a showcase entry and a question; borderless showcase cards with
+rounded pictures; his own commit messages may name him (ADR-0002,
+Changes). Waiting: the owner's merge, and his word on AGENTS.md, a copy's
+own prompt and a gallery picture; step 5's policy, provable only on or
+after 2026-11-02; ADR-0012, held.
 
 ## Publishing
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | The Actions policy allowing `pull_request_target` (step 5) | PARTIAL | [BELIEVED] set by the owner (the chat's report); until 2026-11-02 GitHub runs the scope check without the policy too | 2026-10-18 | ADR-0006, A2; setup Test 1 |
-| This branch, showcase-shapes, merged to main | PENDING | the owner pushes it and opens the pull request; checks and scope must pass | 2026-10-21 | 56c6dc3, d8ccfce, b17d883, 234ad59, ba93032 |
+| This branch, guides-and-prompt, merged to main | PENDING | the owner pushes it, reads the README on the branch, and opens the pull request; checks and scope must pass | 2026-10-22 | b77f3e0, 2b641d4, 495a2ba, 3fed37d |
 
 ## Decisions waiting on the owner
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | Lighthouse in CI | PENDING | held as proposed by the owner; speed measured locally | 2026-10-15 | ADR-0012 |
-| The showcase's shape limits, 2.4 either way | PENDING | proposed from measurement; the chat checks them against the owner's aim before he merges | 2026-10-21 | ADR-0016, Changes |
+| AGENTS.md for coding agents; a short prompt in a copy's README; a picture of the gallery page in the README | PENDING | proposed with their sources, none built | 2026-10-22 | ADR-0017 |
 
 ## Built, not yet complete
 
@@ -69,20 +68,20 @@ DONE rows are in docs/reference/completed.md.
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | CODEOWNERS and the issue templates | PARTIAL | [BELIEVED] written; not exercised until an outside contribution arrives | 2026-10-18 | b798834 |
-| The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-21 | b17d883, ba93032; ADR-0016, Changes |
+| The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
+| The README's routes and prompt; the Showcase entry and Question forms | PARTIAL | [VERIFIED] the prompt check and its defeat cases on a fresh clone; the README rendered by GitHub's Markdown API and looked at; the forms parsed; [BELIEVED] the copy button on GitHub's page and the forms in its issue chooser, until the owner sees them on the branch | 2026-10-22 | 3fed37d, b77f3e0; ADR-0017 |
 
 ## Blocked, and on whom
 
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging this branch | The chat's check of the shape limits; the owner's push, pull request and merge | The chat, then the owner | 2026-10-21 |
+| Merging this branch | The owner's push, his look at the README on the branch, the pull request and the merge | The owner | 2026-10-22 |
 
 ## Known unverified
 
-- Whether the runner's Chrome lays out grid-lanes with its experimental
-  features on, as Chrome 155 and 156 do here; the packing check fails, not
-  skips, if it does not, and this branch's pull request shows it.
+- Whether GitHub accepts the two new issue forms; one it cannot read
+  shows an error in the issue chooser, which the owner sees on the branch.
 - How Safari 26.4 and later, the one browser shipping grid-lanes, packs
   the cards; Chrome's own grid-lanes, behind its flag, matched the
   script's places within 1 px on 2026-10-21.

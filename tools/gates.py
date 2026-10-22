@@ -30,7 +30,9 @@ in the session log that built them; docs/reference/standing-checks.md):
   B  The staged tree builds, pre-commit. Copies the staged tree to a
      temporary folder and runs, there: the workflows' job conditions
      (tools/check_workflows.py); every design checked; the showcase's
-     files checked (tools/check_showcase.py, no fetching); the site built,
+     files checked (tools/check_showcase.py, no fetching); the README's
+     prompt for an AI assistant checked against the repository
+     (tools/check_prompt.py); the site built,
      its files checked and its content traced; the gallery built and its
      files checked (tools/ci.py build); then the template cleanup, while
      there is one (tools/check_template_cleanup.py). Building the staged
@@ -233,6 +235,9 @@ def gate_b() -> list[str]:
                  # The showcase's files, while the project has one; a cleaned
                  # copy of the template has neither it nor this tool.
                  *([["tools/check_showcase.py"]] if (tree / "tools" / "check_showcase.py").is_file() else []),
+                 # The README's prompt against the repository, while the
+                 # project has it (ADR-0017).
+                 *([["tools/check_prompt.py"]] if (tree / "tools" / "check_prompt.py").is_file() else []),
                  ["tools/ci.py", "build", "--mode", "site", "--out", str(Path(tmp) / "site")],
                  ["tools/ci.py", "build", "--mode", "gallery", "--out", str(Path(tmp) / "gallery")],
                  # After the checks it repeats on a cleaned copy.

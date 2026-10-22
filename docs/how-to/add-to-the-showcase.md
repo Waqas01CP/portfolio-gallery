@@ -99,6 +99,8 @@ and the maintainer opens it before removing the entry.
 ## Changing or removing your entry
 
 Open another pull request that changes or deletes the files in your
-folder. Anything merged into this repository stays in its history, which
-is public: your name, address, description and screenshot among it.
+folder, or an issue with the **Showcase entry** form, which also takes a
+report of an entry that impersonates someone or has gone bad. Anything
+merged into this repository stays in its history, which is public: your
+name, address, description and screenshot among it.
 Removing an entry takes it off the gallery, not out of the history.

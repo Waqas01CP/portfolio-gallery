@@ -1,0 +1,23 @@
+name: Question
+description: Ask how to use the template, add a design or add your site, when the guides do not answer it.
+title: "Question: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The README lists the guide for each thing you may want to do; most
+        answers are there. Leave out anything private, such as a password
+        or token: issues are public.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What you are trying to do, what you tried, and where you are stuck.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: A link to your repository or site, if it helps.

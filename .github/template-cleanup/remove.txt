@@ -17,7 +17,6 @@ showcase
 docs/decisions
 docs/deferred
 logs
-briefs
 STATE.md
 CAPABILITIES.md
 MAP.md
@@ -37,7 +36,8 @@ docs/reference/provenance.md
 docs/reference/standing-checks.md
 
 # The project's own tools: its local gates, its map, its defeat cases,
-# its scope check, its showcase check and the test of this cleanup.
+# its scope check, its showcase check, the check of the README's prompt
+# and the test of this cleanup.
 .githooks
 tools/gates.py
 tools/never-commit.txt
@@ -45,4 +45,5 @@ tools/generate_map.py
 tools/prove_checks.py
 tools/scope_check.py
 tools/check_showcase.py
+tools/check_prompt.py
 tools/check_template_cleanup.py

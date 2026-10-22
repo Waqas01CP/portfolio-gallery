@@ -64,7 +64,7 @@ these yourself, the first two above all:
    `"in_use"` line in each `designs/*/design.json`, a link to a design
    author's own site.
 4. The project's records and rules: `docs/decisions/`, `docs/deferred/`,
-   `logs/`, `briefs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
+   `logs/`, `STATE.md`, `CAPABILITIES.md`, `MAP.md`,
    `CLAUDE.md`, `CONTRIBUTING.md`, `SECURITY.md`,
    `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`.
 5. Its own guides: `docs/setup-on-github.md`,
@@ -73,7 +73,8 @@ these yourself, the first two above all:
    `provenance.md`, `standing-checks.md`.
 6. Its own tools: `.githooks/`, and in `tools/`: `gates.py`,
    `never-commit.txt`, `generate_map.py`, `prove_checks.py`,
-   `scope_check.py`, `check_showcase.py`, `check_template_cleanup.py`.
+   `scope_check.py`, `check_showcase.py`, `check_prompt.py`,
+   `check_template_cleanup.py`.
 7. The cleanup itself: `.github/template-cleanup/`, and the project's own
    workflows, `.github/workflows/scope.yml`,
    `.github/workflows/showcase-links.yml` and

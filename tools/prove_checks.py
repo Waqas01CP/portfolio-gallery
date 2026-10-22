@@ -672,6 +672,43 @@ def file_cases():
     yield "control: bot protection's 403 is not a failure", fetch("/blocked"), Passes("CANNOT CHECK")
     yield "control: a gallery with a showcase entry passes its file checks", gallery_built(), Passes("0 problem(s)")
 
+    # The README's prompt for an AI assistant against what it restates
+    # (tools/check_prompt.py; ADR-0017): a change on either side fails.
+    def prompt(rel, old, new):
+        def plant(copy):
+            edit(copy / rel, old, new)
+            return ["tools/check_prompt.py"]
+        return plant
+
+    yield ("prompt: a path that does not exist", prompt(
+        "README.md", "Full guide: `docs/how-to/add-a-design.md`", "Full guide: `docs/how-to/add-a-theme.md`"),
+        "it names docs/how-to/add-a-theme.md, which does not exist")
+    yield ("prompt: the screenshot cap stated wrong", prompt("README.md", "be at most 20 MB", "be at most 25 MB"),
+           "the screenshot's cap in MB: the prompt says 25, the repository 20")
+    yield ("prompt: the shape limit changed at its source", prompt(
+        "build.py", "SHOWCASE_TALL = 2.4", "SHOWCASE_TALL = 3.0"),
+        "the tall shape limit: the prompt says 2.4, the repository 3.0")
+    yield ("prompt: the scope marker changed at its source", prompt(
+        "tools/scope_check.py", 'AS_CONTRIBUTOR = "[scope: as contributor]"', 'AS_CONTRIBUTOR = "[scope: outsider]"'),
+        "the scope marker: the prompt says")
+
+    def new_form(copy):
+        (copy / ".github/ISSUE_TEMPLATE/feature.yml").write_text(
+            "name: Feature\ndescription: x\nbody:\n  - type: textarea\n    id: x\n    attributes:\n      label: x\n",
+            encoding="utf-8")
+        return ["tools/check_prompt.py"]
+
+    yield "prompt: an issue form it does not name", new_form, "the issue forms: the prompt says"
+    yield ("prompt: a command in no guide", prompt(
+        "README.md", "     python tools/check_design.py dusk", "     python tools/check_designs.py dusk"),
+        "the command 'python tools/check_designs.py dusk' is in neither")
+    yield ("prompt: a safety rule taken out", prompt(
+        "README.md", "- Never ask for, accept or handle a password, a token,", "- Do not handle a password, a token,"),
+        "its safety rule 'Never ask for, accept or handle a password' is missing")
+    yield ("prompt: a fact reworded out of the check's sight", prompt(
+        "README.md", "formats: PNG, JPEG or WebP.", "kinds: PNG, JPEG or WebP."),
+        "the screenshot formats: its words for it are not found")
+
     def scheduled(old, new):
         def plant(copy):
             edit(copy / ".github/workflows/showcase-links.yml", old, new)
@@ -859,6 +896,7 @@ def main(argv: list[str]) -> int:
                     ("template cleanup", ["tools/check_template_cleanup.py"]),
                     ("design", ["tools/check_design.py"]),
                     ("showcase", ["tools/check_showcase.py"]),
+                    ("prompt", ["tools/check_prompt.py"]),
                     ("assemble", ["tools/ci.py", "assemble", "--site", gallery_out, "--shots", shots]),
                     ("scope", ["tools/scope_check.py", "--files", "_scope.tsv"]),
                     ("built", ["tools/check_built.py", out]),
