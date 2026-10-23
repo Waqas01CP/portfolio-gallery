@@ -82,13 +82,28 @@ LAYOUT_ALL = ".page > .sec { content-visibility: visible !important }"
 READ_AFTER = 1.5
 
 # Injected before any page script, in the page's own world: counts
-# animation frames requested and keeps script errors for the report.
+# animation frames requested, keeps script errors for the report, and
+# counts the idle callbacks still to run.
 INSTRUMENT = """
-window.__pg = { frames: 0, errors: [] };
+window.__pg = { frames: 0, errors: [], idle: 0 };
 const __raf = window.requestAnimationFrame.bind(window);
 window.requestAnimationFrame = (fn) => { window.__pg.frames += 1; return __raf(fn); };
 window.addEventListener('error', (e) => window.__pg.errors.push(String(e.message)));
+if (window.requestIdleCallback) {
+  const __ric = window.requestIdleCallback.bind(window);
+  window.requestIdleCallback = (fn, options) => {
+    window.__pg.idle += 1;
+    return __ric((deadline) => { window.__pg.idle -= 1; fn(deadline); }, options);
+  };
+}
 """
+# site.js starts the page, the strip and its pause button among it, from
+# an idle callback with a 1.5 s timeout, the same 1.5 s the tree is read
+# after. On the first load in a newly started Chrome the start came after
+# the read in 1 of 15 tries (2,273 ms; 2026-10-23), and the tree check
+# failed on a page that was right. So the tree is read once every idle
+# callback has run, waiting at most this long.
+STARTED_WITHIN = 10.0
 
 
 class Report:
@@ -199,6 +214,13 @@ def open_page(chrome: Chrome, origin: str, path: str, width: int, height: int, *
     return page
 
 
+def wait_started(page) -> None:
+    """Until the page's idle callbacks have all run, its start-up with them."""
+    end = time.monotonic() + STARTED_WITHIN
+    while time.monotonic() < end and not page.evaluate("!window.__pg || window.__pg.idle === 0"):
+        time.sleep(0.05)
+
+
 def lay_out_all(page) -> None:
     """Every section laid out, through the page's own stylesheet: the
     policy refuses an injected <style>, and must."""
@@ -226,6 +248,8 @@ def check_tree(pages, origins, report, loads, quick) -> None:
                                 for variant in ("built", "norule"):
                                     page = open_page(chrome, origins[variant], path, width, height,
                                                      dark=dark, scripts=scripts)
+                                    if scripts:
+                                        wait_started(page)
                                     lists[variant] = tree_lists(page.ax_tree())
                                     if variant == "built":
                                         navs = [n for n in walk(page.ax_tree()) if not n.get("ignored")

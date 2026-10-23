@@ -41,7 +41,10 @@ Each load is a fresh browsing context in a headless Chrome with its own
 empty profile, served from 127.0.0.1. "Without the rule" is the built
 folder with base.css's two layout-skipping lines removed; "no design" is
 that folder with every design.css emptied. The tree is the DevTools
-protocol's full accessibility tree, read 1.5 s after the load event.
+protocol's full accessibility tree, read 1.5 s after the load event and,
+with scripts on, once the page's idle callbacks have run: site.js starts
+the page from one, with a timeout of the same 1.5 s, and on a newly
+started Chrome's first load it once came later (2026-10-23).
 
 **The tree, compared.** Two lists per tree, walked from the root: the
 text nodes' text, and every other named node as role and name; whitespace
