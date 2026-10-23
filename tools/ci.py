@@ -5,13 +5,14 @@
       (tools/check_workflows.py); every design checked; the showcase's
       files checked, while the project has the tool (tools/check_showcase.py,
       no fetching; checks.yml fetches a pull request's sites); the
-      README's prompt for an AI assistant against the repository, while
-      the project has it (tools/check_prompt.py); the site
+      prompts for an AI assistant, the README's and a copy's, against the
+      repository, while the project has it (tools/check_prompt.py); the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; the gallery's pictures made as
-      the deploy makes them (tools/screenshots.py: the previews, and the
-      showcase's served copies, so a screenshot Chrome cannot read fails
+      the deploy makes them (tools/screenshots.py: the previews, the
+      gallery page's own picture, and the showcase's served copies, so a
+      screenshot Chrome cannot read fails
       here) and held to assemble's rules; the template cleanup, while
       there is one (tools/check_template_cleanup.py); and the browser checks on
       every design's page, with axe when given axe.min.js.
@@ -29,7 +30,9 @@
   python tools/ci.py assemble --site DIR --shots DIR
       The deploy workflow's last step before publishing: takes from the
       screenshot job's folder only the pictures the gallery shows, each a
-      WebP image within its limit: designs/<name>/preview.webp for each
+      WebP image within its limit: preview.webp, the gallery page's own
+      picture (300 KB; ADR-0017, Changes, 2026-10-23),
+      designs/<name>/preview.webp for each
       design (300 KB), and showcase/<login>/card.webp (300 KB) and full.webp
       (1 MB) for each showcase entry, which must hold their image and
       nothing else, no EXIF, XMP or colour profile; it refuses anything
@@ -189,6 +192,8 @@ def expected_pictures(site: Path) -> dict[str, tuple[int, bool]]:
     its limit and whether it must be image only."""
     demos = {p.parent.name for p in (site / "designs").glob("*/index.html")}
     wanted = {f"designs/{name}/{PREVIEW_FILE}": (PREVIEW_LIMIT, False) for name in demos}
+    # The gallery page's own picture, which the README shows.
+    wanted[PREVIEW_FILE] = (PREVIEW_LIMIT, False)
     for login in showcase_logins(site):
         for name, limit in SERVED_LIMITS.items():
             wanted[f"showcase/{login}/{name}"] = (limit, True)
@@ -218,7 +223,7 @@ def assemble(site: Path, shots: Path) -> None:
             continue
         relative = path.relative_to(shots).as_posix()
         if relative not in wanted:
-            problem = (f"not a picture this gallery shows: designs/<name>/{PREVIEW_FILE} or "
+            problem = (f"not a picture this gallery shows: {PREVIEW_FILE}, designs/<name>/{PREVIEW_FILE} or "
                        f"showcase/<login>/{SHOWCASE_CARD} and {SHOWCASE_FULL}")
         else:
             problem = served_problem(path, *wanted[relative])

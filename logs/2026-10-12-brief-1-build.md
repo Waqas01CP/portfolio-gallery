@@ -1933,3 +1933,215 @@ clone of 3fed37d unless named.
 - Nothing pushed.
 - AGENTS.md, a copy's own prompt, a gallery picture: proposals.
 - Test 1 once more, on or after 2026-11-02.
+
+# Round 12, 2026-10-23 UTC: AGENTS.md, a copy's own prompt, a picture of the gallery
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 0ce2c71, the website merge of pull request 15,
+whose tree is bc48b45's (eaae956, compared here); Scope and Checks success
+on the pull request, Checks and Deploy success on main, Template cleanup
+skipped (GitHub's API). The owner had ticked Brief 11 and Report 11. Work
+on the branch agents-and-copy-prompt. HEAD at end: the commit that adds
+this section. Mode: mutating.
+
+## What was asked
+
+The portfolio architecture chat's Brief 12, of 2026-10-23, stored word for
+word in place of Brief 11, read first for what it still says (the owner's
+aim for the showcase, carried). His answers to Report 11, 8.1: AGENTS.md
+yes, a copy's own prompt yes, a picture of the gallery page yes; designs
+of his own for the templates are for later. Part 1: AGENTS.md, a short
+router for coding agents other than Claude Code, duplicating no rule; a
+decision, with its reason, whether a copy loses it or receives its own;
+whatever it names held to the repository by the prompt check or a
+sibling, with a defeat case. Part 2: a short prompt for a site owner in
+copy-README.md, with the same rules on secrets and acting, held to its
+sources and tested here, the cleanup test showing a copy's README carrying
+it. Part 3: a picture of the gallery page, captured by the deploy beside
+the previews, in assemble's list, shown in the README by its live address;
+say what it shows before the first deploy after the merge. Do not touch
+showcase/: the owner's friend may add an entry meanwhile.
+
+## Errors this seat made
+
+1. **The tree check, which this seat wrote in Round 1, held a race**, and
+   it failed the defeat harness's browser control once on 2026-10-23,
+   on a page that was right. site.js starts the page, the strip's pause
+   button among it, from an idle callback with a 1.5 s timeout; the check
+   read the tree 1.5 s after load. On the first load in a newly started
+   Chrome the start came later in 1 of 15 tries (2,273 ms), so the button
+   was missing from one tree and not the other. Fixed in eb27870: the
+   check counts the page's pending idle callbacks and reads the tree,
+   with scripts on, once they have run. In 20 newly started Chromes the
+   wait was needed once and the button was read every time; the tree's
+   defeat case still fails. A CPU slowed six times did not reproduce it;
+   a newly started Chrome did.
+2. **The cleanup test's new step first looked for the copy prompt's
+   commands in every Markdown file a copy keeps, its README among them,**
+   which holds the prompt itself: that half could never fail. Caught
+   reading it, before any run; the README is left out now, and a defeat
+   case proves the step.
+3. **One new defeat case expected the wrong text**: the check failed as
+   it should, but printed its source through Python's quoting, which the
+   expected text did not match, so the harness reported the case
+   unproven. The message is plain now.
+4. **CAPABILITIES.md counted 16 decision records "as of 2026-10-19"**
+   through Round 11, which added ADR-0017. Re-measured: 17.
+5. **The handoff's settled list still said his name appears "only in
+   LICENSE and README.md"**, untrue since his showcase entry; corrected
+   there (the handoff is not committed).
+
+## Research and the copy's AGENTS.md
+
+Claude Code's documentation, "How Claude remembers your project", read
+again 2026-10-23: with an AGENTS.md and no CLAUDE.md, CLAUDE.local.md or
+.claude/CLAUDE.md in the working directory or above it, Claude Code reads
+the AGENTS.md (v2.1.277 or later, its default setting
+`claude-md-or-agents-md`); with both, CLAUDE.md only. The other sources are
+Round 11's (ADR-0017, A1 to A3). So here AGENTS.md reaches every coding
+agent but Claude Code, which keeps reading CLAUDE.md; and a cleaned copy,
+which has no CLAUDE.md, has its AGENTS.md read by Claude Code too.
+
+Decided: **a copy receives its own AGENTS.md**, from
+.github/template-cleanup/copy-AGENTS.md, put in place by the cleanup as
+copy-README.md is. Why: a copy's owner is the person most likely to open a
+coding agent in a clone, and AGENTS.md is the file those agents load
+without being asked, Claude Code among them in a copy; the content trace
+is the rule an agent breaks unknowingly (it changes site.json alone and the
+build fails), and the copy's prompt is where it is explained. The
+project's own AGENTS.md cannot stay in a copy: it routes to CLAUDE.md and
+STATE.md, which the cleanup removes. Losing it would leave every agent in
+a copy with nothing loaded.
+
+Checked from GitHub on 2026-10-23, for Round 11's open items: GitHub's
+page for main serves the README's prompt in a block carrying its copy
+button's text, and the three pictures through its image proxy (200,
+WebP). The issue chooser needs a sign-in, so the four forms there are the
+owner's to see.
+
+## What was built
+
+- **A copy's own prompt** (08761a4): copy-README.md gains "Ask an AI
+  assistant to help", a closed section holding a prompt of about 90
+  lines for a site owner's AI: how to behave (the gallery prompt's rules
+  on secrets and acting, less the security route), the files, A write or
+  change the content with the CV trace, B choose a design, C publish, D
+  read a failed build, and the optional local build. tools/check_prompt.py
+  checks it against what a copy keeps: its 16 paths exist and none is on
+  remove.txt; 7 facts (the settings, the trace's starting value, the
+  Deploy and Checks workflows' names, Deploy's jobs, the step a failed
+  build names, the Python version); its 4 commands in
+  use-this-template.md; 4 safety rules. use-this-template.md gains "Build
+  on your own computer, if you like", since a copy loses commands.md and
+  had no local commands at all. check_template_cleanup.py builds the
+  cleaned copy with `tools/ci.py build --mode site`, the prompt's own
+  command, and shows its README carrying the prompt with every path in
+  the copy and every command in a guide the copy keeps.
+- **AGENTS.md and a copy's own** (248123c): the router at the root, and
+  copy-AGENTS.md, which cleanup.py puts in place in a copy beside its
+  README; tools/check_prompt.py holds both (the files each names, the
+  sections each links under their headings' own words, the section
+  holding the README's prompt); CLAUDE.md says rules live there, not in
+  AGENTS.md; the user guide's manual cleanup puts both of a copy's own
+  files in place.
+- **The gallery page's picture** (b63f70d): tools/screenshots.py takes the
+  gallery page's top, 1366 by 1280 CSS pixels at full size, after the
+  previews and the showcase's copies, as preview.webp at the gallery's
+  root; deploy.yml's shots job gathers it; assemble requires it and checks
+  it as a preview, within 300 KB; check_built --previews requires it. The
+  README leads with it by its live address; the two design previews move
+  to "Make your own site". tools/check_prompt.py holds each README address
+  on the live gallery to what the deploy publishes.
+- **The tree check's race** (eb27870): see Errors, 1.
+- ADR-0017 and ADR-0015, Changes; standing-checks.md; commands.md;
+  CAPABILITIES.md, whose count of decision records had stood at 16 since
+  2026-10-19 and is 17.
+
+## What the gallery's picture shows before the first deploy
+
+Measured 2026-10-23: through GitHub's image proxy, its address answers
+404 with "Cache-Control: no-cache, no-store", so nothing holds the
+failure; on the branch, and on main until the first deploy after the
+merge ends, the README shows a broken picture with its alt text. GitHub
+Pages serves pictures with max-age=600, so after that deploy the README
+shows it on its next load, at most about ten minutes old thereafter.
+
+## Proofs
+
+All on 2026-10-23, one browser job at a time, Chrome 156, on fresh clones
+of the branch: b63f70d for the gates, the cleanup and the deploy's path,
+and eb27870, after the tree check's fix, for every check and every
+defeat case.
+
+- **Every check with axe**, `tools/ci.py checks --axe`, on eb27870: exit 0
+  in 1,033 s; the browser checks 967 s (tree 48 runs, keyboard 8, joins
+  4, anchors 136, words 4, motion 3, packing 12, axe 36), 0 failures,
+  light and dark, 390 and 1366 px. On b63f70d before the fix: exit 0 in
+  661 s, the browser checks 631 s, 0 failures. The tree check alone, the old code and the new alternately on one gallery: 200 and 190 s before the fix, 200 and 187 s after, so the wait costs nothing measurable; the slower runs were the machine's, as the defeat cases, most of which the change does not touch, took 2,808 s against 1,813 s that morning. The prompt check
+  passes on all four documents and the README's 8 addresses on the live
+  gallery; 5 pictures made and checked, the gallery's own 89,268 bytes.
+- **Every defeat case with the browser and axe**, on eb27870: exit 0 in
+  2,808 s; 151 defeat cases (133 file, 18 browser) fail as built, naming
+  what failed; 12 controls and 21 planted controls pass; 0 unproven. 22
+  are new: 11 for a copy's prompt, 6 for AGENTS.md and a copy's, 5 for
+  the gallery's picture. On b63f70d the browser control failed once, the
+  race in Errors, 1; every case then behaved as built.
+- **The gates**, on a scratch clone of b63f70d: 26 defeat cases refused,
+  AGENTS.md naming a file that does not exist and a copy's prompt naming
+  a file no copy receives among them (gate B, naming check_prompt.py); 5
+  controls passed; exit 0 in 385 s.
+- **The cleanup**, on the fresh clone: guards hold, 61 files removed,
+  README.md and AGENTS.md the copy's own, a later run changes nothing, the
+  cleaned copy builds and checks (its site by `tools/ci.py build --mode
+  site`), its 9 links resolve, its README carries its prompt with 16 paths
+  in the copy and 4 commands in its guides. A copy made by cleanup.py and
+  kept to look at: its README opens "# My portfolio" with "## Ask an AI
+  assistant to help" holding the prompt; its own AGENTS.md; no CLAUDE.md
+  and no cleanup folder; `tools/ci.py build --mode site` in it, all
+  passed.
+- **The deploy's own path** with the 13 real snips beside the owner's
+  entry: deploy.yml's gathering step, run as written, gathered 31
+  pictures, the gallery's own among them (89,268 bytes); assemble and
+  check_built --previews, 0 problems; every browser check with axe on the
+  assembled gallery, 0 failures in 682 s.
+- **The race and its fix**: on the first load in a newly started Chrome,
+  the strip started 2,273 ms after load in 1 of 15 tries, its pause button
+  missing at the 1.5 s read; a CPU slowed six times did not reproduce it.
+  With the fix, in 20 newly started Chromes the wait was needed once (one
+  idle callback pending at 1.5 s, 0.06 s more) and the button was read
+  every time; the tree's defeat case still fails.
+- **The README as rendered**: GitHub's Markdown API, in a README's mode,
+  rendered README.md, the copy's README and both AGENTS.md files; headless
+  Chrome showed them with GitHub's styles at 1012 and 390 px, light and
+  dark, none scrolling sideways. The gallery's picture, broken on the
+  branch as expected, and with its address pointed at the deploy's own
+  capture, as after the merge: it leads the page, above the table. Both
+  prompts render as text blocks in their closed sections; the anchors
+  GitHub gives the headings equal the check's. GitHub's file view shows
+  AGENTS.md's header as a small table, as it does CLAUDE.md's (read from
+  main's CLAUDE.md page); the API shows it as text.
+
+## Rejected alternatives
+
+- **A copy losing AGENTS.md**: agents in a copy would load nothing, and
+  the content trace is the rule they would break unknowingly.
+- **The project's AGENTS.md kept in a copy**: it routes to CLAUDE.md and
+  STATE.md, which the cleanup removes.
+- **check_prompt.py kept in a copy, to check the copy's prompt there**:
+  a copy's owner edits their README freely, and a check failing on their
+  own words would be the hassle the owner's aim rules out; the prompt is
+  checked here, before any copy receives it.
+- **The gallery's first screen at 1366 by 900**: the heading fills it and
+  the template cards are cut off; 1280 holds the first row whole.
+- **A capture of the whole page**: it grows with every entry, and a
+  section that skips its layout paints blank beyond the view.
+- **Three pictures at the README's top**: they would push "What do you
+  want to do?" far down; the design previews moved to "Make your own
+  site", where a design is chosen.
+
+## Not done
+
+- Nothing pushed.
+- A real copy made from the template after the merge, to see its README
+  and AGENTS.md on GitHub; the cleanup test stands in for it.
+- Test 1 once more, on or after 2026-11-02.

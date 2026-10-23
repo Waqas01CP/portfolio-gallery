@@ -12,15 +12,11 @@ design with one setting, and GitHub builds and publishes your site.
 
 **See every design: https://waqas01cp.github.io/portfolio-gallery/**
 
-<p>
-<a href="https://waqas01cp.github.io/portfolio-gallery/designs/default/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/default/preview.webp" width="400" alt="The Default design's first screen, filled with the sample content"></a>
-<a href="https://waqas01cp.github.io/portfolio-gallery/designs/plain/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/plain/preview.webp" width="400" alt="The Plain design's first screen, filled with the same sample content"></a>
-</p>
+<p><a href="https://waqas01cp.github.io/portfolio-gallery/"><img src="https://waqas01cp.github.io/portfolio-gallery/preview.webp" width="820" alt="The gallery page's top: its heading, its links and the first row of templates, each card showing its design's first screen"></a></p>
 
-Two of the designs, the same page in each. Every design styles the same
-content, so changing one setting changes your whole site's look. These
-pictures are the gallery's own, taken by its deploy each time it
-publishes, so they show the designs as they are today.
+The gallery page as it is today. Every picture in this README is the
+gallery's own, taken by its deploy each time it publishes, so none goes
+stale.
 
 What every site gets, whatever the design:
 
@@ -46,10 +42,18 @@ What every site gets, whatever the design:
 | Remove my showcase entry, or report one that impersonates someone or has gone bad | An issue with the **Showcase entry** form, or for your own entry a pull request deleting its folder |
 | Ask a question the guides do not answer | An issue with the **Question** form |
 | Report a security problem | Privately, as [SECURITY.md](SECURITY.md) says, never in a public issue |
-| Have an AI assistant guide me | [The prompt below](#ask-an-ai-assistant-to-guide-you): copy it into your own AI tool |
+| Have an AI assistant guide me | [The prompt below](#ask-an-ai-assistant-to-guide-you): copy it into your own AI tool. A coding agent working in a clone is pointed to it by [AGENTS.md](AGENTS.md) |
 | Maintain this repository | [CLAUDE.md](CLAUDE.md), then [STATE.md](STATE.md) |
 
 ## Make your own site
+
+Every design styles the same content, so changing one setting changes
+your whole site's look. Two of them, the same page in each:
+
+<p>
+<a href="https://waqas01cp.github.io/portfolio-gallery/designs/default/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/default/preview.webp" width="400" alt="The Default design's first screen, filled with the sample content"></a>
+<a href="https://waqas01cp.github.io/portfolio-gallery/designs/plain/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/plain/preview.webp" width="400" alt="The Plain design's first screen, filled with the same sample content"></a>
+</p>
 
 1. On this page, click **Use this template**, then **Create a new
    repository**. Name it `<your-username>.github.io` for the address
@@ -181,8 +185,9 @@ Needs a GitHub account, nothing else; about fifteen minutes, most of it writing.
    repositories.
 2. A workflow called Template cleanup runs once by itself in the copy and removes
    this project's own files (its records, its contact address, the showcase, its
-   own tools), and gives the copy a short README of its own. The first Deploy run
-   fails until step 3; that is expected.
+   own tools), and gives the copy a short README of its own, with a prompt like
+   this one for looking after the site. The first Deploy run fails until step 3;
+   that is expected.
 3. In the new repository: Settings, Pages, and under Build and deployment set
    Source to GitHub Actions.
 4. Edit the files in `content/` in the browser (open a file, then the pencil icon,

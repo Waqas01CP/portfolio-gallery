@@ -10,7 +10,9 @@ status: current
 someone use the template, add a design, add their site to the showcase,
 report a problem or ask a question should start from README.md instead:
 its table "What do you want to do?" and its prompt for an AI assistant.
-The rules below bind work on the project itself.
+The rules below bind work on the project itself. AGENTS.md routes other
+coding agents to the README or here and states no rule, so a rule is
+changed here, never there (ADR-0017, Changes, 2026-10-23).
 
 portfolio-gallery: a portfolio-site template anyone can copy and publish
 with GitHub Pages without installing anything, and a gallery of designs

@@ -35,10 +35,11 @@ seen without running anything:
     the limits, at most SHOWCASE_TALL times as tall as it is wide and
     SHOWCASE_WIDE times as wide as it is tall: a screenshot beyond them is
     shown within them, with bands (ADR-0016, Changes, 2026-10-20);
-  - with --previews, every design in a gallery has its preview image and
-    every showcase card its served copies, each card's copy the very size
-    its HTML reserves; without it, a missing one is not reported, because
-    the screenshot job makes them after the build.
+  - with --previews, every design in a gallery has its preview image, the
+    gallery its own picture at the root, which the README shows (ADR-0017,
+    Changes, 2026-10-23), and every showcase card its served copies, each
+    card's copy the very size its HTML reserves; without it, a missing one
+    is not reported, because the screenshot job makes them after the build.
 
 Exit 0 when everything passes; 1 when anything fails, each printed with
 its file; 2 when the folder holds no built page. Standard library only.
@@ -370,10 +371,14 @@ def main(argv: list[str]) -> int:
             print(f"  {shown}: {problem}")
         failures += len(found)
     if previews:
-        for demo in sorted((root / "designs").glob("*/index.html")):
+        demos = sorted((root / "designs").glob("*/index.html"))
+        for demo in demos:
             if not (demo.parent / PREVIEW_FILE).is_file():
                 print(f"FAIL designs/{demo.parent.name}: no {PREVIEW_FILE}; run tools/screenshots.py")
                 failures += 1
+        if demos and not (root / PREVIEW_FILE).is_file():
+            print(f"FAIL the gallery page: no {PREVIEW_FILE} of its own; run tools/screenshots.py")
+            failures += 1
     print(f"\n{len(pages)} page(s), {failures} problem(s)")
     return 1 if failures else 0
 

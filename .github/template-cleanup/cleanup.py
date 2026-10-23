@@ -13,7 +13,8 @@ with neither set, it refuses too.
 Otherwise it deletes every path listed in remove.txt beside this file that
 exists, drops "in_use", a link to a design author's own site, from every
 designs/*/design.json (ADR-0016), puts copy-README.md in place of
-README.md, and deletes this folder last. With the folder gone a later run finds nothing to do, so it acts
+README.md and copy-AGENTS.md in place of AGENTS.md (ADR-0017, Changes,
+2026-10-23), and deletes this folder last. With the folder gone a later run finds nothing to do, so it acts
 once. It never touches .github/workflows/: the workflow's own next step
 tries that, by a separate commit.
 
@@ -33,6 +34,8 @@ from pathlib import Path, PurePosixPath
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 PROJECT = "Waqas01CP/portfolio-gallery"
+# A copy's own files, each put in place of the project's.
+OWN = {"copy-README.md": "README.md", "copy-AGENTS.md": "AGENTS.md"}
 
 
 def refusal() -> str | None:
@@ -95,8 +98,9 @@ def main() -> int:
             meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
                                  encoding="utf-8", newline="\n")
             print(f"dropped in_use from {meta_path.relative_to(ROOT).as_posix()}")
-    shutil.copyfile(HERE / "copy-README.md", ROOT / "README.md")
-    print("replaced README.md with a copy's own")
+    for source, target in OWN.items():
+        shutil.copyfile(HERE / source, ROOT / target)
+        print(f"replaced {target} with a copy's own")
     shutil.rmtree(HERE)
     print("removed .github/template-cleanup, so this runs once")
     return 0

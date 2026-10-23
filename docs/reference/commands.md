@@ -56,10 +56,10 @@ python tools/check_showcase.py                   the showcase's files
 python tools/check_showcase.py --fetch-all       also every showcase site and In use link, by response
 python tools/check_showcase.py --fetch-url URL [--login LOGIN]   one address's response
 python tools/check_built.py [_site] [--previews] built files, without a browser
-python tools/check_prompt.py [README]            the README's prompt for an AI, against the repository
+python tools/check_prompt.py [README]            the prompts for an AI, the README's and a copy's, and AGENTS.md, against the repository
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
 python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
-python tools/screenshots.py [_site]              the gallery's previews and showcase copies
+python tools/screenshots.py [_site]              the gallery's previews, showcase copies and own picture
 python tools/ci.py pictures --gallery _site      those pictures made and checked
 python tools/scope_check.py --files LIST.tsv [--author LOGIN]   a pull request's scope, locally
 ```

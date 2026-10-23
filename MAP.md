@@ -18,6 +18,7 @@ Decision records have no `type`; their `topic` is shown.
 
 | File | Type | Status | Description |
 |---|---|---|---|
+| `AGENTS.md` | instruction | current | For an AI coding agent arriving in this repository, who it may be helping and where that person's path is written. A router that states no rule of its own. |
 | `CAPABILITIES.md` | explanation | current | Everything portfolio-gallery is and does, in one file: what it does end to end, how data is stored, the stack, its engineering qualities and what enforces each, measured numbers with their dates, how it was built, and its limits. For any chat or person who will open nothing else. |
 | `CLAUDE.md` | instruction | current | How to work in this repository. Reading order, authority order, the six-line scope floor, runtime, conventions and the gates. Read before touching anything. |
 | `CODE_OF_CONDUCT.md` | reference | current | The Code of Conduct, the Contributor Covenant version 2.1, under its Creative Commons Attribution 4.0 licence, with the maintainer's address for reports. |
@@ -52,7 +53,7 @@ Decision records have no `type`; their `topic` is shown.
 | `docs/decisions/0014-web-fonts-with-font-display-optional.md` | decision (design) | accepted | The default design loads its web fonts with font-display: optional, not swap as on the owner's site, so a link to a section lands where it should and a late font never moves the text. Read before changing a design's @font-face rules. |
 | `docs/decisions/0015-a-copy-cleans-itself-once.md` | decision (build) | accepted | A copy made with Use this template removes the project's own files once, by a workflow that holds contents: write and never runs here or in a fork; the user guide lists the same files for when it does not run. Read before changing what a copy keeps, the cleanup workflow, or a project-only workflow. |
 | `docs/decisions/0016-templates-then-a-showcase.md` | decision (process) | accepted | The gallery shows templates first, each with an optional In use link to its author's own site, then a showcase of contributors' own sites, each a folder of one entry and one screenshot, checked as files and, never rendered, by its response on the pull request and weekly. The footer credit names the design and its author. Read before changing the showcase, its checks or limits, the gallery's order, or the credit. |
-| `docs/decisions/0017-documents-for-people-and-their-ai.md` | decision (process) | accepted | The README routes every kind of visitor to their path and carries a self-contained prompt a person gives their own AI assistant; tools/check_prompt.py holds the prompt to the repository it restates. AGENTS.md is proposed, not added. Read before changing the README's table or prompt, the issue forms, or what an AI arriving at the repository is told. |
+| `docs/decisions/0017-documents-for-people-and-their-ai.md` | decision (process) | accepted | The README routes every kind of visitor to their path and carries a self-contained prompt a person gives their own AI assistant; tools/check_prompt.py holds the prompt to the repository it restates. Since 2026-10-23 an AGENTS.md routes other coding agents, and a copy receives its own AGENTS.md and a prompt of its own (Changes). Read before changing the README's table or prompt, the issue forms, or what an AI arriving at the repository is told. |
 | `docs/decisions/README.md` | index | current | The decision record index for portfolio-gallery, with the fixed topic list and the Pending list of decisions identified but not concluded. |
 
 ## docs/deferred
@@ -68,7 +69,7 @@ Decision records have no `type`; their `topic` is shown.
 |---|---|---|---|
 | `docs/how-to/add-a-design.md` | how-to | current | A contributor's journey, step by step. Fork, create a design folder, build and check it locally, and open a pull request that passes the checks. Read to add a design to the gallery. |
 | `docs/how-to/add-to-the-showcase.md` | how-to | current | A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, a screenshot as their tool saves it, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery. |
-| `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address and the checks. Read to make your own site. |
+| `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address, the checks, and building on your own computer if you like. Read to make your own site. |
 
 ## docs/reference
 

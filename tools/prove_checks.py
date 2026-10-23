@@ -387,7 +387,7 @@ def file_cases():
             "MISSING: Example City, Exampleland (content/cv.md, line 12)",
             "Add the text to content/cv.md, or change site.json or items.json to match the CV line shown"))
 
-    def assemble(extra=None, big=False, entry=False, served=None):
+    def assemble(extra=None, big=False, entry=False, served=None, gallery=True):
         def plant(copy):
             if entry:
                 plant_entry(copy)
@@ -397,6 +397,8 @@ def file_cases():
                 (shots / "designs" / name).mkdir(parents=True)
                 data = b"RIFF\0\0\0\0WEBPVP8 " + (b"\0" * (310_000 if big and name == "plain" else 64))
                 (shots / "designs" / name / "preview.webp").write_bytes(data)
+            if gallery:
+                (shots / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
             entry_copies(site, shots, skip=("tester",))
             for name, data in (served or {}).items():
                 (shots / "showcase" / "tester").mkdir(parents=True, exist_ok=True)
@@ -423,6 +425,8 @@ def file_cases():
            "supplied no showcase/tester/full.webp")
     yield ("assemble: the screenshot itself among the pictures", assemble(entry=True, served={
         **clean, "screenshot.png": png(1280, 720)}), "not a picture this gallery shows")
+    yield ("assemble: the gallery page's own picture missing", assemble(gallery=False),
+           "the screenshot job supplied no preview.webp")
     yield ("control: assemble takes a gallery's previews and served copies",
            assemble(entry=True, served=clean), Passes("showcase/tester/full.webp"))
 
@@ -492,6 +496,23 @@ def file_cases():
     yield ("cleanup: a kept document links to a removed one", cleanup(
         "docs/reference/content.md", "\n# ", "\n[The records](../decisions/README.md)\n\n# "),
         "which the copy lacks")
+    copy_readme = ".github/template-cleanup/copy-README.md"
+    yield ("cleanup: a copy's README without its prompt", cleanup(
+        copy_readme, "<!-- prompt:end -->", "<!-- end -->"), "the copy's README.md carries no prompt")
+    yield ("cleanup: a copy's prompt naming a file the copy lacks", cleanup(
+        copy_readme, "`docs/reference/content.md` explains", "`docs/reference/commands.md` explains"),
+        "the copy's prompt names docs/reference/commands.md, which the copy lacks")
+    yield ("cleanup: a copy's prompt giving a command no kept guide gives", cleanup(
+        copy_readme, "     python tools/ci.py build --mode site", "     python tools/ci.py checks"),
+        "the copy's prompt gives 'python tools/ci.py checks', which no guide the copy keeps gives")
+    yield ("cleanup: a copy keeping the project's AGENTS.md", cleanup(
+        script, 'OWN = {"copy-README.md": "README.md", "copy-AGENTS.md": "AGENTS.md"}',
+        'OWN = {"copy-README.md": "README.md"}'),
+        "AGENTS.md is not the copy's own")
+    yield ("cleanup: the copy's build command broken", cleanup(
+        "tools/ci.py", '    b.add_argument("--mode", choices=("site", "gallery"), required=True)',
+        '    b.add_argument("--mode", choices=("gallery",), required=True)'),
+        "the cleaned copy fails tools/ci.py build --mode site")
 
     # The showcase's files (tools/check_showcase.py, ADR-0016).
     def showcase(entry=None, files=None, login="tester", extra=None):
@@ -608,12 +629,14 @@ def file_cases():
         {"screenshot.png": png(2000, 400)}, "    elif picture[0] > picture[1] * SHOWCASE_WIDE:",
         "    elif False:"), "beyond the shape limits")
 
-    def copies(card, files=None):
+    def copies(card, files=None, gallery=True):
         def plant(copy):
             plant_entry(copy, files=files)
             out = build_site(copy, "--gallery")
             for name in ("default", "plain"):
                 (out / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+            if gallery:
+                (out / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
             # Every other entry's copies at the size its card reserves.
             page = (out / "index.html").read_text(encoding="utf-8")
             for login, width, height in re.findall(
@@ -629,6 +652,8 @@ def file_cases():
            "is reserved at 1024x576 but is 1024x600")
     yield ("control: a card's copy the size its box reserves passes, with --previews", copies((1024, 576)),
            Passes("0 problem(s)"))
+    yield ("built: a gallery without its own picture, with --previews", copies((1024, 576), gallery=False),
+           "the gallery page: no preview.webp of its own")
     yield ("control: a JPEG turned by its EXIF is reserved at its turned size", copies(
         (720, 1280), {"screenshot.jpg": jpeg(1280, 720, turned(6))}), Passes("0 problem(s)"))
 
@@ -708,6 +733,65 @@ def file_cases():
     yield ("prompt: a fact reworded out of the check's sight", prompt(
         "README.md", "formats: PNG, JPEG or WebP.", "kinds: PNG, JPEG or WebP."),
         "the screenshot formats: its words for it are not found")
+
+    # A copy's own prompt, held to what a copy keeps (ADR-0017, Changes,
+    # 2026-10-23).
+    copy_readme = ".github/template-cleanup/copy-README.md"
+    yield ("prompt: a copy's prompt names a file no copy receives", prompt(
+        copy_readme, "`docs/how-to/use-this-template.md` is the full", "`docs/reference/commands.md` is the full"),
+        "it names docs/reference/commands.md, which a copy does not receive")
+    yield ("prompt: a copy's prompt names a setting config.json lacks", prompt(
+        copy_readme, '"cv_pdf", "content_trace" and', '"cv_pdf", "trace" and'),
+        "copy-README.md: the settings named, each in content/config.json: the prompt says False")
+    yield ("prompt: the content trace's start changed at its source", prompt(
+        "content/config.json", '"content_trace": true', '"content_trace": false'),
+        "the content trace's starting value: the prompt says 'true', the repository 'false'")
+    yield ("prompt: Deploy's jobs changed at their source", prompt(
+        ".github/workflows/deploy.yml", "  assemble:\n    needs: [build, shots]", "  package:\n    needs: [build, shots]"),
+        "Deploy's jobs: the prompt says")
+    yield ("prompt: the failed build's step renamed at its source", prompt(
+        ".github/workflows/deploy.yml", "- name: Build and check\n", "- name: Build and test\n"),
+        "the prompt says 'Build and check', the repository 'no step of that name'")
+    yield ("prompt: a copy's command in the project's guide only", prompt(
+        copy_readme, "     python tools/ci.py build --mode site", "     python tools/ci.py checks"),
+        "the command 'python tools/ci.py checks' is not in docs/how-to/use-this-template.md, the guide a copy keeps")
+    yield ("prompt: a copy's prompt without a safety rule", prompt(
+        copy_readme, "Never say you have done any of these.", "Say when you have done one."),
+        "copy-README.md: its safety rule 'Never say you have done any of these' is missing")
+
+    # The routers for coding agents: what they name, and nothing else.
+    copy_agents = ".github/template-cleanup/copy-AGENTS.md"
+    yield ("prompt: AGENTS.md naming a file that does not exist", prompt(
+        "AGENTS.md", "[STATE.md](STATE.md)", "[STATUS.md](STATUS.md)"),
+        "AGENTS.md: it names STATUS.md, which does not exist")
+    yield ("prompt: the README's section AGENTS.md links, renamed at its source", prompt(
+        "README.md", "## What do you want to do?", "## Where to start"),
+        "AGENTS.md: it links README.md#what-do-you-want-to-do, a section README.md does not have")
+    yield ("prompt: AGENTS.md not linking the README's prompt", prompt(
+        "AGENTS.md", "[Ask an AI assistant to guide you](README.md#ask-an-ai-assistant-to-guide-you)",
+        "its section on AI assistants"),
+        "AGENTS.md: it links no section of the README that holds its prompt")
+    yield ("prompt: a copy's AGENTS.md naming the project's rules", prompt(
+        copy_agents, "It states no\nrule of its own.", "It states no\nrule of its own; see [CLAUDE.md](CLAUDE.md)."),
+        "copy-AGENTS.md: it names CLAUDE.md, which a copy does not receive")
+    yield ("prompt: the copy's README section a copy's AGENTS.md links, renamed", prompt(
+        copy_readme, "## Ask an AI assistant to help", "## For your AI assistant"),
+        "copy-AGENTS.md: it links README.md#ask-an-ai-assistant-to-help, a section the copy's README does not have")
+
+    # The README's pictures on the live gallery, each one the deploy
+    # publishes (ADR-0017, Changes, 2026-10-23).
+    yield ("prompt: the README's gallery picture under another name", prompt(
+        "README.md", 'portfolio-gallery/preview.webp" width="820"', 'portfolio-gallery/gallery.webp" width="820"'),
+        "it shows or links https://waqas01cp.github.io/portfolio-gallery/gallery.webp, which the deploy does not publish")
+
+    def card_gone(copy):
+        # The entry whose card the README shows, removed: its card goes too.
+        login = re.search(r"/showcase/([a-z0-9-]+)/card\.webp", (copy / "README.md").read_text(encoding="utf-8"))[1]
+        shutil.rmtree(copy / "showcase" / login)
+        return ["tools/check_prompt.py"]
+
+    yield ("prompt: the README showing the card of an entry that is gone", card_gone,
+           "/card.webp, which the deploy does not publish")
 
     def scheduled(old, new):
         def plant(copy):
@@ -805,6 +889,10 @@ def browser_cases(axe: Path | None):
     yield ("pictures: a build that ignores a PNG's EXIF turn", served(
         '    if facts["orientation"] >= 5:', "    if False:", where="tools/check_showcase.py", exif=turned(6)),
         "Chrome reads it as 1080x1920, the build as 1920x1080")
+    # The gallery page's own picture, which the README shows (ADR-0017,
+    # Changes, 2026-10-23): a maker that skips it is refused.
+    yield ("pictures: a maker that skips the gallery page's picture", served(
+        "        gallery_picture(folder, failed)\n", ""), "preview.webp: not a regular file")
 
     # The showcase packed (ADR-0016, Changes, 2026-10-20), with snips of
     # every shape measured on 2026-10-21, scaled down: desktop, Retina,
@@ -891,6 +979,7 @@ def main(argv: list[str]) -> int:
         for name in ("default", "plain"):
             (shots / "designs" / name).mkdir(parents=True)
             (shots / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+        (shots / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
         entry_copies(gallery_out, shots)
         controls = [("workflows", ["tools/check_workflows.py"]),
                     ("template cleanup", ["tools/check_template_cleanup.py"]),

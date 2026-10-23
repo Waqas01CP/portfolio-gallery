@@ -1,11 +1,13 @@
-"""Check that the README's prompt for an AI assistant agrees with the
-repository (the owner's decision of 2026-10-21; ADR-0017).
+"""Check that the prompts for an AI assistant agree with the repository
+(the owner's decisions of 2026-10-21 and 2026-10-23; ADR-0017).
 
   python tools/check_prompt.py [README]
 
-The prompt restates the repository, so that an AI given it needs nothing
-else; this holds it to what it restates. It reads the fenced block
-between the README's prompt:start and prompt:end markers and checks:
+Each prompt restates the repository, so that an AI given it needs nothing
+else; this holds it to what it restates. A prompt is the fenced block
+between a README's prompt:start and prompt:end markers. Two are checked.
+
+README.md's, the gallery's, for anyone arriving at the project:
 
   - every path it names exists: each one in backticks, and each one under
     .github/, content/, designs/, docs/, showcase/, src/ or tools/, a
@@ -24,11 +26,45 @@ between the README's prompt:start and prompt:end markers and checks:
     secret, the person acts on GitHub, the public history, security
     reported privately.
 
+.github/template-cleanup/copy-README.md's, which a copy of the template
+receives as its README, for the copy's owner (ADR-0017, Changes,
+2026-10-23). It is checked here, before any copy receives it, against
+what a copy keeps:
+
+  - every path it names exists and is one a copy keeps: none that
+    .github/template-cleanup/remove.txt lists;
+  - every fact it states equals its source: the settings it names and the
+    content trace's starting value (content/config.json); the Deploy and
+    Checks workflows' names, Deploy's jobs and the step a failed build
+    names (.github/workflows/); the Python version
+    (docs/how-to/use-this-template.md);
+  - every command it gives appears in docs/how-to/use-this-template.md,
+    the guide a copy keeps;
+  - it carries the same safety rules, but security, which a copy's owner
+    receives as reports of their own.
+
 A fact is found by the words the prompt states it in; a prompt reworded
 so that a fact is no longer found fails, naming it, so the check and the
-prompt change together. Exit 0 when everything agrees; 1 on any
-disagreement, each printed; 2 when there is no prompt to check. Standard
-library only.
+prompt change together.
+
+Then the two routers for coding agents (ADR-0017, Changes, 2026-10-23):
+AGENTS.md, and .github/template-cleanup/copy-AGENTS.md, which a copy
+receives as its AGENTS.md. Each states no rule of its own, so what it
+names is all there is to check: every Markdown file it names exists, and
+for a copy's is one a copy keeps; every section it links is a heading of
+that file, under the heading's own words (for a copy's, of copy-README.md,
+the copy's README); and it links the README's section holding the prompt.
+
+Last, the README's pictures and links on the live gallery (ADR-0017,
+Changes, 2026-10-23): each names something the deploy publishes, the
+gallery page, its own picture (preview.webp), a design's demo or preview
+for a design in designs/, or a card's copies for an entry in showcase/,
+so that a picture renamed, or a design or entry gone, fails here rather
+than showing broken on GitHub.
+
+Given a README, only its prompt is checked, as the gallery's. Exit 0 when
+everything agrees; 1 on any disagreement, each printed with its file; 2
+when a prompt or a router is missing. Standard library only.
 """
 
 from __future__ import annotations
@@ -36,18 +72,25 @@ from __future__ import annotations
 import json
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
-from build import SHOWCASE_TALL, SHOWCASE_WIDE  # noqa: E402
+from build import PREVIEW_FILE, SHOWCASE_CARD, SHOWCASE_FULL, SHOWCASE_TALL, SHOWCASE_WIDE  # noqa: E402
 from check_design import FILE_COUNT_LIMIT, FOLDER_LIMIT, KB, LICENCES, LIMITS, META_FIELDS, SUBFOLDERS  # noqa: E402
 from check_showcase import (DESCRIPTION_LIMIT, ENTRY_FIELDS, KINDS, MAX_BYTES,  # noqa: E402
                             NAME_LIMIT)
 from scope_check import AS_CONTRIBUTOR  # noqa: E402
 
-BLOCK = re.compile(r"<!-- prompt:start[^>]*-->\s*```text\n(.*?)\n```\s*<!-- prompt:end -->", re.S)
+CLEANUP = ".github/template-cleanup"
+COPY_README = f"{CLEANUP}/copy-README.md"
+COPY_AGENTS = f"{CLEANUP}/copy-AGENTS.md"
+LIVE = "https://waqas01cp.github.io/portfolio-gallery/"
+LIVE_ADDRESS = re.compile(re.escape(LIVE) + r"([^\s\"'<>()]*)")
+LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+MARKDOWN_NAME = re.compile(r"(?<![\w/.-])((?:[\w-]+/)*[\w-]+\.md)\b")
+BLOCK =re.compile(r"<!-- prompt:start[^>]*-->\s*```text\n(.*?)\n```\s*<!-- prompt:end -->", re.S)
 PATH = re.compile(r"(?<![\w/.-])((?:\.github|content|designs|docs|showcase|src|tools)/[A-Za-z0-9_./-]*)(?![\w<-])")
 TICKED = re.compile(r"`([^`\s]+)`")
 COMMAND = re.compile(r"^\s{3,}((?:python|\.venv)\S* .+?)\s*$", re.M)
@@ -55,6 +98,10 @@ NUMBERS = {1: "one", 2: "two", 3: "three", 4: "four"}
 SAFETY = ("explain what it does", "Never ask for, accept or handle a password",
           "Never say you have done any of these", "stays in its public history",
           "privately, never in a public issue")
+# A copy's owner is the one who receives reports about their site.
+COPY_SAFETY = SAFETY[:4]
+GALLERY_GUIDES = ("docs/reference/commands.md", "docs/how-to/add-a-design.md")
+COPY_GUIDES = ("docs/how-to/use-this-template.md",)
 
 
 def flat(text: str) -> str:
@@ -69,14 +116,55 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def facts(prompt: str) -> list[tuple[str, object, object]]:
-    """(what, what the prompt says, what the source says); None where the
-    prompt's words for it are not found."""
+def block(text: str) -> str | None:
+    """A README's prompt, or None."""
+    m = BLOCK.search(text)
+    return m.group(1) if m else None
 
+
+def named_paths(raw: str) -> set[str]:
+    bare = re.sub(r"https?://\S+", " ", raw)
+    named = {p.rstrip(".,") for p in PATH.findall(bare)}
+    return named | {p.rstrip(".,") for p in TICKED.findall(raw) if "<" not in p and not p.startswith("[")}
+
+
+def commands(raw: str) -> list[str]:
+    return [flat(c) for c in COMMAND.findall(raw)]
+
+
+def removed() -> list[str]:
+    """What the template cleanup removes from a copy, from its own list."""
+    return [line.strip().rstrip("/") for line in read(f"{CLEANUP}/remove.txt").splitlines()
+            if line.strip() and not line.strip().startswith("#")] + [CLEANUP]
+
+
+def kept(path: str) -> bool:
+    """Whether a path exists here and a copy keeps it."""
+    parts = PurePosixPath(path.rstrip("/")).parts
+    gone = any(parts[:len(PurePosixPath(r).parts)] == PurePosixPath(r).parts for r in removed())
+    return (ROOT / path).exists() and not gone
+
+
+def workflow(name: str) -> tuple[str | None, list[str], list[str]]:
+    """A workflow's name, its jobs and its steps' names."""
+    text = read(f".github/workflows/{name}")
+    title = re.search(r"^name:\s*(.+)$", text, re.M)
+    jobs = re.findall(r"^  ([\w-]+):\s*$", text.split("\njobs:\n", 1)[-1], re.M)
+    steps = [s.strip() for s in re.findall(r"^\s+- name: (.+)$", text, re.M)]
+    return (title.group(1).strip() if title else None), jobs, steps
+
+
+def finder(prompt: str):
     def find(pattern: str, cast=str):
         m = re.search(pattern, prompt)
         return cast(m.group(1)) if m else None
+    return find
 
+
+def facts(prompt: str) -> list[tuple[str, object, object]]:
+    """The gallery's prompt: (what, what the prompt says, what the source
+    says); None where the prompt's words for it are not found."""
+    find = finder(prompt)
     template = read(".github/pull_request_template.md")
     sections = re.findall(r"^## (.+)$", template, re.M)
     forms = {}
@@ -130,40 +218,155 @@ def facts(prompt: str) -> list[tuple[str, object, object]]:
     ]
 
 
-def main(argv: list[str]) -> int:
-    readme = Path(argv[0]) if argv else ROOT / "README.md"
-    m = BLOCK.search(readme.read_text(encoding="utf-8")) if readme.is_file() else None
-    if not m:
-        print(f"no prompt between prompt:start and prompt:end in {readme}", file=sys.stderr)
-        return 2
-    raw = m.group(1)
+def copy_facts(prompt: str) -> list[tuple[str, object, object]]:
+    """A copy's prompt, as facts() is the gallery's."""
+    find = finder(prompt)
+    config = json.loads(read("content/config.json"))
+    deploy, deploy_jobs, deploy_steps = workflow("deploy.yml")
+    checks, _, _ = workflow("checks.yml")
+    settings = find(r"`content/config\.json`: the settings, (.*?)\.", lambda s: set(re.findall(r"\"(\w+)\"", s)))
+    jobs = re.search(r"with the jobs (\w+), (\w+) and (\w+)\. A fourth, (\w+), is skipped", prompt)
+    step = find(r"its failed step, usually \"([^\"]+)\"")
+    return [
+        ("the settings named, each in content/config.json", settings <= set(config) if settings else None, True),
+        ("the content trace's starting value", find(r"While \"content_trace\" is (\w+), as it is to start"),
+         json.dumps(config.get("content_trace"))),
+        ("the Deploy workflow's name", find(r"starts a (\w+) run in the Actions tab"), deploy),
+        ("Deploy's jobs", set(jobs.groups()) if jobs else None, set(deploy_jobs)),
+        ("the step a failed build names, one of Deploy's", step,
+         step if step in deploy_steps else "no step of that name"),
+        ("the Checks workflow's name", find(r"The (\w+) run beside it runs accessibility checks"), checks),
+        ("the Python version", find(r"With Python ([\d.]+) or later"),
+         re.search(r"Python ([\d.]+) or later", read(COPY_GUIDES[0])).group(1)),
+    ]
+
+
+def check_prompt(raw: str, stated, safety: tuple[str, ...], guides: tuple[str, ...],
+                 for_copy: bool) -> tuple[list[str], str]:
+    """Problems with one prompt, and a count of what was checked."""
     prompt = flat(raw)
     problems = []
-    bare = re.sub(r"https?://\S+", " ", raw)
-    named = {p.rstrip(".,") for p in PATH.findall(bare)}
-    named |= {p.rstrip(".,") for p in TICKED.findall(raw) if "<" not in p and not p.startswith("[")}
+    named = named_paths(raw)
     for path in sorted(named):
         if not (ROOT / path).exists():
             problems.append(f"it names {path}, which does not exist")
-    for what, said, source in facts(prompt):
+        elif for_copy and not kept(path):
+            problems.append(f"it names {path}, which a copy does not receive "
+                            f"({CLEANUP}/remove.txt lists it)")
+    checked = stated(prompt)
+    for what, said, source in checked:
         if said is None:
             problems.append(f"{what}: its words for it are not found; the prompt and this check must change together")
         elif said != source:
             problems.append(f"{what}: the prompt says {said!r}, the repository {source!r}")
-    sources = flat(read("docs/reference/commands.md") + "\n" + read("docs/how-to/add-a-design.md"))
-    commands = [flat(c) for c in COMMAND.findall(raw)]
-    for command in commands:
+    sources = flat("\n".join(read(g) for g in guides))
+    given = commands(raw)
+    for command in given:
         if command not in sources:
-            problems.append(f"the command '{command}' is in neither docs/reference/commands.md nor "
-                            f"docs/how-to/add-a-design.md")
-    for phrase in SAFETY:
+            problems.append(f"the command '{command}' is in neither {' nor '.join(guides)}" if len(guides) > 1
+                            else f"the command '{command}' is not in {guides[0]}"
+                            + (", the guide a copy keeps" if for_copy else ""))
+    for phrase in safety:
         if phrase not in prompt:
             problems.append(f"its safety rule '{phrase}' is missing")
-    for problem in problems:
-        print(f"FAIL {problem}")
-    print(f"{len(named)} path(s), {len(facts(prompt))} fact(s), {len(commands)} command(s), "
-          f"{len(SAFETY)} safety rule(s); {len(problems)} problem(s)")
-    return 1 if problems else 0
+    return problems, (f"{len(named)} path(s), {len(checked)} fact(s), {len(given)} command(s), "
+                      f"{len(safety)} safety rule(s)")
+
+
+def slug(heading: str) -> str:
+    """GitHub's anchor for a heading: lower case, punctuation dropped,
+    spaces as hyphens."""
+    return re.sub(r"[^\w\- ]", "", heading.strip().lower()).replace(" ", "-")
+
+
+def sections(text: str) -> dict[str, tuple[str, str]]:
+    """A Markdown file's headings by anchor: (the heading, its section's text)."""
+    found, heads = {}, list(re.finditer(r"^(#{1,6}) (.+?)\s*$", text, re.M))
+    for i, m in enumerate(heads):
+        end = next((h.start() for h in heads[i + 1:] if len(h.group(1)) <= len(m.group(1))), len(text))
+        found[slug(m.group(2))] = (m.group(2), text[m.end():end])
+    return found
+
+
+def check_router(text: str, for_copy: bool) -> list[str]:
+    """Problems with AGENTS.md, or with a copy's."""
+    own = {"README.md": COPY_README if for_copy else "README.md",
+           "AGENTS.md": COPY_AGENTS if for_copy else "AGENTS.md"}
+    problems, prompt_linked = [], False
+    named = set(MARKDOWN_NAME.findall(text)) | {t.split("#", 1)[0] for _, t in LINK.findall(text)}
+    for path in sorted(p for p in named if p):
+        if not (ROOT / own.get(path, path)).exists():
+            problems.append(f"it names {path}, which does not exist")
+        elif for_copy and path not in own and not kept(path):
+            problems.append(f"it names {path}, which a copy does not receive ({CLEANUP}/remove.txt lists it)")
+    for linked_as, target in LINK.findall(text):
+        path, _, anchor = target.partition("#")
+        if not anchor or not (ROOT / own.get(path, path)).is_file():
+            continue
+        found = sections(read(own.get(path, path)))
+        where = "the copy's README" if for_copy and path == "README.md" else path
+        if anchor not in found:
+            problems.append(f"it links {target}, a section {where} does not have")
+        elif found[anchor][0] != linked_as:
+            problems.append(f"it links {target} as '{linked_as}', but the heading reads '{found[anchor][0]}'")
+        elif path == "README.md" and block(found[anchor][1]) is not None:
+            prompt_linked = True
+    if not prompt_linked:
+        problems.append("it links no section of the README that holds its prompt for an AI assistant")
+    return problems
+
+
+def published(path: str) -> bool:
+    """Whether the deploy publishes this path on the live gallery."""
+    if path == "" or path.startswith("#") or path == PREVIEW_FILE:
+        return True
+    design = re.fullmatch(rf"designs/([a-z0-9-]+)/(?:index\.html|{re.escape(PREVIEW_FILE)})", path)
+    if design:
+        return (ROOT / "designs" / design.group(1) / "design.json").is_file()
+    entry = re.fullmatch(rf"showcase/([a-z0-9-]+)/(?:{re.escape(SHOWCASE_CARD)}|{re.escape(SHOWCASE_FULL)})", path)
+    return bool(entry) and (ROOT / "showcase" / entry.group(1) / "entry.json").is_file()
+
+
+def check_live(readme: str) -> tuple[list[str], int]:
+    """The README's addresses on the live gallery, each one the deploy publishes."""
+    addresses = sorted({a.rstrip("*.,;:") for a in LIVE_ADDRESS.findall(readme)})
+    return [f"it shows or links {LIVE}{a}, which the deploy does not publish"
+            for a in addresses if not published(a)], len(addresses)
+
+
+def main(argv: list[str]) -> int:
+    sys.stdout.reconfigure(errors="backslashreplace")
+    prompts = [(Path(argv[0]) if argv else ROOT / "README.md", facts, SAFETY, GALLERY_GUIDES, False)]
+    if not argv:
+        prompts.append((ROOT / COPY_README, copy_facts, COPY_SAFETY, COPY_GUIDES, True))
+    failures = 0
+    for path, stated, safety, guides, for_copy in prompts:
+        shown = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
+        raw = block(path.read_text(encoding="utf-8")) if path.is_file() else None
+        if raw is None:
+            print(f"no prompt between prompt:start and prompt:end in {shown}", file=sys.stderr)
+            return 2
+        problems, counts = check_prompt(raw, stated, safety, guides, for_copy)
+        for problem in problems:
+            print(f"FAIL {shown}: {problem}")
+        print(f"{shown}: {counts}; {len(problems)} problem(s)")
+        failures += len(problems)
+    for router, for_copy in ([] if argv else [("AGENTS.md", False), (COPY_AGENTS, True)]):
+        if not (ROOT / router).is_file():
+            print(f"no {router}", file=sys.stderr)
+            return 2
+        problems = check_router(read(router), for_copy)
+        for problem in problems:
+            print(f"FAIL {router}: {problem}")
+        print(f"{router}: {len(LINK.findall(read(router)))} link(s); {len(problems)} problem(s)")
+        failures += len(problems)
+    if not argv:
+        problems, count = check_live(read("README.md"))
+        for problem in problems:
+            print(f"FAIL README.md: {problem}")
+        print(f"README.md: {count} address(es) on the live gallery; {len(problems)} problem(s)")
+        failures += len(problems)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

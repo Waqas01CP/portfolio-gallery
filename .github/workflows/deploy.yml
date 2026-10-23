@@ -8,10 +8,11 @@
 #
 # Four jobs, each with the least it needs (ADR-0006, ADR-0010):
 #   build     builds and checks the files; read-only; no browser
-#   shots     the gallery only: takes each design's preview, and makes each
+#   shots     the gallery only: takes each design's preview, makes each
 #             showcase entry's served copies from its author's screenshot,
-#             in headless Chrome; read-only; publishes nothing but its own
-#             artifact
+#             and takes the gallery page's own picture, which the README
+#             shows, in headless Chrome; read-only; publishes nothing but
+#             its own artifact
 #   assemble  takes only the WebP pictures the gallery shows from shots,
 #             checks them and the site, and packages the site for Pages;
 #             read-only
@@ -86,12 +87,13 @@ jobs:
       # 2026-10-20). Only those pictures leave this job, gathered into
       # _shots/ with their paths in the site and uploaded whole, as build
       # uploads _site/; assemble checks every one before publishing.
-      - name: Take each design's preview and make the showcase's served copies
+      - name: Take each design's preview, make the showcase's served copies, take the gallery's picture
         run: python3 tools/screenshots.py _site
       - name: Gather only the pictures
         run: |
           mkdir _shots
           cd _site
+          cp preview.webp ../_shots/
           cp --parents designs/*/preview.webp ../_shots/
           if [ -d showcase ]; then cp --parents showcase/*/card.webp showcase/*/full.webp ../_shots/; fi
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
