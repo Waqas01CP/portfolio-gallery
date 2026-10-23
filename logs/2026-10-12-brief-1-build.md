@@ -2145,3 +2145,193 @@ defeat case.
 - A real copy made from the template after the merge, to see its README
   and AGENTS.md on GitHub; the cleanup test stands in for it.
 - Test 1 once more, on or after 2026-11-02.
+
+# Round 13, 2026-10-23 UTC: a copy's first run with Pages off, and the showcase's overlay
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 4e771b7, the website merge of pull request 16,
+whose tree is 573bbde's (1b783b9, compared here); Scope and Checks success
+on the pull request, Checks and Deploy success on main, Template cleanup
+skipped (GitHub's API); the gallery's own picture live, 200, image/webp,
+99,280 bytes from the runner's Chrome. The owner had ticked Brief 12 and
+Report 12. Work on the branch copy-first-run-and-overlay. HEAD at end: the
+commit that adds this section. Mode: mutating.
+
+## What was asked
+
+The portfolio architecture chat's Brief 13, of 2026-10-23, with its
+Addendum 1, stored word for word in place of Brief 12, read first for what
+it still says (the owner's aim for the showcase, his designs for the
+templates decided for later, showcase/ left to contributors). Brief 13:
+in a real copy the owner made, the first Deploy failed red because GitHub
+Pages is off until the copy's owner turns it on. Decided by him on the
+chat's recommendation: the copy's README leads with turning Pages on, with
+the exact clicks and how to run Deploy again; with Pages off, Deploy in a
+copy does not fail but ends with a notice, in the run's summary and an
+annotation, and publishes nothing; a real failure still fails; the
+gallery's own Deploy unchanged, an off Pages failing loudly. The seat to
+judge whether the cleanup should also open an issue. Confirm from the
+source that configure-pages cannot turn Pages on with the run's own
+token. Addendum 1: a showcase card's larger copy opens, with scripts on,
+in an overlay that can be closed: a Close button, Escape, a click outside,
+focus in and back; the browser's own dialog preferred; with scripts off,
+the plain link.
+
+## Errors this seat made
+
+1. **The test server in tools/cdp.py, written by this seat in Round 1,
+   served .webp with no media type on this machine.** Python's table
+   comes from the machine, and this Windows has none for .webp, so in the
+   browser checks a link to a picture downloaded it rather than opening
+   it; pictures inside a page loaded anyway, by sniffing, so nothing
+   showed until the overlay check's scripts-off half failed on a page
+   that was right. Found by probing: the Live demo link navigated, the
+   card's link to full.webp did not. Fixed in 42f5760: the server serves
+   each type the built site uses as GitHub Pages does (the live full.webp
+   is image/webp).
+2. **A commit message counted sixteen defeat cases where there were
+   eleven**; corrected by amending, before any push.
+3. **The setup guide's new line first dated the fix of the skipped deploy
+   job 2026-10-17, the local date**; the commit is 2026-10-16 21:16 UTC.
+   Corrected before the commit.
+4. **The first overlay defeat case, "no Close button", swapped the button
+   for a span** that the size check would still have counted; caught by
+   reading it, before any run.
+
+## Checked from the source
+
+- actions/configure-pages' action.yml at the pinned 45bfe01 (v6.0.0), read
+  2026-10-23: `enablement` "requires a token other than `GITHUB_TOKEN`".
+  Its src/api-client.js treats any failed lookup as Pages being off; it
+  does not single out 404.
+- GitHub's REST documentation, "Get a GitHub Pages site", read 2026-10-23:
+  200 or 404; `build_type` "legacy" (built from a branch) or "workflow".
+  GitHub's permissions table for GitHub Apps, read the same day: GET
+  /repos/{owner}/{repo}/pages needs Pages: read, for installation access
+  tokens, which a workflow's own token is.
+- A README's callout: GitHub's Markdown API renders `> [!IMPORTANT]` as a
+  callout in its gfm mode only; GitHub's repository page renders one as
+  the coloured box (cli/cli's README, read 2026-10-23,
+  `markdown-alert-important`).
+
+## What was built
+
+- **A copy's first run** (e459014): Deploy gains a job, pages, Pages: read,
+  which runs `tools/ci.py pages`: it asks GitHub's API whether Pages is on.
+  pages_verdict decides: publishing from GitHub Actions, publish; a 404 in
+  a copy, a notice titled "Turn on GitHub Pages to publish your site", as
+  an annotation and in the run's summary with the three steps, and
+  on=false, so deploy is skipped and the run ends green; a 404 in the
+  gallery, a branch source, or any other answer, a failure. The build and
+  checks never wait on it. tools/check_workflows.py holds the wiring (the
+  publishing job needs pages and runs only when it says on; no other job
+  reads it; no continue-on-error) and pages_verdict's table. The copy's
+  README opens with an IMPORTANT callout: the setting, the notice's title,
+  Actions, Deploy, Run workflow, or any commit. tools/check_prompt.py holds
+  that lead and both prompts' new lines to ci.py and deploy.yml. The user
+  guide, the README's walk-through and the setup guide's first push, step
+  8 and Test 4 say what a first run now shows. ADR-0015 and ADR-0004,
+  Changes.
+- **No issue in the copy**: the seat's judgment, in ADR-0015's row. The
+  README GitHub shows on the copy's front page leads with the setting, and
+  every Deploy run until then ends with the notice; an issue would be a
+  third copy of one instruction, an artifact the owner must close, and
+  issues: write for a job that otherwise writes only its own files.
+- **The showcase's overlay** (42f5760): the gallery's own `<dialog>`,
+  shown with showModal(), chosen over a hand-built overlay because the
+  browser then makes the page behind inert, keeps focus inside and closes
+  it on Escape by itself. gallery.js, with scripts on, opens it on a click
+  or Enter on a card's picture: the picture made in the page with its size
+  from the build (build.py passes full_size), the entry's name above it, a
+  Close button, an X named "Close", which takes focus; the button, Escape
+  and a click outside the picture close it, and focus returns to the
+  card's link. gallery.css shows the picture whole within the window, at
+  its own size or smaller, on the page's colours in either theme, with no
+  motion. With scripts off the card is the plain link it was.
+  tools/check_browser.py's overlay check, and tools/cdp.py's test server
+  serving .webp as image/webp (Errors). ADR-0016, Changes.
+
+## Proofs
+
+All on 2026-10-23, one browser job at a time, Chrome 156, on a fresh
+clone of 42f5760 unless named.
+
+- **Every check with axe**, `tools/ci.py checks --axe`: exit 0 in 678 s;
+  the browser checks 648 s (tree 48 runs, keyboard 8, joins 4, anchors
+  136, words 4, motion 3, packing 12, overlay 4, axe 36), 0 failures,
+  light and dark. The prompt check passes on all four documents, the copy
+  README's lead (5 facts) and the README's 8 addresses on the live
+  gallery; 5 pictures made and checked. The first try, at 18:22Z, lost
+  Chrome's DevTools connection at the browser checks' first load
+  (ConnectionResetError), after every file check, build and picture had
+  passed; the defeat harness, started a minute later, ran its own Chrome
+  without fault, and the retry above passed on the same clone.
+- **Every defeat case with the browser and axe**: exit 0 in 1,914 s; 167
+  defeat cases fail as built, naming what failed; 12 controls and 23
+  planted controls pass; 0 unproven. 16 are new: 5 workflow cases (a
+  copy's Deploy failing red with Pages off; the gallery's quiet with
+  Pages off; the build waiting on pages; continue-on-error on the build;
+  deploy publishing whatever Pages says), 3 for the pages step against a
+  fake GitHub API (the gallery with Pages off; a branch source; the API
+  answering 500), 3 for the copy's README and prompts (the notice's title
+  changed in ci.py; the README not leading with the callout; Run workflow
+  named while Deploy cannot be started by hand), and 5 for the overlay
+  (no Close button; focus not returned; the dialog open with scripts off;
+  the picture cropped to a square; the dialog shown without showModal).
+  2 new planted controls: a copy with Pages off ends with the notice,
+  the summary and on=false, exit 0; the gallery with Pages on publishes.
+- **The gates**, on a scratch clone of 42f5760: 27 defeat cases refused,
+  a copy's Deploy failing red with Pages off among them (gate B, naming
+  check_workflows.py); 5 controls passed; exit 0 in 417 s.
+- **The cleanup**: guards hold, 61 files removed, README.md and AGENTS.md
+  the copy's own, a later run changes nothing, the cleaned copy builds and
+  checks, its 9 links resolve, its README carries its prompt. A copy made
+  by cleanup.py and kept to look at: its README opens with the callout,
+  "First, once: turn on GitHub Pages"; its own workflow check passes its
+  five workflows, the Pages rules among them; `tools/ci.py build --mode
+  site` in it, all passed.
+- **The deploy's own path** with the 13 real snips beside the owner's
+  entry: deploy.yml's gathering step gathered 31 pictures; assemble and
+  check_built --previews, 0 problems; every browser check with axe on the
+  assembled gallery, 0 failures in 657 s, overlay 4 runs.
+- **The tree at load**, the gallery page's whole accessibility tree, main's
+  build against the branch's, at 390 and 1366 px, light and dark, scripts
+  on and off: the same in all 8 cells (36 text entries, 26 named nodes).
+- **The overlay, looked at**: opened by Enter on the first card in light
+  and dark, at 390 and 1366 px: a modal, focus on Close, the picture
+  358 by 569 and 511 by 812, both the 0.629 of its 1077 by 1713, within
+  the window; Escape closed it, focus back on the card.
+- **The pages step's output**, against a fake API answering 404 in a copy:
+  exit 0; the annotation "::notice title=Turn on GitHub Pages to publish
+  your site::" with the setting and Run workflow; on=false; the summary
+  headed the same, with the three steps.
+- **The READMEs as rendered**: GitHub's Markdown API rendered both; in its
+  gfm mode the copy's README opens with the Important callout, which
+  GitHub's repository page renders likewise (cli/cli's, read the same
+  day); headless Chrome showed both with GitHub's styles at 1012 and 390
+  px, light and dark, none scrolling sideways.
+
+## Rejected alternatives
+
+- **configure-pages' enablement**: needs a token other than the run's own;
+  asking each copy's owner for one is worse than one setting.
+- **configure-pages with continue-on-error**: it fails alike for Pages off
+  and for any other fault, so it cannot tell a notice from a failure, and
+  continue-on-error would end a failed run green.
+- **The pages job before build, or the build waiting on it**: with Pages
+  off a broken build would never run, and the run would end green; the
+  workflow check now refuses that.
+- **An issue in the copy**: see What was built.
+- **A hand-built overlay**: the inert page, the focus held inside and
+  Escape would all be the seat's to write and to get right; the browser's
+  dialog gives them.
+- **The overlay's picture in the page's HTML**: an `<img>` without a
+  source is not valid HTML; the script makes it when the overlay opens.
+
+## Not done
+
+- Nothing pushed.
+- The real copy, made by the owner after the merge, its first Deploy
+  ending with the notice and no red, then Pages turned on and Deploy
+  publishing; the chat reads it through the API before he deletes it.
+- Test 1 once more, on or after 2026-11-02.
