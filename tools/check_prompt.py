@@ -36,12 +36,20 @@ what a copy keeps:
   - every fact it states equals its source: the settings it names and the
     content trace's starting value (content/config.json); the Deploy and
     Checks workflows' names, Deploy's jobs and the step a failed build
-    names (.github/workflows/); the Python version
+    names (.github/workflows/); the notice a run ends with while GitHub
+    Pages is off (tools/ci.py), and Run workflow, which only a workflow
+    that can be started by hand offers; the Python version
     (docs/how-to/use-this-template.md);
   - every command it gives appears in docs/how-to/use-this-template.md,
     the guide a copy keeps;
   - it carries the same safety rules, but security, which a copy's owner
     receives as reports of their own.
+
+And the copy's README itself leads with turning GitHub Pages on (the
+owner's decision of 2026-10-23; ADR-0015, Changes): its first block, a
+callout, names the setting, the notice a run ends with until then
+(tools/ci.py), the Deploy workflow by its name, and Run workflow, which
+Deploy must offer.
 
 A fact is found by the words the prompt states it in; a prompt reworded
 so that a fact is no longer found fails, naming it, so the check and the
@@ -82,6 +90,7 @@ from check_design import FILE_COUNT_LIMIT, FOLDER_LIMIT, KB, LICENCES, LIMITS, M
 from check_showcase import (DESCRIPTION_LIMIT, ENTRY_FIELDS, KINDS, MAX_BYTES,  # noqa: E402
                             NAME_LIMIT)
 from scope_check import AS_CONTRIBUTOR  # noqa: E402
+from ci import PAGES_OFF_TITLE  # noqa: E402
 
 CLEANUP = ".github/template-cleanup"
 COPY_README = f"{CLEANUP}/copy-README.md"
@@ -154,6 +163,37 @@ def workflow(name: str) -> tuple[str | None, list[str], list[str]]:
     return (title.group(1).strip() if title else None), jobs, steps
 
 
+def by_hand(name: str) -> bool:
+    """Whether a workflow can be started by hand, so offers Run workflow."""
+    on = read(f".github/workflows/{name}").split("\njobs:\n", 1)[0]
+    return bool(re.search(r"^\s+workflow_dispatch\s*:", on, re.M))
+
+
+def pages_notice(prompt: str) -> tuple[str, object, object]:
+    """The notice a run ends with while Pages is off, as a text quotes it."""
+    m = re.search(r"ends with the notice \"([^\"]+)\"", prompt)
+    return "the notice a Deploy run ends with while GitHub Pages is off", m.group(1) if m else None, PAGES_OFF_TITLE
+
+
+def copy_lead(readme: str) -> list[tuple[str, object, object]]:
+    """The copy's README leads with turning Pages on: its first block after
+    the title, a callout, read as facts."""
+    body = readme.split("\n", 1)[1].lstrip("\n") if readme.startswith("# ") else ""
+    callout = body.split("\n\n", 1)[0]
+    lead = flat(re.sub(r"^> ?", "", callout, flags=re.M))
+    deploy, _, _ = workflow("deploy.yml")
+    find = finder(lead)
+    return [
+        ("the copy's README opening with a callout on turning GitHub Pages on",
+         callout.startswith("> [!IMPORTANT]") and "turn on GitHub Pages" in lead, True),
+        ("the setting the callout names", "set **Source** to **GitHub Actions**" in lead, True),
+        pages_notice(lead),
+        ("the workflow the callout says to run", find(r"\*\*Actions\*\*, \*\*(\w+)\*\* in the left list"), deploy),
+        ("Run workflow, named by the callout, offered by Deploy",
+         "**Run workflow**" in lead and by_hand("deploy.yml"), True),
+    ]
+
+
 def finder(prompt: str):
     def find(pattern: str, cast=str):
         m = re.search(pattern, prompt)
@@ -215,6 +255,7 @@ def facts(prompt: str) -> list[tuple[str, object, object]]:
          int(re.search(r"A first response within (\d+) days", read("CONTRIBUTING.md")).group(1))),
         ("the Python version", find(r"Python ([\d.]+) or later"),
          re.search(r"Python ([\d.]+) or later", read("docs/how-to/add-a-design.md")).group(1)),
+        pages_notice(prompt),
     ]
 
 
@@ -225,7 +266,7 @@ def copy_facts(prompt: str) -> list[tuple[str, object, object]]:
     deploy, deploy_jobs, deploy_steps = workflow("deploy.yml")
     checks, _, _ = workflow("checks.yml")
     settings = find(r"`content/config\.json`: the settings, (.*?)\.", lambda s: set(re.findall(r"\"(\w+)\"", s)))
-    jobs = re.search(r"with the jobs (\w+), (\w+) and (\w+)\. A fourth, (\w+), is skipped", prompt)
+    jobs = re.search(r"with the jobs (\w+), (\w+), (\w+) and (\w+)\. A fifth, (\w+), is skipped", prompt)
     step = find(r"its failed step, usually \"([^\"]+)\"")
     return [
         ("the settings named, each in content/config.json", settings <= set(config) if settings else None, True),
@@ -236,6 +277,9 @@ def copy_facts(prompt: str) -> list[tuple[str, object, object]]:
         ("the step a failed build names, one of Deploy's", step,
          step if step in deploy_steps else "no step of that name"),
         ("the Checks workflow's name", find(r"The (\w+) run beside it runs accessibility checks"), checks),
+        pages_notice(prompt),
+        ("Run workflow, named by the prompt, offered by Deploy",
+         "Deploy in the left list, Run workflow" in prompt and by_hand("deploy.yml"), True),
         ("the Python version", find(r"With Python ([\d.]+) or later"),
          re.search(r"Python ([\d.]+) or later", read(COPY_GUIDES[0])).group(1)),
     ]
@@ -347,6 +391,13 @@ def main(argv: list[str]) -> int:
             print(f"no prompt between prompt:start and prompt:end in {shown}", file=sys.stderr)
             return 2
         problems, counts = check_prompt(raw, stated, safety, guides, for_copy)
+        if for_copy:
+            for what, said, source in copy_lead(path.read_text(encoding="utf-8")):
+                if said is None:
+                    problems.append(f"its README's lead, {what}: its words for it are not found")
+                elif said != source:
+                    problems.append(f"its README's lead, {what}: it says {said!r}, the repository {source!r}")
+            counts += ", the lead's 5 facts"
         for problem in problems:
             print(f"FAIL {shown}: {problem}")
         print(f"{shown}: {counts}; {len(problems)} problem(s)")

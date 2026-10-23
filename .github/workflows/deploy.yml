@@ -6,8 +6,16 @@
 # of this repository therefore publishes its owner's site with no change
 # here (docs/how-to/use-this-template.md).
 #
-# Four jobs, each with the least it needs (ADR-0006, ADR-0010):
+# Five jobs, each with the least it needs (ADR-0006, ADR-0010):
 #   build     builds and checks the files; read-only; no browser
+#   pages     asks GitHub whether Pages is on, publishing from GitHub
+#             Actions; Pages: read only. In a copy whose owner has not
+#             turned Pages on yet, the run ends with a notice saying how,
+#             and publishes nothing, rather than failing red on a
+#             stranger's first run; in the gallery an off Pages fails, as
+#             does Pages set to publish from a branch (ADR-0015, Changes,
+#             2026-10-23). It never holds back build: a build that fails
+#             fails the run, whatever Pages says
 #   shots     the gallery only: takes each design's preview, makes each
 #             showcase entry's served copies from its author's screenshot,
 #             and takes the gallery page's own picture, which the README
@@ -16,7 +24,8 @@
 #   assemble  takes only the WebP pictures the gallery shows from shots,
 #             checks them and the site, and packages the site for Pages;
 #             read-only
-#   deploy    publishes the package; the only job that can
+#   deploy    publishes the package, only when pages says Pages is on; the
+#             only job that can
 # Chrome parses contributed fonts, images and screenshots, so it never runs
 # in a job whose output is published without being checked.
 name: Deploy
@@ -64,6 +73,27 @@ jobs:
           path: _site
           retention-days: 1
           if-no-files-found: error
+
+  pages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pages: read
+    outputs:
+      on: ${{ steps.pages.outputs.on }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Is GitHub Pages on, publishing from GitHub Actions?
+        id: pages
+        env:
+          GALLERY: ${{ vars.PORTFOLIO_GALLERY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GALLERY" = "true" ]; then MODE=gallery; else MODE=site; fi
+          python3 tools/ci.py pages --mode "$MODE"
 
   shots:
     needs: build
@@ -141,9 +171,11 @@ jobs:
         with:
           path: _site
 
+  # Publishes only when pages says Pages is on; with Pages off in a copy,
+  # it is skipped and the run ends with pages' notice.
   deploy:
-    needs: assemble
-    if: ${{ !cancelled() && needs.assemble.result == 'success' }}
+    needs: [assemble, pages]
+    if: ${{ !cancelled() && needs.assemble.result == 'success' && needs.pages.result == 'success' && needs.pages.outputs.on == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

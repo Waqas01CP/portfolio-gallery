@@ -211,6 +211,15 @@ class Pages(http.server.BaseHTTPRequestHandler):
         elif path == "/slow":
             time.sleep(3)
             self.answer(200, self.LINKED)
+        # A fake GitHub API's Pages endpoint, for the pages step's cases.
+        elif path == "/api/repos/tester/off/pages":
+            self.answer(404, b'{"message": "Not Found"}', "application/json")
+        elif path == "/api/repos/tester/actions/pages":
+            self.answer(200, b'{"build_type": "workflow", "status": "built"}', "application/json")
+        elif path == "/api/repos/tester/branch/pages":
+            self.answer(200, b'{"build_type": "legacy", "status": "built"}', "application/json")
+        elif path == "/api/repos/tester/broken/pages":
+            self.answer(500, b'{"message": "Server Error"}', "application/json")
         else:
             self.answer(404)
 
@@ -454,7 +463,8 @@ def file_cases():
             return ["tools/check_workflows.py"]
         return plant
 
-    deploy_if = "    if: ${{ !cancelled() && needs.assemble.result == 'success' }}\n"
+    deploy_if = ("    if: ${{ !cancelled() && needs.assemble.result == 'success' && needs.pages.result == 'success' "
+                 "&& needs.pages.outputs.on == 'true' }}\n")
     # The deploy job as published at 6a4de5e: skipped in every site-mode run.
     yield "workflows: a job needing a skippable job, with no if:", workflow(deploy_if, ""), "has no if: of its own"
     yield ("workflows: an if: with no status function", workflow(
@@ -464,11 +474,66 @@ def file_cases():
     # deploy needs mid, which has no if: but needs shots, which has one:
     # deploy is caught only if the check follows the chain.
     yield ("workflows: a skip two jobs back", workflow(
-        "  deploy:\n    needs: assemble\n" + deploy_if,
+        "  deploy:\n    needs: [assemble, pages]\n" + deploy_if,
         "  mid:\n    needs: shots\n    runs-on: ubuntu-24.04\n    steps:\n      - run: echo\n\n"
         "  deploy:\n    needs: mid\n"), "job 'deploy'")
-    yield ("workflows: an alias for needs", workflow("    needs: assemble\n", "    needs: *assemble\n"),
+    yield ("workflows: an alias for needs", workflow("    needs: build\n", "    needs: *build\n"),
            "unreadable under jobs:")
+
+    # GitHub Pages off (the owner's decision of 2026-10-23; ADR-0015,
+    # Changes): a copy's Deploy ends with a notice, the gallery's fails, and
+    # a build never waits on Pages.
+    def verdict(old, new):
+        def plant(copy):
+            edit(copy / "tools/ci.py", old, new)
+            return ["tools/check_workflows.py"]
+        return plant
+
+    yield ("workflows: a copy's Deploy failing red with Pages off", verdict(
+        '    if status == 404:\n        return "notice"', '    if status == 404:\n        return "fail"'),
+        "gives 'fail' for site mode, the API answering 404, where it must give 'notice'")
+    yield ("workflows: the gallery's Deploy quiet with Pages off", verdict(
+        '    if status == 404 and mode == "gallery":', '    if status == 404 and mode == "none":'),
+        "gives 'notice' for gallery mode, the API answering 404, where it must give 'fail'")
+    yield ("workflows: a build waiting on Pages, so a copy's broken build would pass", workflow(
+        "  build:\n    runs-on: ubuntu-24.04\n",
+        "  build:\n    needs: pages\n    if: needs.pages.outputs.on == 'true'\n    runs-on: ubuntu-24.04\n"),
+        "job 'build' (line")
+    yield ("workflows: a failed build let through by continue-on-error", workflow(
+        "      - name: Build and check\n", "      - name: Build and check\n        continue-on-error: true\n"),
+        "continue-on-error would let a failed build or check end the run green")
+    yield ("workflows: deploy publishing whatever Pages says", workflow(
+        " && needs.pages.outputs.on == 'true' }}", " }}"),
+        "it publishes, so it must need 'pages' and run only when")
+
+    # The pages step itself, against a fake GitHub API on the fetch cases'
+    # local server: the environment GitHub Actions gives it, and what it
+    # wrote to the run's output and summary.
+    def pages(mode, state):
+        def plant(copy):
+            (copy / "_pages.py").write_text(
+                "import os, runpy, sys\n"
+                f"os.environ.update(GITHUB_API_URL={local_site('/api')!r}, GITHUB_REPOSITORY='tester/{state}',\n"
+                "    GITHUB_TOKEN='t', GITHUB_OUTPUT='_output.txt', GITHUB_STEP_SUMMARY='_summary.md')\n"
+                f"sys.argv = ['tools/ci.py', 'pages', '--mode', {mode!r}]\n"
+                "try:\n    runpy.run_path('tools/ci.py', run_name='__main__')\nexcept SystemExit as stop:\n"
+                "    code = stop.code\n"
+                "read = lambda p: open(p, encoding='utf-8').read() if os.path.exists(p) else ''\n"
+                "print('RESULT', read('_output.txt').strip() or 'no output',\n"
+                "      'summary' if 'Turn on GitHub Pages' in read('_summary.md') else 'no summary')\n"
+                "sys.exit(code)\n", encoding="utf-8")
+            return ["_pages.py"]
+        return plant
+
+    yield ("control: a copy with Pages off ends with the notice and publishes nothing", pages("site", "off"),
+           Passes("RESULT on=false summary"))
+    yield ("control: the gallery with Pages on, from GitHub Actions, publishes", pages("gallery", "actions"),
+           Passes("RESULT on=true no summary"))
+    yield ("pages: the gallery with Pages off fails", pages("gallery", "off"),
+           ("::error title=GitHub Pages::GitHub Pages is off, so the gallery is not published", "RESULT on=false"))
+    yield ("pages: a copy with Pages publishing from a branch fails", pages("site", "branch"),
+           "GitHub Pages publishes from a branch here")
+    yield "pages: GitHub's API failing fails", pages("site", "broken"), "GitHub's API answered 500"
 
     def cleanup(rel, old, new):
         def plant(copy):
@@ -758,6 +823,18 @@ def file_cases():
     yield ("prompt: a copy's prompt without a safety rule", prompt(
         copy_readme, "Never say you have done any of these.", "Say when you have done one."),
         "copy-README.md: its safety rule 'Never say you have done any of these' is missing")
+    # A copy's README leads with turning GitHub Pages on (the owner's
+    # decision of 2026-10-23; ADR-0015, Changes).
+    yield ("prompt: the Pages notice's title changed at its source", prompt(
+        "tools/ci.py", 'PAGES_OFF_TITLE = "Turn on GitHub Pages to publish your site"',
+        'PAGES_OFF_TITLE = "Pages is off"'),
+        "the notice a Deploy run ends with while GitHub Pages is off: the prompt says 'Turn on GitHub Pages")
+    yield ("prompt: a copy's README not leading with turning Pages on", prompt(
+        copy_readme, "# My portfolio\n\n> [!IMPORTANT]\n", "# My portfolio\n\nWelcome.\n\n> [!IMPORTANT]\n"),
+        "its README's lead, the copy's README opening with a callout on turning GitHub Pages on: it says False")
+    yield ("prompt: Run workflow named, Deploy not startable by hand", prompt(
+        ".github/workflows/deploy.yml", "  workflow_dispatch:\n", ""),
+        "its README's lead, Run workflow, named by the callout, offered by Deploy: it says False")
 
     # The routers for coding agents: what they name, and nothing else.
     copy_agents = ".github/template-cleanup/copy-AGENTS.md"

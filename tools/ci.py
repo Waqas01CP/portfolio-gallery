@@ -27,6 +27,20 @@
       A built gallery's pictures made, as the screenshot job makes them,
       and held to assemble's rules. Headless Chrome.
 
+  python tools/ci.py pages --mode site|gallery
+      The deploy workflow's question before it publishes: is GitHub Pages
+      on, publishing from GitHub Actions? It asks GitHub's API with the
+      run's own token (Pages: read). On, it says so. Off in a copy, whose
+      owner has not turned it on yet, it ends with a notice in the run's
+      summary and an annotation, naming the setting and how to run Deploy
+      again, and publishes nothing: a red first run reads as a broken
+      template (the owner's decision of 2026-10-23, ADR-0015, Changes).
+      Off in the gallery, set to publish from a branch, or any other
+      answer, it fails: the gallery would be down, or the site published
+      would not be the one built. Writes on=true or on=false to
+      GITHUB_OUTPUT. pages_verdict() is the decision, and
+      tools/check_workflows.py holds it to its table.
+
   python tools/ci.py assemble --site DIR --shots DIR
       The deploy workflow's last step before publishing: takes from the
       screenshot job's folder only the pictures the gallery shows, each a
@@ -49,12 +63,16 @@ from __future__ import annotations
 
 import argparse
 import filecmp
+import json
+import os
 import re
 import shutil
 import struct
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -70,6 +88,29 @@ PREVIEW_LIMIT = 300 * 1024
 # wall of photographs.
 SERVED_LIMITS = {SHOWCASE_CARD: 300 * 1024, SHOWCASE_FULL: 1024 * 1024}
 SERVED_RE = re.compile(r"showcase/([a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38})/(card|full)\.webp")
+
+# What the run says when GitHub Pages is off in a copy; the copy's README
+# and its prompt name the same title (tools/check_prompt.py holds them).
+PAGES_OFF_TITLE = "Turn on GitHub Pages to publish your site"
+PAGES_OFF_STEPS = ("In this repository: Settings, then Pages, and under Build and deployment set Source to "
+                   "GitHub Actions. Then Actions, Deploy, Run workflow, or commit any change: the next run "
+                   "publishes.")
+PAGES_SETTING = "Settings, Pages, Build and deployment, Source: GitHub Actions"
+
+
+def pages_verdict(mode: str, status: int, build_type: str | None) -> tuple[str, str]:
+    """What Deploy does, by what GitHub's API says of Pages: ("publish",
+    "notice" or "fail", the message). Only a 404 means Pages is off."""
+    if status == 200 and build_type == "workflow":
+        return "publish", "GitHub Pages is on, publishing from GitHub Actions"
+    if status == 200:
+        return "fail", (f"GitHub Pages publishes from a branch here, not from GitHub Actions, so what "
+                        f"it shows is not what was built and checked; set {PAGES_SETTING}")
+    if status == 404 and mode == "gallery":
+        return "fail", f"GitHub Pages is off, so the gallery is not published; set {PAGES_SETTING}"
+    if status == 404:
+        return "notice", f"GitHub Pages is off, so this run published nothing. {PAGES_OFF_STEPS}"
+    return "fail", f"GitHub's API answered {status} when asked whether GitHub Pages is on"
 
 
 def served_problem(path: Path, limit: int, image_only: bool) -> str | None:
@@ -242,6 +283,50 @@ def assemble(site: Path, shots: Path) -> None:
     run("tools/check_built.py", site, "--previews")
 
 
+def pages(mode: str) -> None:
+    api = os.environ.get("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+    repository = os.environ.get("GITHUB_REPOSITORY", "")
+    if not repository:
+        print("=== FAILED: GITHUB_REPOSITORY is not set: this runs in GitHub Actions")
+        raise Failed(1)
+    request = urllib.request.Request(f"{api}/repos/{repository}/pages", headers={
+        "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28",
+        "Authorization": f"Bearer {os.environ.get('GITHUB_TOKEN', '')}"})
+    build_type = None
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            status = response.status
+            build_type = json.loads(response.read().decode("utf-8")).get("build_type")
+    except urllib.error.HTTPError as error:
+        status = error.code
+    except (urllib.error.URLError, OSError, ValueError, AttributeError) as error:
+        print(f"::error title=GitHub Pages::GitHub's API could not be asked whether GitHub Pages is on: {error}")
+        raise Failed(1)
+    verdict, message = pages_verdict(mode, status, build_type)
+    print(f"=== {mode}: GitHub's API answered {status}, build_type {build_type}: {verdict}")
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with open(output, "a", encoding="utf-8") as out:
+            out.write(f"on={'true' if verdict == 'publish' else 'false'}\n")
+    if verdict == "fail":
+        print(f"::error title=GitHub Pages::{message}")
+        raise Failed(1)
+    if verdict == "notice":
+        print(f"::notice title={PAGES_OFF_TITLE}::{message}")
+        summary = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary:
+            with open(summary, "a", encoding="utf-8") as out:
+                out.write(f"## {PAGES_OFF_TITLE}\n\n"
+                          "GitHub Pages is off in this repository, so this run published nothing. "
+                          "Turn it on once:\n\n"
+                          "1. **Settings**, then **Pages** in the left sidebar.\n"
+                          "2. Under \"Build and deployment\", set **Source** to **GitHub Actions**.\n"
+                          "3. **Actions**, then **Deploy** in the left list, then **Run workflow**, and the "
+                          "green **Run workflow** button. Or commit any change: the next run publishes.\n")
+    else:
+        print(f"=== {message}")
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="The workflows' entry point.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -256,6 +341,8 @@ def main(argv: list[str]) -> int:
     a.add_argument("--shots", type=Path, required=True)
     p = sub.add_parser("pictures")
     p.add_argument("--gallery", type=Path, required=True)
+    g = sub.add_parser("pages")
+    g.add_argument("--mode", choices=("site", "gallery"), required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "checks":
@@ -265,6 +352,9 @@ def main(argv: list[str]) -> int:
         elif args.command == "pictures":
             run("tools/screenshots.py", args.gallery.resolve())
             pictures(args.gallery.resolve())
+        elif args.command == "pages":
+            pages(args.mode)
+            return 0
         else:
             assemble(args.site.resolve(), args.shots.resolve())
     except Failed as failure:

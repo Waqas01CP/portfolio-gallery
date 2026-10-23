@@ -122,7 +122,10 @@ The workflows call these, and they run the same locally:
 python tools/ci.py checks [--quick] [--axe FILE]
 python tools/ci.py build --mode site|gallery [--out DIR]
 python tools/ci.py assemble --site DIR --shots DIR
+python tools/ci.py pages --mode site|gallery
 ```
+
+`pages` is Deploy's question before it publishes, whether GitHub Pages is on; it reads GITHUB_REPOSITORY, GITHUB_TOKEN and GITHUB_API_URL as GitHub Actions sets them, so it runs only there, or against a fake API as the defeat cases run it.
 
 `checks` is everything a pull request must pass: the workflows' job
 conditions, designs, two builds each of the site and the gallery compared
