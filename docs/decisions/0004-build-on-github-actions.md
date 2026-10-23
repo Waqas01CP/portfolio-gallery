@@ -129,3 +129,7 @@ the setup steps end with that test.
   Actions stops being free for public repositories.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-23 | **Deploy asks whether GitHub Pages is on before it publishes**: a job, pages, runs `tools/ci.py pages` with the run's own token (Pages: read). With Pages off, a copy's run ends with a notice and publishes nothing, and the gallery's fails; Pages publishing from a branch, or any other answer, fails. The build and checks never wait on it. The decision is ADR-0015's, Changes, 2026-10-23. | The owner's decision of 2026-10-23, through the chat's Brief 13. |

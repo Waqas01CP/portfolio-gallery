@@ -1,5 +1,14 @@
 # My portfolio
 
+> [!IMPORTANT]
+> **First, once: turn on GitHub Pages**, or nothing is published. In this
+> repository, click **Settings**, then **Pages** in the left sidebar, and
+> under "Build and deployment" set **Source** to **GitHub Actions**. Then
+> click **Actions**, **Deploy** in the left list, **Run workflow**, and the
+> green **Run workflow** button; or commit any change. Until then each
+> Deploy run ends with the notice "Turn on GitHub Pages to publish your
+> site" and publishes nothing; that is expected, not a fault.
+
 This repository builds my portfolio site and publishes it with GitHub
 Pages. Each commit to `main` builds the site again; the **Actions** tab
 shows each run.
@@ -92,10 +101,13 @@ off. The MIT licence asks only that LICENSE stays.
 
 C. PUBLISH
 1. Once: Settings, Pages, and under Build and deployment set Source to GitHub
-   Actions. Until then each Deploy run fails at its last job.
+   Actions. Until then each Deploy run ends with the notice "Turn on GitHub Pages
+   to publish your site" and publishes nothing; that is expected, not a fault.
+   Then Actions, Deploy in the left list, Run workflow, and the green Run
+   workflow button; or commit any change.
 2. Each commit to main starts a Deploy run in the Actions tab, with the jobs build,
-   assemble and deploy. A fourth, shots, is skipped in their repository; that is
-   normal.
+   pages, assemble and deploy. A fifth, shots, is skipped in their repository;
+   that is normal.
 3. When the run is green the site is live: https://<username>.github.io/ for a
    repository named <username>.github.io, otherwise
    https://<username>.github.io/<repository>/. The deploy job links to it.
@@ -103,6 +115,7 @@ The Checks run beside it runs accessibility checks on their content in every
 design. It does not stop the site publishing.
 
 D. READ A FAILED BUILD
+A run that ended with the notice about GitHub Pages has not failed: see C.
 1. In the Actions tab, open the failed Deploy run, then the failed job, usually
    build, and its failed step, usually "Build and check".
 2. Ask them to copy that step's last lines into the chat. They name every problem:

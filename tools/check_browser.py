@@ -43,6 +43,18 @@ docs/reference/standing-checks.md with the case built to defeat it.
               cards in folder order; Tab reaches them in folder order; and,
               packed, no gap is left under a card. With scripts off and no
               grid-lanes the cards sit in rows, gaps allowed.
+  overlay     Gallery only, the showcase's larger copy (Brief 13, Addendum
+              1; ADR-0016, Changes, 2026-10-23), at 390 and 1366 px, light
+              and dark. At load the closed overlay is not in the tree. Tab
+              to the first card and Enter: the page's dialog opens as a
+              modal, named, focus inside it, with a visible Close button
+              of at least 24 px named "Close", and the card's own picture
+              loaded, whole within the window and in its own proportions,
+              never enlarged; with --axe, axe-core's default rules with it
+              open and closed. Escape, the Close button and a click
+              outside the picture each close it and put focus back on the
+              card's link. With scripts off, nothing opens: Enter on the
+              card opens the picture itself, as a plain link.
   axe         With --axe FILE, axe-core's default rules at 360 and 1366 px,
               light, device dark and switched dark, panels closed and open.
               The checks workflow fetches axe.min.js by exact version and
@@ -708,6 +720,145 @@ def check_packing(origin, report) -> None:
 AXE_RUN = """axe.run(document, { resultTypes: ['violations'] }).then((r) =>
   r.violations.map((v) => v.id + ' (' + v.nodes.length + '): ' + v.nodes[0].target.join(' ')))"""
 
+OVERLAY_STATE = """(() => { const d = document.querySelector('[data-view]'); const a = document.activeElement;
+  const links = [...document.querySelectorAll('.g-site .g-frame')];
+  const p = d ? d.querySelector('img') : null; const r = p ? p.getBoundingClientRect() : null;
+  const c = d ? d.querySelector('[data-view-close]') : null; const cr = c ? c.getBoundingClientRect() : null;
+  return { open: !!(d && d.open), modal: !!(d && d.matches(':modal')), inside: !!(d && d.contains(a)),
+    card: links.indexOf(a), focus: a ? a.tagName + (a.className ? '.' + a.className : '') : 'nothing',
+    href: links.length ? links[0].getAttribute('href') : null, path: location.pathname,
+    close: c && c.offsetParent !== null ? { w: cr.width, h: cr.height } : null,
+    picture: p ? { loaded: p.complete && p.naturalWidth > 0, src: p.getAttribute('src'), nw: p.naturalWidth,
+                   nh: p.naturalHeight, w: r.width, h: r.height, left: r.left, top: r.top, right: r.right,
+                   bottom: r.bottom } : null,
+    vw: innerWidth, vh: innerHeight }; })()"""
+PICTURE_LOADED = """(() => { const p = document.querySelector('[data-view] img');
+  return p ? p.decode().then(() => true, () => false) : false; })()"""
+
+
+def overlay_problems(state: dict) -> list[str]:
+    """What is wrong with the overlay as it stands open."""
+    problems = []
+    if not state["open"] or not state["modal"]:
+        return [f"Enter on the card did not open the overlay as a modal dialog "
+                f"(open: {state['open']}, modal: {state['modal']}); the page is at {state['path']}"]
+    if not state["inside"]:
+        problems.append(f"focus stayed on {state['focus']}, outside the overlay")
+    if not state["close"] or state["close"]["w"] < 24 or state["close"]["h"] < 24:
+        problems.append("the overlay has no visible Close button of at least 24 px")
+    picture = state["picture"]
+    if not picture or not picture["loaded"]:
+        problems.append("the overlay's picture did not load")
+    elif picture["src"] != state["href"]:
+        problems.append(f"the overlay shows {picture['src']}, not the card's own {state['href']}")
+    else:
+        if (picture["left"] < -1 or picture["top"] < -1 or picture["right"] > state["vw"] + 1
+                or picture["bottom"] > state["vh"] + 1):
+            problems.append(f"the picture is not whole within the window: {picture['left']:.0f}, "
+                            f"{picture['top']:.0f} to {picture['right']:.0f}, {picture['bottom']:.0f} in "
+                            f"{state['vw']}x{state['vh']}")
+        shape, natural = picture["w"] / picture["h"], picture["nw"] / picture["nh"]
+        if abs(shape - natural) > natural * 0.01:
+            problems.append(f"the picture is shown at {picture['w']:.0f}x{picture['h']:.0f}, not in its own "
+                            f"proportions, {picture['nw']}x{picture['nh']}")
+        if picture["w"] > picture["nw"] + 1:
+            problems.append(f"the picture is enlarged past its own {picture['nw']} px")
+    return problems
+
+
+def check_overlay(origin, report, axe_source: str | None) -> None:
+    def tab_to_card(page) -> bool:
+        page.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0); true")
+        for _ in range(600):
+            page.key("Tab")
+            if page.evaluate(OVERLAY_STATE)["card"] == 0:
+                return True
+        return False
+
+    def named(page, role: str, name: str | None = None) -> bool:
+        return any(_value(n, "role") == role and (_value(n, "name").strip() if name is None else
+                                                  _value(n, "name").strip() == name)
+                   for n in page.ax_tree() if not n.get("ignored"))
+
+    with Chrome(accessibility=True) as chrome:
+        for width, height in PACKING_WIDTHS:
+            for dark in (False, True):
+                cell = f"{width}px {'dark' if dark else 'light'}"
+                page = open_page(chrome, origin, "index.html", width, height, dark=dark, reduced=True)
+                if page.evaluate(OVERLAY_STATE)["href"] is None:
+                    report.notes.append("overlay: the gallery has no showcase cards to check")
+                    page.close()
+                    return
+                report.ran("overlay")
+                if named(page, "dialog") or named(page, "button", "Close"):
+                    report.fail("overlay", "index.html", f"{cell}: the closed overlay is in the tree at load")
+                if axe_source:
+                    page.evaluate(axe_source + "\n;true")
+                    for violation in page.evaluate(AXE_RUN, await_promise=True) or []:
+                        report.fail("axe", "index.html", f"{cell}, the overlay closed: {violation}")
+                if not tab_to_card(page):
+                    report.fail("overlay", "index.html", f"{cell}: Tab never reached the first card's picture")
+                    page.close()
+                    continue
+                # Escape, the Close button and a click outside the picture,
+                # each from the overlay opened by Enter on the card.
+                for way in ("Escape", "the Close button", "a click outside the picture"):
+                    page.key("Enter")
+                    chrome.drain(0.3)
+                    page.evaluate(PICTURE_LOADED, await_promise=True)
+                    state = page.evaluate(OVERLAY_STATE)
+                    problems = overlay_problems(state)
+                    for problem in problems:
+                        report.fail("overlay", "index.html", f"{cell}: {problem}")
+                    if not state["open"]:
+                        break
+                    if way == "Escape":
+                        if not named(page, "button", "Close"):
+                            report.fail("overlay", "index.html", f"{cell}: no button named 'Close' in the tree")
+                        if not named(page, "dialog"):
+                            report.fail("overlay", "index.html", f"{cell}: the overlay is not a named dialog "
+                                        f"in the tree")
+                        if axe_source:
+                            for violation in page.evaluate(AXE_RUN, await_promise=True) or []:
+                                report.fail("axe", "index.html", f"{cell}, the overlay open: {violation}")
+                        page.key("Escape")
+                    elif way == "the Close button":
+                        page.evaluate("(() => { const c = document.querySelector('[data-view-close]');"
+                                      " if (c) c.focus(); return true; })()")
+                        page.key("Enter")
+                    else:
+                        for kind in ("mousePressed", "mouseReleased"):
+                            page.send("Input.dispatchMouseEvent", {"type": kind, "x": 4, "y": 4,
+                                                                  "button": "left", "clickCount": 1})
+                    chrome.drain(0.3)
+                    after = page.evaluate(OVERLAY_STATE)
+                    if after["open"]:
+                        report.fail("overlay", "index.html", f"{cell}: {way} did not close the overlay")
+                        break
+                    if after["card"] != 0:
+                        report.fail("overlay", "index.html", f"{cell}: after {way}, focus is on "
+                                    f"{after['focus']}, not the card's link")
+                        break
+                for problem in page_errors(chrome, page, origin):
+                    report.fail("requests", "index.html", f"{cell}: {problem}")
+                page.close()
+                # Scripts off: the card is the plain link it always was.
+                page = open_page(chrome, origin, "index.html", width, height, dark=dark, scripts=False)
+                state = page.evaluate(OVERLAY_STATE)
+                if state["open"]:
+                    report.fail("overlay", "index.html", f"{cell}, scripts off: an overlay is open")
+                elif tab_to_card(page):
+                    page.key("Enter")
+                    chrome.drain(1.0)
+                    landed = page.evaluate("location.pathname")
+                    if not landed.endswith(state["href"]):
+                        report.fail("overlay", "index.html", f"{cell}, scripts off: Enter on the card led to "
+                                    f"{landed}, not the picture {state['href']}")
+                else:
+                    report.fail("overlay", "index.html", f"{cell}, scripts off: Tab never reached the first "
+                                f"card's picture")
+                page.close()
+
 
 def check_axe(pages, origin, report, axe_source: str) -> None:
     with Chrome() as chrome:
@@ -755,7 +906,7 @@ def main(argv: list[str]) -> int:
     gallery = bool(demos)
     sites = demos if gallery else ["index.html"]
     chosen = set(args.only.split(",")) if args.only else {
-        "tree", "keyboard", "joins", "anchors", "words", "motion", "packing", "axe"}
+        "tree", "keyboard", "joins", "anchors", "words", "motion", "packing", "overlay", "axe"}
     loads = 1 if args.quick else args.loads
     report = Report()
     started = time.monotonic()
@@ -781,6 +932,9 @@ def main(argv: list[str]) -> int:
                 check_motion(sites + (["index.html"] if gallery else []), origins["built"], report)
             if "packing" in chosen and gallery:
                 check_packing(origins["built"], report)
+            if "overlay" in chosen and gallery:
+                check_overlay(origins["built"], report,
+                              args.axe.read_text(encoding="utf-8") if args.axe and "axe" in chosen else None)
             if "axe" in chosen:
                 if args.axe:
                     check_axe(sites + (["index.html"] if gallery else []), origins["built"], report,

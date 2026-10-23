@@ -60,7 +60,8 @@ your whole site's look. Two of them, the same page in each:
    `https://<your-username>.github.io/`, or anything else for
    `https://<your-username>.github.io/<name>/`.
 2. In your new repository, open **Settings**, then **Pages**, and under
-   "Build and deployment", set **Source** to **GitHub Actions**.
+   "Build and deployment", set **Source** to **GitHub Actions**. Until you
+   do, each Deploy run ends with a notice saying so and publishes nothing.
 3. Open the `content/` folder and edit the files in your browser: your CV
    in `cv.md` first, then your details in `site.json` and your projects
    and roles in `items.json`, and the design in `config.json`, such as
@@ -186,10 +187,12 @@ Needs a GitHub account, nothing else; about fifteen minutes, most of it writing.
 2. A workflow called Template cleanup runs once by itself in the copy and removes
    this project's own files (its records, its contact address, the showcase, its
    own tools), and gives the copy a short README of its own, with a prompt like
-   this one for looking after the site. The first Deploy run fails until step 3;
-   that is expected.
+   this one for looking after the site. Until step 3, each Deploy run ends with
+   the notice "Turn on GitHub Pages to publish your site" and publishes nothing;
+   that is expected, not a fault.
 3. In the new repository: Settings, Pages, and under Build and deployment set
-   Source to GitHub Actions.
+   Source to GitHub Actions. Then Actions, Deploy, Run workflow, or commit any
+   change, and the site is published.
 4. Edit the files in `content/` in the browser (open a file, then the pencil icon,
    then Commit changes). Write `content/cv.md` first: every fact in
    `content/site.json` and `content/items.json` must also be in `content/cv.md`, word
@@ -198,9 +201,9 @@ Needs a GitHub account, nothing else; about fifteen minutes, most of it writing.
    Pick the design there too, such as "design": "plain". Every project in
    items.json needs a "layer1": the same words as one of its bullets, in the same
    order, some left out. Anything in cv.md is public.
-5. Watch the Actions tab: each commit starts a Deploy run (build, assemble,
-   deploy). When it is green, the site is live. A job called shots is skipped in a
-   copy; that is normal. If the build fails, the failed step names every problem;
+5. Watch the Actions tab: each commit starts a Deploy run (build, pages, assemble,
+   deploy). When it is green and deploy ran, the site is live. A job called shots
+   is skipped in a copy; that is normal. If the build fails, the failed step names every problem;
    a failed build publishes nothing and the previous site stays up.
 6. The footer carries a credit line naming this project and the design's author,
    on by default; "credit": false turns it off. The MIT licence asks only that

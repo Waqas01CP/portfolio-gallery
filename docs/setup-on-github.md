@@ -85,10 +85,14 @@ Waqas01CP.
 Then open https://github.com/Waqas01CP/portfolio-gallery and click the
 **Actions** tab. You should see two runs for the push: **Checks**, which
 should go green in about 10 minutes (9 on 2026-10-16), and **Deploy**,
-which will fail at its last job, "deploy", because Pages is not set up
-yet. That failure is expected; step 8 runs it again.
+which publishes nothing yet: Pages is not set up and step 7's variable is
+not set, so it runs as a copy's would and ends with the notice "Turn on
+GitHub Pages to publish your site", its deploy job skipped. On 2026-10-16,
+before that notice existed, it failed at its last job instead. Step 8
+runs it again.
 
-**Send back:** the result of each run (green or the failed step's name).
+**Send back:** the result of each run (green, the notice, or the failed
+step's name).
 
 ## Part C: settings, in this order
 
@@ -179,8 +183,10 @@ have it, builds its owner's site instead.
 1. **Actions** tab, then **Deploy** in the left list.
 2. **Run workflow**, branch `main`, **Run workflow**.
 
-You should see four jobs: build, shots, assemble, deploy, all green within
-about 5 minutes. Open the run and look at each job's icon, not the run's:
+You should see five jobs: build, pages, shots, assemble, deploy, all green
+within about 5 minutes. If pages failed saying GitHub Pages is off, step 6
+did not take: in the gallery an off Pages fails, since the gallery would
+be down. Open the run and look at each job's icon, not the run's:
 GitHub counts a skipped job as passed, so a run can be green while a job
 was skipped (a grey circle with a line through it). If **shots** was
 skipped, the build did not read the variable of step 7: check that it is
@@ -385,14 +391,15 @@ deleted at the end.
    You should see the new repository's page say it was generated from
    Waqas01CP/portfolio-gallery.
 3. Its **Actions** tab. You should see **Checks** and **Deploy** for its
-   first commit; if none appear, note it and go on to 4. In Deploy: build
-   and assemble green, shots skipped (grey), and deploy started and failed
-   at "Check that Pages is set to publish from GitHub Actions", because
-   the copy has no Pages yet. Deploy starting at all is the fix at work.
+   first commit; if none appear, note it and go on to 4. In Deploy: build,
+   pages and assemble green, shots and deploy skipped (grey), no red, and
+   the run's summary headed "Turn on GitHub Pages to publish your site",
+   because the copy has no Pages yet (ADR-0015, Changes, 2026-10-23).
+   Deploy starting at all is the fix of 2026-10-16 at work.
 4. In the copy: **Settings**, **Pages**, **Source**: **GitHub Actions**.
 5. **Actions**, **Deploy**, **Run workflow**, branch `main`, **Run
-   workflow**. You should see build, assemble and deploy green and shots
-   skipped, within about 3 minutes. Then open
+   workflow**. You should see build, pages, assemble and deploy green and
+   shots skipped, within about 3 minutes. Then open
    https://waqas01cp.github.io/pg-copy-test/: the sample site, Alex
    Example.
 6. Delete the copy: its **Settings**, **General**, at the bottom **Delete

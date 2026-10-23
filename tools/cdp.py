@@ -387,6 +387,15 @@ class Page:
 
 
 class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    # Every type the built site serves, as GitHub Pages serves it. Python's
+    # own table depends on the machine: on the seat's Windows it had no
+    # .webp, so a link to a picture downloaded it instead of opening it
+    # (2026-10-23); images inside a page loaded anyway, by sniffing.
+    extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map,
+                      ".webp": "image/webp", ".woff2": "font/woff2", ".js": "text/javascript",
+                      ".css": "text/css", ".html": "text/html", ".json": "application/json",
+                      ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".pdf": "application/pdf"}
+
     def log_message(self, *args) -> None:
         pass
 

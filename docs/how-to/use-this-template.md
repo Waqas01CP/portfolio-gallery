@@ -41,8 +41,9 @@ Fork only to contribute a design
 
 GitHub runs your copy's workflows for that first commit on its own:
 "Checks", "Deploy" and "Template cleanup" started by themselves in test
-copies on 2026-10-18. "Deploy" fails at its last job, because Pages is not
-set up yet; step 3 fixes it.
+copies on 2026-10-18. "Deploy" builds and checks your site but publishes
+nothing yet, because Pages is not set up: the run ends with the notice
+"Turn on GitHub Pages to publish your site", with no red. Step 3 fixes it.
 
 ## 2. Make it yours
 
@@ -93,8 +94,14 @@ licence asks that its notice stays with every copy.
 1. In your repository, click **Settings**, then **Pages** in the left
    sidebar.
 2. Under "Build and deployment", set **Source** to **GitHub Actions**.
+   Nothing else on that page needs changing.
+3. Click **Actions**, then **Deploy** in the left list, then **Run
+   workflow**, and the green **Run workflow** button. Or commit any
+   change: every commit publishes.
 
-Nothing else on that page needs changing.
+GitHub Actions cannot turn Pages on by itself: the action that could
+needs a token other than the run's own (actions/configure-pages, its
+`enablement` input), and one setting is less to ask than a token.
 
 ## 4. Write your content
 
@@ -134,11 +141,13 @@ commit fails and the second goes green; a failed build publishes nothing.
 ## 5. Watch it publish
 
 Open the **Actions** tab. Each commit to `main` starts a "Deploy" run:
-build, then assemble, then deploy. When all three are green, your site is
-live at the address from step 1, and the run's "deploy" job links to it.
-A fourth job, "shots", shows as skipped (a grey circle with a line
-through it): it takes the gallery's previews and runs only in this
-project's own repository.
+build, then assemble, then deploy, with "pages" beside them asking GitHub
+whether Pages is on. When all four are green, your site is live at the
+address from step 1, and the run's "deploy" job links to it. If "deploy"
+shows as skipped and the run's summary says "Turn on GitHub Pages to
+publish your site", Pages is still off: step 3. A fifth job, "shots",
+shows as skipped too (a grey circle with a line through it): it takes the
+gallery's previews and runs only in this project's own repository.
 
 If the build fails, open the run and the failed step: it names every
 problem, such as an item missing a field, a `layer1` that is not a cut, or

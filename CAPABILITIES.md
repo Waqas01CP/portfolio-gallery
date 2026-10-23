@@ -65,7 +65,11 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    first screen, and then the gallery page's own top, 1366 by 1280 pixels,
    which the README shows, in a job with no write token; only checked WebP
    files reach the published site (ADR-0010; ADR-0017, Changes).
-5. **Publish.** GitHub Pages, from the deploy workflow's artifact.
+5. **Publish.** GitHub Pages, from the deploy workflow's artifact, once a
+   job has asked GitHub whether Pages is on. In a copy whose owner has not
+   turned it on yet, the run ends with a notice saying how and publishes
+   nothing, rather than failing red; in the gallery an off Pages fails
+   (ADR-0015, Changes, 2026-10-23).
 6. **In the browser.** The page is whole without scripts. site.js closes
    the "In depth" panels, runs the timeline's lane filters and cards, the
    section menu, the progress marker, a Dark switch for the visit when
@@ -74,7 +78,10 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    reduced motion nothing moves. On the gallery, the showcase's cards are
    packed as on Pinterest: by CSS grid-lanes where the browser has it,
    else by gallery.js, each card in turn in the column whose bottom is
-   highest, so they run in folder order; without either, in rows.
+   highest, so they run in folder order; without either, in rows. A
+   card's picture opens its larger copy in the page's own dialog, shown
+   as a modal, with a Close button, Escape and a click outside to close
+   it; without scripts, the plain link (ADR-0016, Changes, 2026-10-23).
 7. **Contributions.** The README opens with a row for each thing a
    visitor may want to do, and carries a self-contained prompt they can
    give their own AI assistant, held to the repository by
@@ -95,7 +102,8 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
    template", a workflow removes the project's own files once, puts a
    README and an AGENTS.md of the copy's own in place and commits; it
    never runs here or in a fork (ADR-0015). The showcase and every
-   design's "In use" link go with them. The copy's README carries a short
+   design's "In use" link go with them. The copy's README opens with
+   turning GitHub Pages on, once, and carries a short
    prompt for the owner's AI assistant: content and its CV trace, the
    design, publishing, a failed build; checked here before any copy
    receives it (ADR-0017, Changes, 2026-10-23).
@@ -151,8 +159,8 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 | Gallery page | 3,778 bytes (1,485 gzipped); plain design.css 11,678 bytes | 2026-10-12 | same |
 | Builds | site in each design and the gallery: exit 0, twice each, byte-identical (default 14 files, plain 8, gallery 18), from a fresh clone | 2026-10-12 | the session log |
 | Content trace, sample | 196 blocks traced, 0 not; every CV line on the page; 8 of 8 sources name a CV entry | 2026-10-19 | tools/check_content.py |
-| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures. On a fresh clone of db055e5, 2026-10-19: exit 0 in 648 s, the browser checks 634 s, 0 failures. On a fresh clone of 5a7cecf, 2026-10-19: exit 0 in 642 s, the browser checks 627 s, 0 failures; and every browser check with axe on a gallery holding ten showcase entries, 0 failures in 620 s. On a fresh clone of 3020bb4, 2026-10-20: exit 0 in 667 s, the browser checks 642 s, 0 failures; and every browser check with axe on a gallery assembled from ten real snips, 0 failures in 644 s. On a fresh clone of b17d883, 2026-10-21: exit 0 in 643 s, the browser checks 621 s (packing 12 runs), 0 failures; and every browser check with axe on a gallery assembled from 13 real snips of every shape, 0 failures in 622 s. On a fresh clone of 3fed37d, 2026-10-22: exit 0 in 665 s, the browser checks 638 s, 0 failures; and every browser check with axe on a gallery assembled from 13 real snips, 0 failures in 629 s. On a fresh clone of eb27870, 2026-10-23: exit 0 in 1,033 s on a slower hour, the browser checks 967 s, 0 failures (the tree check alone took the same 187 to 200 s before and after that commit's change) | 2026-10-12 to 23 | the session log; GitHub's API |
-| Defeat cases | 151 (133 file, 18 browser) fail as built, naming what failed; 12 controls and 21 planted controls pass, on a fresh clone of eb27870. Gates: 26 defeat cases refused, 5 controls passed, on a clone of b63f70d | 2026-10-23 | tools/prove_checks.py; the session log |
+| Full checks | `tools/ci.py checks` on a fresh clone: exit 0 in 503 s on the seat's Windows machine; the browser checks 496 s of it (tree 48 runs, keyboard 8, joins 4, anchors 136, words 4, motion 3), 0 failures. Rerun with the default design's fonts optional, 2026-10-13: 0 failures, no anchor misses, 483 s. With axe, `tools/ci.py checks --axe` on a fresh clone of e794feb, 2026-10-16: exit 0 in 632 s; the browser checks 623 s of it (axe 36 runs), 0 failures. On GitHub's runner, 2026-10-16: every check with axe in 8 min 53 s, run 38957566173. On a fresh clone of d612b96, 2026-10-18: exit 0 in 622 s, the browser checks 614 s, 0 failures. On a fresh clone of db055e5, 2026-10-19: exit 0 in 648 s, the browser checks 634 s, 0 failures. On a fresh clone of 5a7cecf, 2026-10-19: exit 0 in 642 s, the browser checks 627 s, 0 failures; and every browser check with axe on a gallery holding ten showcase entries, 0 failures in 620 s. On a fresh clone of 3020bb4, 2026-10-20: exit 0 in 667 s, the browser checks 642 s, 0 failures; and every browser check with axe on a gallery assembled from ten real snips, 0 failures in 644 s. On a fresh clone of b17d883, 2026-10-21: exit 0 in 643 s, the browser checks 621 s (packing 12 runs), 0 failures; and every browser check with axe on a gallery assembled from 13 real snips of every shape, 0 failures in 622 s. On a fresh clone of 3fed37d, 2026-10-22: exit 0 in 665 s, the browser checks 638 s, 0 failures; and every browser check with axe on a gallery assembled from 13 real snips, 0 failures in 629 s. On a fresh clone of eb27870, 2026-10-23: exit 0 in 1,033 s on a slower hour, the browser checks 967 s, 0 failures (the tree check alone took the same 187 to 200 s before and after that commit's change). On a fresh clone of 42f5760: exit 0 in 678 s, the browser checks 648 s, the overlay among them, 0 failures | 2026-10-12 to 23 | the session log; GitHub's API |
+| Defeat cases | 167 (144 file, 23 browser) fail as built, naming what failed; 12 controls and 23 planted controls pass, on a fresh clone of 42f5760. Gates: 27 defeat cases refused, 5 controls passed, on a clone of it | 2026-10-23 | tools/prove_checks.py; the session log |
 | Speed, sample site | Lighthouse 13.5.0, default mobile, median of five, served uncompressed from 127.0.0.1 (GitHub Pages compresses), Chrome 154 on the seat's Windows machine. Default design with font-display: optional (as committed), 2026-10-13: LCP 2,108 ms, CLS 0, TBT 40 ms (runs 174, 37, 40, 46, 25), 197,433 bytes. The same design with swap, 2026-10-12: LCP 2,179 ms, CLS 0, TBT 195 ms (runs 195, 248, 280, 22, 64). Plain, 2026-10-12: LCP 1,389 ms, CLS 0.048, TBT 0 ms, 79,399 bytes. ADR-0009's limits: 2,500 ms, 0.1, 200 ms | 2026-10-12 and 13 | the session log |
 | Showcase screenshots | Full-screen snips of four pages, a wall of photographs among them, by headless Chrome 155 and re-encoded by Windows' WIC and GDI+: at full HD up to 2,525,046 bytes, at 4K up to 12,439,711, on a 5K display up to 16,928,260 (all the photo wall, GDI+); the cap is 20 MiB. Their served copies, WebP at 0.82: the card at most 147,498 bytes, the full view 401,498 | 2026-10-20 | the session log, Round 9 |
 | Gallery with a showcase | 0, 10 and 50 cards packed in their pictures' shapes, copies drawn from 13 real snips of every shape, the owner's among them: page 4,729, 10,383 and 32,599 bytes, gallery.js 3,094; Lighthouse 13.5.0 default mobile, median of five: LCP 1,075, 1,504 and 1,654 ms, CLS 0 in every run, TBT 38, 0 and 0 ms, 74,587, 309,817 and 330,177 bytes loaded at first; desktop preset, three columns packed, at 10 and 50: LCP 365 and 406 ms, CLS 0 in every run, TBT 0; every card, scrolled to the end, 2,964,813 bytes at 50 | 2026-10-21 | the session log, Round 10 |
@@ -179,6 +187,7 @@ is in logs/.
 | 2026-10-21 | Showcase cards in their pictures' own shapes, packed as on Pinterest; one pull request template for a design or a showcase entry; the briefs folder off the repository |
 | 2026-10-22 | The README routes every visitor and carries a checked prompt for their AI assistant; Showcase entry and Question forms; borderless showcase cards with rounded pictures |
 | 2026-10-23 | AGENTS.md routes coding agents, and a copy receives its own; a copy's README carries a short prompt for its owner's AI; the deploy takes a picture of the gallery page, which leads the README |
+| 2026-10-23 | A copy's first Deploy ends with a notice, not red, while GitHub Pages is off, and its README leads with turning Pages on; a showcase card's larger copy opens in an overlay that can be closed |
 
 ## What it does not do, and its limits
 

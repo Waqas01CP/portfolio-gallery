@@ -26,6 +26,17 @@ at the top and none in its jobs. A scheduled run starts with nobody's
 review, so it may write nothing (ADR-0016, the owner's answer Q2 of
 2026-10-19).
 
+A workflow that publishes with actions/deploy-pages must ask first
+whether GitHub Pages is on (the owner's decision of 2026-10-23; ADR-0015,
+Changes): a job named pages running `tools/ci.py pages`; the publishing
+job needing it and running only when `needs.pages.outputs.on == 'true'`;
+no other job needing or reading it, so a build or check never waits on
+Pages and still fails when it should; and no `continue-on-error`, which
+would end a failed run green. And the decision itself,
+tools/ci.py's pages_verdict, must give its table: with Pages off, a
+notice in a copy and a failure in the gallery; publishing from GitHub
+Actions, publish; from a branch, or any other answer, fail.
+
 Its limit: it checks that each result is named, not what the condition
 does with it. `!cancelled() && needs.assemble.result != 'success'` passes,
 though such a job runs only after assemble did not succeed (the portfolio
@@ -51,6 +62,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WORKFLOWS = ROOT / ".github" / "workflows"
+sys.path.insert(0, str(ROOT / "tools"))
+from ci import pages_verdict  # noqa: E402
+
+PUBLISH = "actions/deploy-pages@"
+PAGES_ON = re.compile(r"""needs\s*\.\s*pages\s*\.\s*outputs\s*\.\s*on\s*==\s*['"]true['"]""")
+READS_PAGES = re.compile(r"needs\s*\.\s*pages\b")
+# (mode, the API's status, build_type, what Deploy must do, why).
+PAGES_TABLE = (
+    ("site", 404, None, "notice", "with Pages off, a copy's Deploy ends with a notice and publishes nothing, "
+                                  "never red on a stranger's first run"),
+    ("gallery", 404, None, "fail", "with Pages off, the gallery's Deploy fails: the gallery would be down"),
+    ("site", 200, "workflow", "publish", "with Pages publishing from GitHub Actions, a copy publishes"),
+    ("gallery", 200, "workflow", "publish", "with Pages publishing from GitHub Actions, the gallery publishes"),
+    ("site", 200, "legacy", "fail", "with Pages publishing from a branch, what it shows is not what was built"),
+    ("site", 500, None, "fail", "any other answer from GitHub's API fails"),
+)
 
 KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)\s*:(?:\s+(.*))?$")
 STATUS = re.compile(r"\b(always|cancelled|failure)\s*\(\s*\)")
@@ -229,6 +256,44 @@ def schedule_problems(text: str, jobs: dict[str, dict], shown: str) -> list[str]
     return problems
 
 
+def pages_problems(text: str, jobs: dict[str, dict], shown: str) -> list[str]:
+    """A workflow that publishes asks first whether Pages is on."""
+    if PUBLISH not in text:
+        return []
+    problems = []
+    lines = text.splitlines()
+    starts = sorted((job["line"], name) for name, job in jobs.items())
+    publishing = []
+    for i, (line, name) in enumerate(starts):
+        end = starts[i + 1][0] - 1 if i + 1 < len(starts) else len(lines)
+        if any(PUBLISH in row for row in lines[line - 1:end]):
+            publishing.append(name)
+    if "pages" not in jobs or "tools/ci.py pages" not in text:
+        problems.append(f"{shown}: publishes with actions/deploy-pages but has no job 'pages' running "
+                        f"tools/ci.py pages, which says whether GitHub Pages is on")
+    for name in publishing:
+        job = jobs[name]
+        if "pages" not in job["needs"] or not PAGES_ON.search(job["if"] or ""):
+            problems.append(f"{shown}, job '{name}' (line {job['line']}): it publishes, so it must need "
+                            f"'pages' and run only when needs.pages.outputs.on == 'true'")
+    for name, job in jobs.items():
+        if name in publishing or name == "pages":
+            continue
+        if "pages" in job["needs"] or READS_PAGES.search(job["if"] or ""):
+            problems.append(f"{shown}, job '{name}' (line {job['line']}): it waits on or reads the pages job, "
+                            f"so with Pages off a build or check that should fail could be skipped; only "
+                            f"the publishing job may")
+    if re.search(r"^\s*-?\s*continue-on-error\s*:", text, re.M):
+        problems.append(f"{shown}: continue-on-error would let a failed build or check end the run green")
+    for mode, status, build_type, want, why in PAGES_TABLE:
+        got, _ = pages_verdict(mode, status, build_type)
+        if got != want:
+            problems.append(f"{shown}: tools/ci.py's pages_verdict gives '{got}' for {mode} mode, the API "
+                            f"answering {status}{f' with {build_type}' if build_type else ''}, where it must "
+                            f"give '{want}': {why}")
+    return problems
+
+
 def skippable(jobs: dict[str, dict]) -> set[str]:
     found = {name for name, job in jobs.items() if job["if"] is not None}
     changed = True
@@ -248,7 +313,7 @@ def check_file(path: Path) -> list[str]:
         jobs = read_jobs(text)
     except Unreadable as error:
         return [f"{shown}: unreadable under jobs:, {error}"]
-    problems = schedule_problems(text, jobs, shown)
+    problems = schedule_problems(text, jobs, shown) + pages_problems(text, jobs, shown)
     can_skip = skippable(jobs)
     for name, job in jobs.items():
         where = f"{shown}, job '{name}' (line {job['line']})"
