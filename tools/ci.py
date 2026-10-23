@@ -5,8 +5,8 @@
       (tools/check_workflows.py); every design checked; the showcase's
       files checked, while the project has the tool (tools/check_showcase.py,
       no fetching; checks.yml fetches a pull request's sites); the
-      README's prompt for an AI assistant against the repository, while
-      the project has it (tools/check_prompt.py); the site
+      prompts for an AI assistant, the README's and a copy's, against the
+      repository, while the project has it (tools/check_prompt.py); the site
       built in the design content/config.json names and the gallery built
       with every design, each built twice and compared byte for byte; the
       built files checked; the content trace; the gallery's pictures made as

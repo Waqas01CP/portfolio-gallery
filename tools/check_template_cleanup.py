@@ -17,10 +17,14 @@ Copies this repository's files to a temporary folder and there runs
   4. with only the script left and no list, as a later run would find it:
      nothing may change;
   5. the cleaned copy passes its own checks without a browser: its
-     workflows, its designs, the site and the gallery built, their files
-     checked, the content trace;
+     workflows, its designs, the site built, its files checked and the
+     content trace run by the command its README's prompt gives (tools/ci.py
+     build --mode site), and the gallery built and its files checked;
   6. every relative link in the cleaned copy's Markdown names a file that
-     exists.
+     exists;
+  7. the copy's README carries its prompt for an AI assistant (ADR-0017,
+     Changes, 2026-10-23): every path it names is in the cleaned copy, and
+     every command it gives is in a guide the copy keeps.
 
 Exit 0 on a pass; 1 on a failure, each printed; 2 when there is no
 cleanup to check. Standard library only; needs the venv, as the build
@@ -41,6 +45,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+from check_prompt import block, commands, flat, named_paths  # noqa: E402
+
 CLEANUP = Path(".github/template-cleanup")
 PROJECT = "Waqas01CP/portfolio-gallery"
 MUST_GO = {"CODE_OF_CONDUCT.md": "which names the project's contact",
@@ -177,8 +184,7 @@ def main() -> int:
         # 5: the cleaned copy's own checks.
         as_of = datetime.now(timezone.utc).strftime("%Y-%m")
         steps = [["tools/check_workflows.py"], ["tools/check_design.py"],
-                 ["build.py", "--as-of", as_of, "--out", "_site"], ["tools/check_built.py", "_site"],
-                 ["tools/check_content.py", "--page", "_site/index.html"],
+                 ["tools/ci.py", "build", "--mode", "site"],
                  ["build.py", "--as-of", as_of, "--gallery", "--out", "_gallery"],
                  ["tools/check_built.py", "_gallery"]]
         for step in steps:
@@ -205,6 +211,27 @@ def main() -> int:
         problems += broken
         if not broken:
             print(f"ok   every relative link in the copy's Markdown resolves ({checked} links)")
+
+        # 7: the copy's README carries its prompt, and what the prompt names
+        # is in the copy.
+        raw = block((copy / "README.md").read_text(encoding="utf-8"))
+        if raw is None:
+            problems.append("the copy's README.md carries no prompt for an AI assistant")
+        else:
+            lacking = [f"the copy's prompt names {p}, which the copy lacks"
+                       for p in sorted(named_paths(raw)) if not (copy / p).exists()]
+            # The guides: every Markdown file the copy keeps but the README,
+            # which holds the prompt itself.
+            guides = flat("\n".join(md.read_text(encoding="utf-8") for md in sorted(copy.rglob("*.md"))
+                                    if md != copy / "README.md"
+                                    and not any(part.startswith(("_site", "_gallery", ".venv"))
+                                                for part in md.relative_to(copy).parts)))
+            lacking += [f"the copy's prompt gives '{c}', which no guide the copy keeps gives"
+                        for c in commands(raw) if c not in guides]
+            problems += lacking
+            if not lacking:
+                print(f"ok   the copy's README carries its prompt: {len(named_paths(raw))} paths in the copy, "
+                      f"{len(commands(raw))} commands in its guides")
     finally:
         shutil.rmtree(work, ignore_errors=True)
     return report(problems)

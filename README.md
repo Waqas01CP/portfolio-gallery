@@ -181,8 +181,9 @@ Needs a GitHub account, nothing else; about fifteen minutes, most of it writing.
    repositories.
 2. A workflow called Template cleanup runs once by itself in the copy and removes
    this project's own files (its records, its contact address, the showcase, its
-   own tools), and gives the copy a short README of its own. The first Deploy run
-   fails until step 3; that is expected.
+   own tools), and gives the copy a short README of its own, with a prompt like
+   this one for looking after the site. The first Deploy run fails until step 3;
+   that is expected.
 3. In the new repository: Settings, Pages, and under Build and deployment set
    Source to GitHub Actions.
 4. Edit the files in `content/` in the browser (open a file, then the pencil icon,

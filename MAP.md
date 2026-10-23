@@ -68,7 +68,7 @@ Decision records have no `type`; their `topic` is shown.
 |---|---|---|---|
 | `docs/how-to/add-a-design.md` | how-to | current | A contributor's journey, step by step. Fork, create a design folder, build and check it locally, and open a pull request that passes the checks. Read to add a design to the gallery. |
 | `docs/how-to/add-to-the-showcase.md` | how-to | current | A contributor's steps to add their own portfolio site to the gallery's showcase, in the browser: the link to their GitHub profile, a screenshot as their tool saves it, the entry, the pull request, and what is checked then and every week. Read to show your site in the gallery. |
-| `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address and the checks. Read to make your own site. |
+| `docs/how-to/use-this-template.md` | how-to | current | A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address, the checks, and building on your own computer if you like. Read to make your own site. |
 
 ## docs/reference
 

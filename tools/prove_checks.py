@@ -492,6 +492,19 @@ def file_cases():
     yield ("cleanup: a kept document links to a removed one", cleanup(
         "docs/reference/content.md", "\n# ", "\n[The records](../decisions/README.md)\n\n# "),
         "which the copy lacks")
+    copy_readme = ".github/template-cleanup/copy-README.md"
+    yield ("cleanup: a copy's README without its prompt", cleanup(
+        copy_readme, "<!-- prompt:end -->", "<!-- end -->"), "the copy's README.md carries no prompt")
+    yield ("cleanup: a copy's prompt naming a file the copy lacks", cleanup(
+        copy_readme, "`docs/reference/content.md` explains", "`docs/reference/commands.md` explains"),
+        "the copy's prompt names docs/reference/commands.md, which the copy lacks")
+    yield ("cleanup: a copy's prompt giving a command no kept guide gives", cleanup(
+        copy_readme, "     python tools/ci.py build --mode site", "     python tools/ci.py checks"),
+        "the copy's prompt gives 'python tools/ci.py checks', which no guide the copy keeps gives")
+    yield ("cleanup: the copy's build command broken", cleanup(
+        "tools/ci.py", '    b.add_argument("--mode", choices=("site", "gallery"), required=True)',
+        '    b.add_argument("--mode", choices=("gallery",), required=True)'),
+        "the cleaned copy fails tools/ci.py build --mode site")
 
     # The showcase's files (tools/check_showcase.py, ADR-0016).
     def showcase(entry=None, files=None, login="tester", extra=None):
@@ -708,6 +721,31 @@ def file_cases():
     yield ("prompt: a fact reworded out of the check's sight", prompt(
         "README.md", "formats: PNG, JPEG or WebP.", "kinds: PNG, JPEG or WebP."),
         "the screenshot formats: its words for it are not found")
+
+    # A copy's own prompt, held to what a copy keeps (ADR-0017, Changes,
+    # 2026-10-23).
+    copy_readme = ".github/template-cleanup/copy-README.md"
+    yield ("prompt: a copy's prompt names a file no copy receives", prompt(
+        copy_readme, "`docs/how-to/use-this-template.md` is the full", "`docs/reference/commands.md` is the full"),
+        "it names docs/reference/commands.md, which a copy does not receive")
+    yield ("prompt: a copy's prompt names a setting config.json lacks", prompt(
+        copy_readme, '"cv_pdf", "content_trace" and', '"cv_pdf", "trace" and'),
+        "copy-README.md: the settings named, each in content/config.json: the prompt says False")
+    yield ("prompt: the content trace's start changed at its source", prompt(
+        "content/config.json", '"content_trace": true', '"content_trace": false'),
+        "the content trace's starting value: the prompt says 'true', the repository 'false'")
+    yield ("prompt: Deploy's jobs changed at their source", prompt(
+        ".github/workflows/deploy.yml", "  assemble:\n    needs: [build, shots]", "  package:\n    needs: [build, shots]"),
+        "Deploy's jobs: the prompt says")
+    yield ("prompt: the failed build's step renamed at its source", prompt(
+        ".github/workflows/deploy.yml", "- name: Build and check\n", "- name: Build and test\n"),
+        "the prompt says 'Build and check', the repository 'no step of that name'")
+    yield ("prompt: a copy's command in the project's guide only", prompt(
+        copy_readme, "     python tools/ci.py build --mode site", "     python tools/ci.py checks"),
+        "the command 'python tools/ci.py checks' is not in docs/how-to/use-this-template.md, the guide a copy keeps")
+    yield ("prompt: a copy's prompt without a safety rule", prompt(
+        copy_readme, "Never say you have done any of these.", "Say when you have done one."),
+        "copy-README.md: its safety rule 'Never say you have done any of these' is missing")
 
     def scheduled(old, new):
         def plant(copy):

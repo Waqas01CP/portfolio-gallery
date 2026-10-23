@@ -1,6 +1,6 @@
 ---
 type: how-to
-description: A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address and the checks. Read to make your own site.
+description: A user's journey, click by click. Copy the repository, turn on Pages, write your content in the browser, pick a design, and publish; then the address, the checks, and building on your own computer if you like. Read to make your own site.
 status: current
 ---
 
@@ -50,7 +50,8 @@ The "Template cleanup" workflow removes portfolio-gallery's own project
 files from your copy, once, by itself: in your history you see "Make it
 yours: remove portfolio-gallery's project files" by github-actions, then
 a second commit removing the project's own workflows, the cleanup's among
-them. Your README becomes a short one of your own. Those commits start no
+them. Your README becomes a short one of your own, with a prompt you can
+give an AI assistant to guide you. Those commits start no
 other run; your next commit builds and checks the cleaned files.
 
 If those commits are not there, as when Actions are turned off, delete
@@ -166,3 +167,28 @@ see what a design does with your content.
   appreciated either way.
 - **Your site in the gallery**: once it is live, you can add it to the
   gallery's showcase (https://github.com/Waqas01CP/portfolio-gallery/blob/main/docs/how-to/add-to-the-showcase.md).
+
+## 7. Build on your own computer, if you like
+
+Nothing here is needed to publish: GitHub builds your site. To see a
+change before you commit it, you need Python 3.12 or later and a clone of
+your repository. From its folder:
+
+```
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt      Windows
+.venv/bin/python -m pip install -r requirements.txt          macOS, Linux
+```
+
+Then, with the venv's Python (`.venv\Scripts\python` on Windows,
+`.venv/bin/python` elsewhere):
+
+```
+python tools/ci.py build --mode site
+python -m http.server --directory _site 8000
+```
+
+The first builds your site into `_site/`, checks its files and runs the
+content trace, as the Deploy run's build does, and names every problem
+the same way. The second serves it: open http://127.0.0.1:8000/ in your
+browser, and stop it with Ctrl+C. Git ignores `_site/` and `.venv/`.
