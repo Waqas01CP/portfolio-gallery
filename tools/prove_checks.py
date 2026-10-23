@@ -1008,6 +1008,38 @@ def browser_cases(axe: Path | None):
     yield ("packing: no script, so gaps under short cards", packed(
         ("src/static/gallery.js", '  const list = document.querySelector("[data-pack]");',
          '  const list = null;')), "px gap")
+
+    # The showcase's overlay (Brief 13, Addendum 1; ADR-0016, Changes,
+    # 2026-10-23), on main's own showcase, its pictures made as the deploy
+    # makes them.
+    def overlay(rel, old, new):
+        def plant(copy):
+            edit(copy / rel, old, new)
+            out = build_site(copy, "--gallery")
+            code, text = run(copy, "tools/screenshots.py", out)
+            if code:
+                raise SystemExit(f"prove_checks: the gallery's pictures were not made:\n{text}")
+            return ["tools/check_browser.py", out, "--only", "overlay"]
+        return plant
+
+    template = "src/templates/gallery.html.j2"
+    yield ("overlay: no Close button", overlay(
+        template, '<button type="button" class="g-view-close" aria-label="Close" data-view-close><svg viewBox="0 0 24 24" '
+        'width="24" height="24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" '
+        'stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>', ""),
+        "the overlay has no visible Close button")
+    yield ("overlay: focus not returned to the card", overlay(
+        "src/static/gallery.js", "    if (opener) opener.focus();\n", "    document.activeElement.blur();\n"),
+        "focus is on BODY, not the card's link")
+    yield ("overlay: open with scripts off", overlay(
+        template, '<dialog class="g-view"', '<dialog open class="g-view"'), "scripts off: an overlay is open")
+    yield ("overlay: the picture cropped to a square", overlay(
+        "src/static/gallery.css", ".g-view-pic {\n  display: block;\n  width: auto;\n  height: auto;",
+        ".g-view-pic {\n  display: block;\n  width: 300px;\n  height: 300px;\n  object-fit: cover;"),
+        "not in its own proportions")
+    yield ("overlay: shown without showModal, so not modal", overlay(
+        "src/static/gallery.js", "      view.showModal();", "      view.show();"),
+        "did not open the overlay as a modal dialog")
     yield ("joins: the hidden spaces removed", gallery(lambda c: edit(
         c / "src/templates/macros.html.j2", '{% macro sp() %}<span class="vh"> </span>{% endmacro %}',
         "{% macro sp() %}{% endmacro %}"), "joins"), "join(s)")

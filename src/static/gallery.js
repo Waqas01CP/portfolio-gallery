@@ -1,9 +1,11 @@
-/* Enhancement for the gallery page: packs the showcase's cards as on
-   Pinterest in a browser without CSS grid-lanes (ADR-0016, Changes,
-   2026-10-20). Every word is already in the HTML, and the page works
-   without this file: the cards then sit in rows of the same columns
-   (scope floor line 3). It stores nothing, sets no cookie and requests
-   nothing (scope floor line 2).
+/* Enhancements for the gallery page. Every word is already in the HTML,
+   and the page works without this file (scope floor line 3). It stores
+   nothing, sets no cookie and requests nothing from another site (scope
+   floor line 2).
+
+   First, packing: the showcase's cards as on Pinterest in a browser
+   without CSS grid-lanes (ADR-0016, Changes, 2026-10-20); without this
+   file the cards sit in rows of the same columns.
 
    Each card, in folder order, goes to the column whose bottom is highest,
    the leftmost of equals, as grid-lanes places them: so no card sits above
@@ -72,4 +74,59 @@
   });
   observer.observe(list);
   cards.forEach((card) => observer.observe(card));
+})();
+
+/* Second, the showcase's larger copy in an overlay on the gallery (Brief
+   13, Addendum 1; ADR-0016, Changes, 2026-10-23). A click on a card's
+   picture, or Enter on it, opens the page's own <dialog> with showModal():
+   the browser makes the rest of the page inert, keeps focus inside, and
+   closes it on Escape. Its Close button, and a click outside the picture,
+   close it too; focus then returns to the card's link. The picture is the
+   same file the link opens, shown whole at its own size within the window,
+   with its size set before it loads; nothing moves. A click that asks for
+   a new tab or window, and a browser without showModal, keep the plain
+   link. */
+(() => {
+  "use strict";
+
+  const view = document.querySelector("[data-view]");
+  if (!view || typeof view.showModal !== "function") return;
+  const name = view.querySelector("[data-view-name]");
+  const close = view.querySelector("[data-view-close]");
+  let opener = null;
+  let picture = null;
+
+  document.querySelectorAll(".g-site .g-frame").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      const [width, height] = (link.dataset.full || "").split("x").map(Number);
+      picture = document.createElement("img");
+      picture.className = "g-view-pic";
+      if (width && height) {
+        picture.width = width;
+        picture.height = height;
+      }
+      picture.alt = link.querySelector("img").alt;
+      picture.src = link.getAttribute("href");
+      view.append(picture);
+      name.textContent = link.closest(".g-site").querySelector(".g-name").textContent.trim();
+      opener = link;
+      view.showModal();
+      if (close) close.focus();
+    });
+  });
+
+  if (close) close.addEventListener("click", () => view.close());
+  // A click outside the picture lands on the dialog itself, or on its
+  // backdrop, which reports the dialog as its target.
+  view.addEventListener("click", (event) => {
+    if (event.target === view) view.close();
+  });
+  view.addEventListener("close", () => {
+    if (picture) picture.remove();
+    picture = null;
+    if (opener) opener.focus();
+    opener = null;
+  });
 })();

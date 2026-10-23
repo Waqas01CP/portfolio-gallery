@@ -7,7 +7,10 @@
    by its author (ADR-0016, D1) and shown as served copies made from it:
    whole, never cropped, at the card's full width in its own shape within
    the limits build.py sets, loaded only as it scrolls into view, and a
-   click opens the larger copy. Every picture has its size set, so the page
+   click opens the larger copy: with scripts, in the page's own dialog,
+   which static/gallery.js shows as a modal with a Close button (Brief 13,
+   Addendum 1; ADR-0016, Changes, 2026-10-23); without them, as the page
+   itself, the link it always is. Every picture has its size set, so the page
    does not shift as they load. The showcase's cards are packed as on
    Pinterest (ADR-0016, Changes, 2026-10-20): by the browser's own
    grid-lanes where it has them, else by static/gallery.js; with neither,
@@ -71,7 +74,7 @@
 <ul class="g-pack" data-pack>
 {% for e in showcase %}
 <li class="g-card g-site">
-<a class="g-frame" href="{{ e.full }}"><img class="g-full" src="{{ e.card }}" width="{{ e.card_size[0] }}" height="{{ e.card_size[1] }}" alt="{{ e.name }}'s portfolio site, a screenshot supplied by its author" loading="lazy" decoding="async"><span class="vh"> (full size)</span></a>
+<a class="g-frame" href="{{ e.full }}" data-full="{{ e.full_size[0] }}x{{ e.full_size[1] }}"><img class="g-full" src="{{ e.card }}" width="{{ e.card_size[0] }}" height="{{ e.card_size[1] }}" alt="{{ e.name }}'s portfolio site, a screenshot supplied by its author" loading="lazy" decoding="async"><span class="vh"> (full size)</span></a>
 <div class="g-body">
 <h3 class="g-name"><a href="{{ e.url }}" rel="ugc nofollow">{{ e.name }}</a></h3>
 <p class="g-host">{{ e.host }}</p>
@@ -82,6 +85,9 @@
 </li>
 {% endfor %}
 </ul>
+<dialog class="g-view" aria-labelledby="g-view-name" data-view>
+<div class="g-view-bar"><p class="g-view-name" id="g-view-name" data-view-name></p><button type="button" class="g-view-close" aria-label="Close" data-view-close><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button></div>
+</dialog>
 {% else %}
 <p class="g-count">No sites yet: portfolio sites by contributors, each built its own way, will be shown here. <a href="{{ project_url }}/blob/main/docs/how-to/add-to-the-showcase.md">Add yours</a></p>
 {% endif %}

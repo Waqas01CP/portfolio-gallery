@@ -173,6 +173,49 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .g-btn:hover { color: var(--on-acc); text-decoration: underline; }
 
+/* The showcase's overlay (static/gallery.js): the larger copy whole, never
+   cropped, at its own size or smaller to fit the window, on the page's own
+   colours in either theme. Nothing moves as it opens or closes. */
+.g-view {
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line);
+  overflow: auto;
+}
+.g-view::backdrop { background: rgba(0, 0, 0, 0.72); }
+.g-view-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 16px; }
+.g-view-name { font-weight: 700; overflow-wrap: anywhere; }
+.g-view-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.g-view-close:hover { border-color: var(--ink); }
+.g-view-pic {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 88px);
+  max-height: calc(100dvh - 88px);
+}
+
 .g-foot { padding-top: 24px; padding-bottom: 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
 .g-foot p + p { margin-top: 8px; }
 

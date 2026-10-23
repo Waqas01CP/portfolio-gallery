@@ -941,7 +941,7 @@ def load_showcase() -> list[dict]:
                         "description": description if _text(description) else None,
                         "screenshot": f"{where}/{shots[0]}", "shown": (width, height), "shapes": shapes,
                         "card": f"{where}/{SHOWCASE_CARD}", "full": f"{where}/{SHOWCASE_FULL}",
-                        "card_size": shapes[SHOWCASE_CARD]["size"]})
+                        "card_size": shapes[SHOWCASE_CARD]["size"], "full_size": shapes[SHOWCASE_FULL]["size"]})
     return entries
 
 
