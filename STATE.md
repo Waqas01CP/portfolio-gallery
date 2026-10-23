@@ -90,9 +90,13 @@ DONE rows are in docs/reference/completed.md.
 - Whether GitHub accepts the two issue forms added on 2026-10-22; one it
   cannot read shows an error in the issue chooser, which needs a sign-in.
 - Whether a copy's own token, with Pages: read, gets a 404 from GitHub's
-  API while Pages is off, as the documentation's table implies, rather
-  than another answer, which would fail the run; the owner's real copy
-  shows it.
+  API while Pages is off, rather than another answer, which would fail
+  the run. Sourced, not measured here: the documentation's permissions
+  table, and a public run in actions/configure-pages issue 194
+  (2026-03-31) where a fork without Pages got "Not Found" for the run's
+  own token. The owner's real copy measures it. During a GitHub incident
+  the API has answered "temporarily being throttled" (issue 190,
+  2026-02-11); the run then fails, and a re-run is the remedy.
 - Whether coding agents follow AGENTS.md as their documentation says;
   read from first-party documentation, not tried with each agent.
 - How Safari 26.4 and later, the one browser shipping grid-lanes, packs

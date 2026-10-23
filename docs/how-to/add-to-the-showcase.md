@@ -36,7 +36,8 @@ it. There is no size to check and nothing to resize.
 Any size and any shape work, a phone's tall screen too: the gallery makes
 its own smaller copies of your screenshot, without its metadata, and your
 card shows a copy whole, never cropped, at the card's full width in your
-screenshot's own shape; a click opens a larger copy. A shape longer than
+screenshot's own shape; a click opens a larger copy over the gallery, with
+a button to close it. A shape longer than
 a 21:9 screen either way, as a whole page or a very wide monitor gives,
 is shown whole within that shape, with bands. The checks take PNG, JPEG
 or WebP, as screenshot tools save them. Two things they refuse, neither
