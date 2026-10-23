@@ -46,7 +46,7 @@ What every site gets, whatever the design:
 | Remove my showcase entry, or report one that impersonates someone or has gone bad | An issue with the **Showcase entry** form, or for your own entry a pull request deleting its folder |
 | Ask a question the guides do not answer | An issue with the **Question** form |
 | Report a security problem | Privately, as [SECURITY.md](SECURITY.md) says, never in a public issue |
-| Have an AI assistant guide me | [The prompt below](#ask-an-ai-assistant-to-guide-you): copy it into your own AI tool |
+| Have an AI assistant guide me | [The prompt below](#ask-an-ai-assistant-to-guide-you): copy it into your own AI tool. A coding agent working in a clone is pointed to it by [AGENTS.md](AGENTS.md) |
 | Maintain this repository | [CLAUDE.md](CLAUDE.md), then [STATE.md](STATE.md) |
 
 ## Make your own site

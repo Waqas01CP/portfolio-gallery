@@ -501,6 +501,10 @@ def file_cases():
     yield ("cleanup: a copy's prompt giving a command no kept guide gives", cleanup(
         copy_readme, "     python tools/ci.py build --mode site", "     python tools/ci.py checks"),
         "the copy's prompt gives 'python tools/ci.py checks', which no guide the copy keeps gives")
+    yield ("cleanup: a copy keeping the project's AGENTS.md", cleanup(
+        script, 'OWN = {"copy-README.md": "README.md", "copy-AGENTS.md": "AGENTS.md"}',
+        'OWN = {"copy-README.md": "README.md"}'),
+        "AGENTS.md is not the copy's own")
     yield ("cleanup: the copy's build command broken", cleanup(
         "tools/ci.py", '    b.add_argument("--mode", choices=("site", "gallery"), required=True)',
         '    b.add_argument("--mode", choices=("gallery",), required=True)'),
@@ -746,6 +750,25 @@ def file_cases():
     yield ("prompt: a copy's prompt without a safety rule", prompt(
         copy_readme, "Never say you have done any of these.", "Say when you have done one."),
         "copy-README.md: its safety rule 'Never say you have done any of these' is missing")
+
+    # The routers for coding agents: what they name, and nothing else.
+    copy_agents = ".github/template-cleanup/copy-AGENTS.md"
+    yield ("prompt: AGENTS.md naming a file that does not exist", prompt(
+        "AGENTS.md", "[STATE.md](STATE.md)", "[STATUS.md](STATUS.md)"),
+        "AGENTS.md: it names STATUS.md, which does not exist")
+    yield ("prompt: the README's section AGENTS.md links, renamed at its source", prompt(
+        "README.md", "## What do you want to do?", "## Where to start"),
+        "AGENTS.md: it links README.md#what-do-you-want-to-do, a section README.md does not have")
+    yield ("prompt: AGENTS.md not linking the README's prompt", prompt(
+        "AGENTS.md", "[Ask an AI assistant to guide you](README.md#ask-an-ai-assistant-to-guide-you)",
+        "its section on AI assistants"),
+        "AGENTS.md: it links no section of the README that holds its prompt")
+    yield ("prompt: a copy's AGENTS.md naming the project's rules", prompt(
+        copy_agents, "It states no\nrule of its own.", "It states no\nrule of its own; see [CLAUDE.md](CLAUDE.md)."),
+        "copy-AGENTS.md: it names CLAUDE.md, which a copy does not receive")
+    yield ("prompt: the copy's README section a copy's AGENTS.md links, renamed", prompt(
+        copy_readme, "## Ask an AI assistant to help", "## For your AI assistant"),
+        "copy-AGENTS.md: it links README.md#ask-an-ai-assistant-to-help, a section the copy's README does not have")
 
     def scheduled(old, new):
         def plant(copy):

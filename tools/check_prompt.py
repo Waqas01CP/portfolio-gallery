@@ -45,9 +45,19 @@ what a copy keeps:
 
 A fact is found by the words the prompt states it in; a prompt reworded
 so that a fact is no longer found fails, naming it, so the check and the
-prompt change together. Given a README, only its prompt is checked, as
-the gallery's. Exit 0 when everything agrees; 1 on any disagreement, each
-printed with its file; 2 when a prompt is missing. Standard library only.
+prompt change together.
+
+Then the two routers for coding agents (ADR-0017, Changes, 2026-10-23):
+AGENTS.md, and .github/template-cleanup/copy-AGENTS.md, which a copy
+receives as its AGENTS.md. Each states no rule of its own, so what it
+names is all there is to check: every Markdown file it names exists, and
+for a copy's is one a copy keeps; every section it links is a heading of
+that file, under the heading's own words (for a copy's, of copy-README.md,
+the copy's README); and it links the README's section holding the prompt.
+
+Given a README, only its prompt is checked, as the gallery's. Exit 0 when
+everything agrees; 1 on any disagreement, each printed with its file; 2
+when a prompt or a router is missing. Standard library only.
 """
 
 from __future__ import annotations
@@ -68,7 +78,10 @@ from scope_check import AS_CONTRIBUTOR  # noqa: E402
 
 CLEANUP = ".github/template-cleanup"
 COPY_README = f"{CLEANUP}/copy-README.md"
-BLOCK = re.compile(r"<!-- prompt:start[^>]*-->\s*```text\n(.*?)\n```\s*<!-- prompt:end -->", re.S)
+COPY_AGENTS = f"{CLEANUP}/copy-AGENTS.md"
+LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+MARKDOWN_NAME = re.compile(r"(?<![\w/.-])((?:[\w-]+/)*[\w-]+\.md)\b")
+BLOCK =re.compile(r"<!-- prompt:start[^>]*-->\s*```text\n(.*?)\n```\s*<!-- prompt:end -->", re.S)
 PATH = re.compile(r"(?<![\w/.-])((?:\.github|content|designs|docs|showcase|src|tools)/[A-Za-z0-9_./-]*)(?![\w<-])")
 TICKED = re.compile(r"`([^`\s]+)`")
 COMMAND = re.compile(r"^\s{3,}((?:python|\.venv)\S* .+?)\s*$", re.M)
@@ -251,6 +264,49 @@ def check_prompt(raw: str, stated, safety: tuple[str, ...], guides: tuple[str, .
                       f"{len(safety)} safety rule(s)")
 
 
+def slug(heading: str) -> str:
+    """GitHub's anchor for a heading: lower case, punctuation dropped,
+    spaces as hyphens."""
+    return re.sub(r"[^\w\- ]", "", heading.strip().lower()).replace(" ", "-")
+
+
+def sections(text: str) -> dict[str, tuple[str, str]]:
+    """A Markdown file's headings by anchor: (the heading, its section's text)."""
+    found, heads = {}, list(re.finditer(r"^(#{1,6}) (.+?)\s*$", text, re.M))
+    for i, m in enumerate(heads):
+        end = next((h.start() for h in heads[i + 1:] if len(h.group(1)) <= len(m.group(1))), len(text))
+        found[slug(m.group(2))] = (m.group(2), text[m.end():end])
+    return found
+
+
+def check_router(text: str, for_copy: bool) -> list[str]:
+    """Problems with AGENTS.md, or with a copy's."""
+    own = {"README.md": COPY_README if for_copy else "README.md",
+           "AGENTS.md": COPY_AGENTS if for_copy else "AGENTS.md"}
+    problems, prompt_linked = [], False
+    named = set(MARKDOWN_NAME.findall(text)) | {t.split("#", 1)[0] for _, t in LINK.findall(text)}
+    for path in sorted(p for p in named if p):
+        if not (ROOT / own.get(path, path)).exists():
+            problems.append(f"it names {path}, which does not exist")
+        elif for_copy and path not in own and not kept(path):
+            problems.append(f"it names {path}, which a copy does not receive ({CLEANUP}/remove.txt lists it)")
+    for linked_as, target in LINK.findall(text):
+        path, _, anchor = target.partition("#")
+        if not anchor or not (ROOT / own.get(path, path)).is_file():
+            continue
+        found = sections(read(own.get(path, path)))
+        where = "the copy's README" if for_copy and path == "README.md" else path
+        if anchor not in found:
+            problems.append(f"it links {target}, a section {where} does not have")
+        elif found[anchor][0] != linked_as:
+            problems.append(f"it links {target} as '{linked_as}', but the heading reads '{found[anchor][0]}'")
+        elif path == "README.md" and block(found[anchor][1]) is not None:
+            prompt_linked = True
+    if not prompt_linked:
+        problems.append("it links no section of the README that holds its prompt for an AI assistant")
+    return problems
+
+
 def main(argv: list[str]) -> int:
     sys.stdout.reconfigure(errors="backslashreplace")
     prompts = [(Path(argv[0]) if argv else ROOT / "README.md", facts, SAFETY, GALLERY_GUIDES, False)]
@@ -267,6 +323,15 @@ def main(argv: list[str]) -> int:
         for problem in problems:
             print(f"FAIL {shown}: {problem}")
         print(f"{shown}: {counts}; {len(problems)} problem(s)")
+        failures += len(problems)
+    for router, for_copy in ([] if argv else [("AGENTS.md", False), (COPY_AGENTS, True)]):
+        if not (ROOT / router).is_file():
+            print(f"no {router}", file=sys.stderr)
+            return 2
+        problems = check_router(read(router), for_copy)
+        for problem in problems:
+            print(f"FAIL {router}: {problem}")
+        print(f"{router}: {len(LINK.findall(read(router)))} link(s); {len(problems)} problem(s)")
         failures += len(problems)
     return 1 if failures else 0
 

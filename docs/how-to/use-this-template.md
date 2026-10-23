@@ -51,7 +51,8 @@ files from your copy, once, by itself: in your history you see "Make it
 yours: remove portfolio-gallery's project files" by github-actions, then
 a second commit removing the project's own workflows, the cleanup's among
 them. Your README becomes a short one of your own, with a prompt you can
-give an AI assistant to guide you. Those commits start no
+give an AI assistant to guide you, and AGENTS.md, the file coding agents
+read first, points them to it. Those commits start no
 other run; your next commit builds and checks the cleaned files.
 
 If those commits are not there, as when Actions are turned off, delete
@@ -76,13 +77,15 @@ these yourself, the first two above all:
    `never-commit.txt`, `generate_map.py`, `prove_checks.py`,
    `scope_check.py`, `check_showcase.py`, `check_prompt.py`,
    `check_template_cleanup.py`.
-7. The cleanup itself: `.github/template-cleanup/`, and the project's own
-   workflows, `.github/workflows/scope.yml`,
-   `.github/workflows/showcase-links.yml` and
-   `.github/workflows/template-cleanup.yml`.
+7. The cleanup itself: first copy its `copy-README.md` over `README.md`
+   and its `copy-AGENTS.md` over `AGENTS.md`, your copy's own, which
+   point you and any AI assistant to the right files; then delete
+   `.github/template-cleanup/`, and the project's own workflows,
+   `.github/workflows/scope.yml`, `.github/workflows/showcase-links.yml`
+   and `.github/workflows/template-cleanup.yml`.
 
-Then replace `README.md` with your own. Each path, with why it goes, is
-listed in `.github/template-cleanup/remove.txt`. Keep `LICENSE`: the MIT
+Each path, with why it goes, is listed in
+`.github/template-cleanup/remove.txt`. Keep `LICENSE`: the MIT
 licence asks that its notice stays with every copy.
 
 ## 3. Turn on GitHub Pages
