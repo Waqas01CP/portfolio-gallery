@@ -493,7 +493,8 @@ showcase/waqas01cp, with their sizes.
 
 5. Merge. When Deploy is green, open
    https://waqas01cp.github.io/portfolio-gallery/#showcase: one site, your
-   card, the screenshot whole; a click on it opens the larger copy.
+   card, the screenshot whole; a click on it opens the larger copy over
+   the page, closed by its X, by Escape or by a click outside it.
 6. **Actions**, **Showcase links**, **Run workflow**, branch `main`, **Run
    workflow**. You should see it pass, its log listing one entry and its
    response.
