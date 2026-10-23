@@ -1,5 +1,6 @@
-"""Take each design's preview for the gallery, from its live demo, and make
-each showcase entry's served copies from its author's screenshot.
+"""Take each design's preview for the gallery, from its live demo, make
+each showcase entry's served copies from its author's screenshot, and take
+the gallery page's own picture.
 
   python tools/screenshots.py [_site]
 
@@ -33,7 +34,16 @@ drawing a large capture in headless Chrome hung or came out blank on the
 seat's machine (2026-10-20); with it off, five runs of each method gave
 the same bytes.
 
-Exit 0 when every design has its preview and every entry its copies; 1
+Last, the gallery page itself, so that its cards show the previews just
+made: the top GALLERY_SHOT CSS pixels at full size, light, motion
+reduced, once its fonts are ready and the pictures in view have loaded,
+saved as preview.webp at the built folder's root. The README shows it by
+its live address (ADR-0017, Changes, 2026-10-23). On the gallery of
+2026-10-23 it holds the heading, the links and the first row of
+templates, and ends where the showcase begins.
+
+Exit 0 when every design has its preview, every entry its copies and the
+gallery its picture; 1
 when one failed, named; 2 when the folder is not a built gallery. Chrome
 missing is exit 1, naming where it was looked for (ADR-0008, gate D).
 """
@@ -55,6 +65,13 @@ from build import (PREVIEW_FILE, PREVIEW_SIZE, SHOWCASE, SHOWCASE_CARD,  # noqa:
 
 WIDTH, HEIGHT = 1366, 900
 SCALE = PREVIEW_SIZE[0] / WIDTH
+# The gallery page's picture, at full size: 89,268 bytes on 2026-10-23.
+GALLERY_SHOT = (1366, 1280)
+# Every picture in view has loaded, or failed to.
+PICTURES_IN_VIEW = """Promise.all([...document.images]
+  .filter(i => i.getBoundingClientRect().top < innerHeight)
+  .map(i => i.complete ? true : new Promise(done => { i.onload = i.onerror = () => done(true); })))
+  .then(() => true)"""
 
 # Decode once, then draw each copy at the size and place the build gave it;
 # what the picture leaves of the canvas stays transparent.
@@ -126,6 +143,26 @@ def previews(folder: Path, demos: list[Path], failed: list[str]) -> None:
                 page.close()
 
 
+def gallery_picture(folder: Path, failed: list[str]) -> None:
+    width, height = GALLERY_SHOT
+    with Server(folder) as server, Chrome() as chrome:
+        page = chrome.new_page(width, height, reduced=True)
+        try:
+            page.goto(f"{server.origin}/index.html", settle=1.0)
+            page.evaluate("document.fonts.ready.then(() => true)", await_promise=True)
+            page.evaluate(PICTURES_IN_VIEW, await_promise=True)
+            chrome.drain(1.0)
+            image = page.screenshot(width, height, 1.0)
+            if image[:4] != b"RIFF" or image[8:12] != b"WEBP":
+                raise CDPError("the capture is not a WebP image")
+            (folder / PREVIEW_FILE).write_bytes(image)
+            print(f"  the gallery page: {len(image)} bytes")
+        except CDPError as error:
+            failed.append(f"the gallery page: {error}")
+        finally:
+            page.close()
+
+
 def served_copies(folder: Path, entries: list[dict], failed: list[str]) -> None:
     with Server(SHOWCASE) as server, Chrome(flags=("--disable-gpu",)) as chrome:
         print(f"{chrome.version()}, GPU off: {len(entries)} showcase entr{'y' if len(entries) == 1 else 'ies'}")
@@ -180,6 +217,7 @@ def main(argv: list[str]) -> int:
         entries = load_showcase()
         if entries:
             served_copies(folder, entries, failed)
+        gallery_picture(folder, failed)
     except MissingTool as error:
         print(f"missing tool: {error}", file=sys.stderr)
         return 1

@@ -55,6 +55,13 @@ for a copy's is one a copy keeps; every section it links is a heading of
 that file, under the heading's own words (for a copy's, of copy-README.md,
 the copy's README); and it links the README's section holding the prompt.
 
+Last, the README's pictures and links on the live gallery (ADR-0017,
+Changes, 2026-10-23): each names something the deploy publishes, the
+gallery page, its own picture (preview.webp), a design's demo or preview
+for a design in designs/, or a card's copies for an entry in showcase/,
+so that a picture renamed, or a design or entry gone, fails here rather
+than showing broken on GitHub.
+
 Given a README, only its prompt is checked, as the gallery's. Exit 0 when
 everything agrees; 1 on any disagreement, each printed with its file; 2
 when a prompt or a router is missing. Standard library only.
@@ -70,7 +77,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
-from build import SHOWCASE_TALL, SHOWCASE_WIDE  # noqa: E402
+from build import PREVIEW_FILE, SHOWCASE_CARD, SHOWCASE_FULL, SHOWCASE_TALL, SHOWCASE_WIDE  # noqa: E402
 from check_design import FILE_COUNT_LIMIT, FOLDER_LIMIT, KB, LICENCES, LIMITS, META_FIELDS, SUBFOLDERS  # noqa: E402
 from check_showcase import (DESCRIPTION_LIMIT, ENTRY_FIELDS, KINDS, MAX_BYTES,  # noqa: E402
                             NAME_LIMIT)
@@ -79,6 +86,8 @@ from scope_check import AS_CONTRIBUTOR  # noqa: E402
 CLEANUP = ".github/template-cleanup"
 COPY_README = f"{CLEANUP}/copy-README.md"
 COPY_AGENTS = f"{CLEANUP}/copy-AGENTS.md"
+LIVE = "https://waqas01cp.github.io/portfolio-gallery/"
+LIVE_ADDRESS = re.compile(re.escape(LIVE) + r"([^\s\"'<>()]*)")
 LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 MARKDOWN_NAME = re.compile(r"(?<![\w/.-])((?:[\w-]+/)*[\w-]+\.md)\b")
 BLOCK =re.compile(r"<!-- prompt:start[^>]*-->\s*```text\n(.*?)\n```\s*<!-- prompt:end -->", re.S)
@@ -307,6 +316,24 @@ def check_router(text: str, for_copy: bool) -> list[str]:
     return problems
 
 
+def published(path: str) -> bool:
+    """Whether the deploy publishes this path on the live gallery."""
+    if path == "" or path.startswith("#") or path == PREVIEW_FILE:
+        return True
+    design = re.fullmatch(rf"designs/([a-z0-9-]+)/(?:index\.html|{re.escape(PREVIEW_FILE)})", path)
+    if design:
+        return (ROOT / "designs" / design.group(1) / "design.json").is_file()
+    entry = re.fullmatch(rf"showcase/([a-z0-9-]+)/(?:{re.escape(SHOWCASE_CARD)}|{re.escape(SHOWCASE_FULL)})", path)
+    return bool(entry) and (ROOT / "showcase" / entry.group(1) / "entry.json").is_file()
+
+
+def check_live(readme: str) -> tuple[list[str], int]:
+    """The README's addresses on the live gallery, each one the deploy publishes."""
+    addresses = sorted({a.rstrip("*.,;:") for a in LIVE_ADDRESS.findall(readme)})
+    return [f"it shows or links {LIVE}{a}, which the deploy does not publish"
+            for a in addresses if not published(a)], len(addresses)
+
+
 def main(argv: list[str]) -> int:
     sys.stdout.reconfigure(errors="backslashreplace")
     prompts = [(Path(argv[0]) if argv else ROOT / "README.md", facts, SAFETY, GALLERY_GUIDES, False)]
@@ -332,6 +359,12 @@ def main(argv: list[str]) -> int:
         for problem in problems:
             print(f"FAIL {router}: {problem}")
         print(f"{router}: {len(LINK.findall(read(router)))} link(s); {len(problems)} problem(s)")
+        failures += len(problems)
+    if not argv:
+        problems, count = check_live(read("README.md"))
+        for problem in problems:
+            print(f"FAIL README.md: {problem}")
+        print(f"README.md: {count} address(es) on the live gallery; {len(problems)} problem(s)")
         failures += len(problems)
     return 1 if failures else 0
 

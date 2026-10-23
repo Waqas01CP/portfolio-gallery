@@ -59,7 +59,7 @@ python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_prompt.py [README]            the prompts for an AI, the README's and a copy's, and AGENTS.md, against the repository
 python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
 python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
-python tools/screenshots.py [_site]              the gallery's previews and showcase copies
+python tools/screenshots.py [_site]              the gallery's previews, showcase copies and own picture
 python tools/ci.py pictures --gallery _site      those pictures made and checked
 python tools/scope_check.py --files LIST.tsv [--author LOGIN]   a pull request's scope, locally
 ```

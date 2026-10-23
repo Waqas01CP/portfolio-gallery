@@ -387,7 +387,7 @@ def file_cases():
             "MISSING: Example City, Exampleland (content/cv.md, line 12)",
             "Add the text to content/cv.md, or change site.json or items.json to match the CV line shown"))
 
-    def assemble(extra=None, big=False, entry=False, served=None):
+    def assemble(extra=None, big=False, entry=False, served=None, gallery=True):
         def plant(copy):
             if entry:
                 plant_entry(copy)
@@ -397,6 +397,8 @@ def file_cases():
                 (shots / "designs" / name).mkdir(parents=True)
                 data = b"RIFF\0\0\0\0WEBPVP8 " + (b"\0" * (310_000 if big and name == "plain" else 64))
                 (shots / "designs" / name / "preview.webp").write_bytes(data)
+            if gallery:
+                (shots / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
             entry_copies(site, shots, skip=("tester",))
             for name, data in (served or {}).items():
                 (shots / "showcase" / "tester").mkdir(parents=True, exist_ok=True)
@@ -423,6 +425,8 @@ def file_cases():
            "supplied no showcase/tester/full.webp")
     yield ("assemble: the screenshot itself among the pictures", assemble(entry=True, served={
         **clean, "screenshot.png": png(1280, 720)}), "not a picture this gallery shows")
+    yield ("assemble: the gallery page's own picture missing", assemble(gallery=False),
+           "the screenshot job supplied no preview.webp")
     yield ("control: assemble takes a gallery's previews and served copies",
            assemble(entry=True, served=clean), Passes("showcase/tester/full.webp"))
 
@@ -625,12 +629,14 @@ def file_cases():
         {"screenshot.png": png(2000, 400)}, "    elif picture[0] > picture[1] * SHOWCASE_WIDE:",
         "    elif False:"), "beyond the shape limits")
 
-    def copies(card, files=None):
+    def copies(card, files=None, gallery=True):
         def plant(copy):
             plant_entry(copy, files=files)
             out = build_site(copy, "--gallery")
             for name in ("default", "plain"):
                 (out / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+            if gallery:
+                (out / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
             # Every other entry's copies at the size its card reserves.
             page = (out / "index.html").read_text(encoding="utf-8")
             for login, width, height in re.findall(
@@ -646,6 +652,8 @@ def file_cases():
            "is reserved at 1024x576 but is 1024x600")
     yield ("control: a card's copy the size its box reserves passes, with --previews", copies((1024, 576)),
            Passes("0 problem(s)"))
+    yield ("built: a gallery without its own picture, with --previews", copies((1024, 576), gallery=False),
+           "the gallery page: no preview.webp of its own")
     yield ("control: a JPEG turned by its EXIF is reserved at its turned size", copies(
         (720, 1280), {"screenshot.jpg": jpeg(1280, 720, turned(6))}), Passes("0 problem(s)"))
 
@@ -770,6 +778,21 @@ def file_cases():
         copy_readme, "## Ask an AI assistant to help", "## For your AI assistant"),
         "copy-AGENTS.md: it links README.md#ask-an-ai-assistant-to-help, a section the copy's README does not have")
 
+    # The README's pictures on the live gallery, each one the deploy
+    # publishes (ADR-0017, Changes, 2026-10-23).
+    yield ("prompt: the README's gallery picture under another name", prompt(
+        "README.md", 'portfolio-gallery/preview.webp" width="820"', 'portfolio-gallery/gallery.webp" width="820"'),
+        "it shows or links https://waqas01cp.github.io/portfolio-gallery/gallery.webp, which the deploy does not publish")
+
+    def card_gone(copy):
+        # The entry whose card the README shows, removed: its card goes too.
+        login = re.search(r"/showcase/([a-z0-9-]+)/card\.webp", (copy / "README.md").read_text(encoding="utf-8"))[1]
+        shutil.rmtree(copy / "showcase" / login)
+        return ["tools/check_prompt.py"]
+
+    yield ("prompt: the README showing the card of an entry that is gone", card_gone,
+           "/card.webp, which the deploy does not publish")
+
     def scheduled(old, new):
         def plant(copy):
             edit(copy / ".github/workflows/showcase-links.yml", old, new)
@@ -866,6 +889,10 @@ def browser_cases(axe: Path | None):
     yield ("pictures: a build that ignores a PNG's EXIF turn", served(
         '    if facts["orientation"] >= 5:', "    if False:", where="tools/check_showcase.py", exif=turned(6)),
         "Chrome reads it as 1080x1920, the build as 1920x1080")
+    # The gallery page's own picture, which the README shows (ADR-0017,
+    # Changes, 2026-10-23): a maker that skips it is refused.
+    yield ("pictures: a maker that skips the gallery page's picture", served(
+        "        gallery_picture(folder, failed)\n", ""), "preview.webp: not a regular file")
 
     # The showcase packed (ADR-0016, Changes, 2026-10-20), with snips of
     # every shape measured on 2026-10-21, scaled down: desktop, Retina,
@@ -952,6 +979,7 @@ def main(argv: list[str]) -> int:
         for name in ("default", "plain"):
             (shots / "designs" / name).mkdir(parents=True)
             (shots / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
+        (shots / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
         entry_copies(gallery_out, shots)
         controls = [("workflows", ["tools/check_workflows.py"]),
                     ("template cleanup", ["tools/check_template_cleanup.py"]),

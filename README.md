@@ -12,15 +12,11 @@ design with one setting, and GitHub builds and publishes your site.
 
 **See every design: https://waqas01cp.github.io/portfolio-gallery/**
 
-<p>
-<a href="https://waqas01cp.github.io/portfolio-gallery/designs/default/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/default/preview.webp" width="400" alt="The Default design's first screen, filled with the sample content"></a>
-<a href="https://waqas01cp.github.io/portfolio-gallery/designs/plain/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/plain/preview.webp" width="400" alt="The Plain design's first screen, filled with the same sample content"></a>
-</p>
+<p><a href="https://waqas01cp.github.io/portfolio-gallery/"><img src="https://waqas01cp.github.io/portfolio-gallery/preview.webp" width="820" alt="The gallery page's top: its heading, its links and the first row of templates, each card showing its design's first screen"></a></p>
 
-Two of the designs, the same page in each. Every design styles the same
-content, so changing one setting changes your whole site's look. These
-pictures are the gallery's own, taken by its deploy each time it
-publishes, so they show the designs as they are today.
+The gallery page as it is today. Every picture in this README is the
+gallery's own, taken by its deploy each time it publishes, so none goes
+stale.
 
 What every site gets, whatever the design:
 
@@ -50,6 +46,14 @@ What every site gets, whatever the design:
 | Maintain this repository | [CLAUDE.md](CLAUDE.md), then [STATE.md](STATE.md) |
 
 ## Make your own site
+
+Every design styles the same content, so changing one setting changes
+your whole site's look. Two of them, the same page in each:
+
+<p>
+<a href="https://waqas01cp.github.io/portfolio-gallery/designs/default/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/default/preview.webp" width="400" alt="The Default design's first screen, filled with the sample content"></a>
+<a href="https://waqas01cp.github.io/portfolio-gallery/designs/plain/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/plain/preview.webp" width="400" alt="The Plain design's first screen, filled with the same sample content"></a>
+</p>
 
 1. On this page, click **Use this template**, then **Create a new
    repository**. Name it `<your-username>.github.io` for the address
