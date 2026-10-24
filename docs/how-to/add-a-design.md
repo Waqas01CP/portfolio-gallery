@@ -46,8 +46,11 @@ Pick a name: lowercase letters, digits and single hyphens, such as
 `dark` says whether your design styles a dark theme. With `true`, the
 page follows the visitor's device and offers a Dark switch, and your CSS
 styles both themes (docs/reference/design-contract.md, "Light and dark").
-With `false`, the page stays light on every device and has no switch, and
-you style one theme only.
+With `false`, the page has one theme, the same on every device, and no
+switch, and you style that theme only. It is light unless your CSS makes
+it dark: the page tells the browser it is light, so the browser's own
+defaults stay light, and a design whose one theme is dark sets
+`color-scheme: dark` on `:root` itself, as `designs/console/` does.
 
 `in_use` is optional: the `https://` address of your own live site built
 with this design, shown as "In use" on its gallery card. Like a showcase

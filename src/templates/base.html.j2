@@ -20,8 +20,9 @@
 <meta name="generator" content="{{ project_name }}">
 <title>{{ site.name }}</title>
 <meta name="description" content="{{ site.headline|join(' | ') }}">
-{# A design that offers no dark theme is light only, whatever the device
-   says, so the browser's dark defaults never meet its colours. #}
+{# A design that offers no dark theme has one, whatever the device says.
+   The tag says light, so the browser's dark defaults never meet its
+   colours; a design whose one theme is dark says so on :root itself. #}
 <meta name="color-scheme" content="{{ 'light dark' if design.dark else 'light' }}">
 {# An empty icon, so the browser does not ask the server for one. #}
 <link rel="icon" href="data:,">

@@ -134,10 +134,13 @@ on, 0 off.
   dark">` and carries the Dark switch, in both menus. The design follows
   `prefers-color-scheme` and `data-theme` as above, and every check runs
   it in light, in device dark and switched dark. Set `color-scheme` on
-  `:root` for each theme, as both maintained designs do.
+  `:root` for each theme, as `default`, `plain` and `signal` do.
 - `false`: the page declares `content="light"` and has no Dark switch. The
   browser keeps its light defaults on a device set to dark, so a design
-  that sets few colours still reads, and the design styles one theme.
+  that sets few colours still reads, and the design styles one theme, the
+  same on every device. That theme may be dark: set every colour, and
+  `color-scheme: dark` on `:root` for the browser's own parts, such as the
+  scrollbars, as `console` does.
 
 ## What base.css guarantees
 

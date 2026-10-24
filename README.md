@@ -48,7 +48,8 @@ What every site gets, whatever the design:
 ## Make your own site
 
 Every design styles the same content, so changing one setting changes
-your whole site's look. Two of them, the same page in each:
+your whole site's look. Two of them, the same page in each; the rest are
+in [the gallery](https://waqas01cp.github.io/portfolio-gallery/):
 
 <p>
 <a href="https://waqas01cp.github.io/portfolio-gallery/designs/default/index.html"><img src="https://waqas01cp.github.io/portfolio-gallery/designs/default/preview.webp" width="400" alt="The Default design's first screen, filled with the sample content"></a>

@@ -1,0 +1,322 @@
+/* Broadsheet: the page set as a newspaper's front page. A centred
+   nameplate, serif headlines, text in ruled columns on warm newsprint,
+   small capitals for every label, and a dense, even rhythm. Light only.
+
+   The system's own serif faces, chosen in order of how well they set a
+   page; nothing to download but this file. No motion and none of the
+   engine's effects. It styles the engine's fixed HTML
+   (docs/reference/design-contract.md). */
+
+:root {
+  --paper: #F4EFE4;
+  --paper-2: #EAE3D3;
+  --ink: #1C1A16;
+  --muted: #4F4A40;
+  --hair: #A79F8E;     /* rules, never text */
+  --accent: #1E3A5C;
+  --head: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --text: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, "Liberation Serif", serif;
+  --label: "Franklin Gothic Medium", "Arial Narrow", "Liberation Sans Narrow", "Helvetica Neue", Arial, sans-serif;
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: 17px;
+  line-height: 1.5;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--accent); text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+.mono, time { font-variant-numeric: lining-nums; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); }
+.skip { padding: 10px 16px; background: var(--ink); color: var(--paper); font-family: var(--label); }
+.skip:focus { color: var(--paper); }
+.proj, .job, .degree, .cert { scroll-margin-top: 16px; }
+
+/* Labels: small capitals in a narrow sans, as a paper sets its kickers. */
+.avail, .headline, .result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-lane,
+.tl-dates, .degree-courses h4, .skill h3, .sec-n, .dnav-list a, .btn, .depth-toggle, .tl-filter,
+.cert-view, .foot-credit, .strip-static {
+  font-family: var(--label);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .avail-dot, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .skill-n { display: none; }
+
+/* Buttons: ruled boxes, no rounding. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: var(--paper-2); color: var(--ink); }
+.btn-acc { background: var(--ink); color: var(--paper); }
+.btn-acc:hover { background: var(--accent); color: var(--paper); }
+.btn-sm, .depth-toggle { min-height: 34px; padding: 0 10px; font-size: 12px; }
+.depth-toggle::after { content: "+" / ""; font-size: 15px; }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+/* Chips: a run of words with middots, as an index line. */
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0; font-style: italic; }
+.chips li + li::before { content: "\00B7" / ""; padding: 0 8px; font-style: normal; color: var(--muted); }
+
+/* The menu: the paper's index line, between rules, centred. */
+.dnav {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+.dnav-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 4px;
+  border-bottom: 1px solid var(--ink);
+}
+.dnav-list li + li::before { content: "\00B7" / ""; color: var(--hair); padding-right: 4px; }
+.dnav-list a { display: inline-block; padding: 6px 8px; text-decoration: none; }
+.dnav-list a:hover { text-decoration: underline; }
+.dnav-list a[aria-current] { color: var(--accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+/* Intro: the nameplate. */
+.intro { padding: 32px 0 0; text-align: center; }
+.avail { display: flex; align-items: center; gap: 16px; color: var(--accent); }
+.avail::before, .avail::after { content: "" / ""; flex: 1; border-top: 1px solid var(--hair); }
+.intro-name {
+  margin-top: 16px;
+  font-family: var(--head);
+  font-size: clamp(52px, 10vw, 128px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+}
+.intro-name .serif { font-style: italic; font-weight: 400; }
+.headline {
+  margin-top: 20px;
+  padding: 8px 0;
+  border-top: 3px double var(--ink);
+  border-bottom: 1px solid var(--ink);
+  color: var(--ink);
+}
+.sep { color: var(--muted); }
+.intro-grid { display: grid; gap: 24px; margin-top: 28px; text-align: left; }
+.facts { list-style: none; margin: 0; padding: 0 0 12px; border-bottom: 1px solid var(--hair); font-style: italic; color: var(--muted); }
+.facts li { display: flex; gap: 8px; }
+.arrow { font-style: normal; }
+.lede { margin-top: 12px; }
+.intro-main .lede:first-of-type::first-letter {
+  float: left;
+  margin: 4px 8px 0 0;
+  font-family: var(--head);
+  font-size: 4.1em;
+  font-weight: 700;
+  line-height: 0.82;
+}
+.cta { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.results { list-style: none; margin: 0; padding: 0; display: grid; align-content: start; border-top: 3px double var(--ink); }
+.result { padding: 14px 0; border-bottom: 1px solid var(--hair); }
+.result-label { color: var(--accent); }
+.result-fig { margin-top: 4px; display: block; font-style: italic; color: var(--muted); }
+.result-num, .result-word {
+  display: block;
+  font-family: var(--head);
+  font-size: 44px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.result-suffix { font-size: 0.5em; }
+.strip { margin-top: 28px; padding: 8px 0; border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink); }
+.strip-static { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 28px; }
+@media (min-width: 900px) {
+  .intro-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 40px; }
+  .intro-main { columns: 2; column-gap: 40px; column-rule: 1px solid var(--hair); }
+  .facts, .cta { column-span: all; }
+  .facts { margin-bottom: 4px; }
+  .lede, .proj-summary { text-align: justify; hyphens: auto; }
+  .lede { break-inside: avoid-column; }
+  .intro-main .lede:first-of-type { margin-top: 12px; }
+  .results { padding-left: 40px; border-left: 1px solid var(--hair); border-top: 0; }
+  .result:first-child { padding-top: 0; }
+}
+
+/* Sections: a heavy rule, the title, the number on the right. */
+.sec { padding: 48px 0 0; }
+.sec-last { padding-bottom: 48px; }
+.sec-head { margin-bottom: 20px; border-top: 4px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.sec-title { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: baseline; gap: 16px; padding: 6px 0 4px; }
+.sec-n { color: var(--muted); }
+.sec-n::before { content: "No. " / ""; }
+.sec-title h2 { font-family: var(--head); font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
+
+/* Projects: the lead story across the page, the rest in columns. */
+.feature { margin-bottom: 24px; padding: 16px 0; border-bottom: 1px solid var(--hair); display: grid; gap: 4px; text-align: center; }
+.feature-label { color: var(--accent); }
+.feature-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 14px; }
+.feature-num { font-family: var(--head); font-size: 72px; font-weight: 700; line-height: 1; }
+.feature-text { font-family: var(--head); font-size: 30px; font-style: italic; }
+.feature-pairs { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 24px; color: var(--muted); }
+.feature-pairs .num { font-weight: 700; color: var(--ink); }
+.feature-note { font-style: italic; color: var(--muted); }
+.proj-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px 40px; }
+.proj-grid > * { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .js .proj-grid { grid-auto-flow: row dense; }
+  .js .proj-grid > .proj { grid-column: span var(--span-wide); }
+  .js .proj-grid > .proj-lead { grid-column: 1 / -1; }
+}
+.proj { min-width: 0; padding-top: 12px; border-top: 1px solid var(--ink); }
+.proj-lead { padding-top: 16px; border-top: 3px double var(--ink); }
+.proj-dates, .job-dates, .cert-top { color: var(--muted); }
+.proj h3 { margin-top: 6px; font-family: var(--head); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.proj-lead h3 { font-size: clamp(34px, 4.4vw, 52px); }
+.proj-sub { margin-top: 4px; font-size: 19px; font-style: italic; color: var(--muted); }
+.proj-summary { margin-top: 10px; }
+.proj-side { margin-top: 12px; display: grid; gap: 10px; }
+.proj-fact { font-weight: 700; }
+.proj.is-open h3 { color: var(--accent); }
+@media (min-width: 900px) {
+  .proj-lead .proj-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 40px; }
+  .proj-lead .proj-side { margin-top: 0; padding-left: 40px; border-left: 1px solid var(--hair); align-content: start; }
+}
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { padding: 20px 24px; background: var(--paper-2); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.depth-head h3 { font-family: var(--head); font-size: 26px; font-weight: 700; }
+.depth-head .serif { font-style: italic; }
+/* No list markers: they would enter the tree only once laid out. The
+   engine's own numbers, hidden from screen readers, stand in. */
+.depth-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 2.4em minmax(0, 1fr); padding: 8px 0; border-top: 1px solid var(--hair); }
+.depth-n { font-family: var(--head); font-weight: 700; font-style: italic; color: var(--accent); }
+@media (min-width: 900px) {
+  .depth-list { columns: 2; column-gap: 40px; column-rule: 1px solid var(--hair); }
+  .depth-list li { break-inside: avoid; }
+}
+
+/* Timeline: a chronicle in two columns, the degree across them. */
+.tl-lanes { margin-bottom: 16px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-filter { min-height: 34px; font-size: 12px; }
+.tl-filter[aria-pressed="false"] { border-style: dashed; color: var(--muted); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-filter .shape { display: none; }
+.tl-empty { margin: 12px 0; font-style: italic; }
+.tl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0 40px; }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; margin: 12px 0; padding: 10px 0; border-top: 3px double var(--ink); border-bottom: 3px double var(--ink); text-align: center; }
+.tl-entry { order: 2; min-width: 0; border-top: 1px solid var(--hair); }
+.tl-band-label { font-family: var(--head); font-size: 20px; font-style: italic; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 12px; }
+.tl-card summary { list-style: none; display: grid; padding: 10px 0; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-meta { display: flex; justify-content: space-between; color: var(--accent); }
+.tl-sign::before { content: "+" / ""; font-family: var(--label); font-weight: 700; }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-dates { font-size: 12px; color: var(--muted); }
+.tl-title { margin-top: 2px; font-family: var(--head); font-size: 20px; font-weight: 700; line-height: 1.2; }
+.tl-org { font-style: italic; color: var(--muted); }
+.tl-card summary:hover .tl-title { text-decoration: underline; text-underline-offset: 3px; }
+.tl-pop { padding: 0 0 12px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-style: italic; }
+@media (min-width: 900px) {
+  .tl-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tl-band { grid-column: 1 / -1; }
+}
+
+/* Work and Education. */
+.jobs { display: grid; gap: 24px 40px; }
+.job { min-width: 0; padding-top: 12px; border-top: 1px solid var(--ink); }
+.job h3, .degree h3 { margin-top: 4px; font-family: var(--head); font-size: 26px; font-weight: 700; line-height: 1.15; }
+.job-org, .degree-org { font-style: italic; font-size: 18px; }
+.job-loc, .degree-cgpa { color: var(--muted); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 6px; padding-left: 18px; }
+.job-list li::before { content: "\25A0" / ""; position: absolute; left: 0; top: 0.2em; font-size: 9px; line-height: 2; color: var(--accent); }
+@media (min-width: 900px) {
+  .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* The degree, boxed as a notice: a rule and a hairline inside it. */
+.degree { padding: 20px 24px; border: 1px solid var(--ink); outline: 1px solid var(--ink); outline-offset: 3px; }
+.degree-courses { margin-top: 12px; }
+.degree-courses h4 { margin-bottom: 4px; color: var(--accent); }
+@media (min-width: 900px) {
+  .degree { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+  .degree-courses { margin-top: 0; padding-left: 40px; border-left: 1px solid var(--hair); }
+}
+
+/* Certifications. */
+.certs { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px 40px; }
+.cert { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; border-top: 1px solid var(--ink); color: var(--ink); text-decoration: none; }
+.cert-title { font-family: var(--head); font-size: 21px; font-weight: 700; line-height: 1.2; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cert-org { display: block; font-style: italic; color: var(--muted); }
+.cert-view { margin-top: 4px; color: var(--accent); }
+.cert:hover .cert-title { color: var(--accent); text-decoration-thickness: 2px; }
+@media (min-width: 900px) {
+  .certs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Skills: three short columns. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px 40px; }
+.skill { padding-top: 8px; border-top: 1px solid var(--ink); }
+.skill h3 { margin-bottom: 6px; color: var(--accent); }
+
+/* Contact: boxed like notices. */
+.routes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+.route {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--ink);
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
+  color: var(--ink);
+  text-decoration: none;
+  text-align: center;
+}
+.route:hover { background: var(--paper-2); }
+.route-top .i { display: none; }
+.route-label { font-family: var(--head); font-size: 26px; font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.route-line { font-style: italic; color: var(--muted); }
+.route-addr { margin-top: 6px; font-family: var(--label); font-size: 15px; letter-spacing: 0.04em; overflow-wrap: anywhere; }
+.route:hover .route-label { color: var(--accent); }
+
+/* Footer: the colophon. */
+.foot { max-width: 1240px; margin: 0 auto; padding: 20px clamp(16px, 3vw, 40px) 48px; border-top: 3px double var(--ink); display: grid; gap: 6px; text-align: center; }
+.foot-name { font-family: var(--head); font-size: 30px; font-style: italic; }
+.foot-loc { color: var(--muted); }
+.foot-demo { font-style: italic; }
+.foot-credit { margin-top: 8px; color: var(--muted); }
+.foot-credit a { color: inherit; }

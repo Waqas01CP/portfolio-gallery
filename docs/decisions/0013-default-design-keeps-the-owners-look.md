@@ -105,3 +105,7 @@ and the demo's footer show it.
 - Revisit if sites made from the template are mistaken for his.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-24 | **Every design the owner commissions is credited to him, and the project maintains it.** Plain's author, "portfolio-gallery" since 2026-10-12 (the implementing seat's choice; no record decided it), becomes Waqas01CP, with his GitHub profile as author_url, as Default's is. Five more designs of his join the Templates, each credited to Waqas01CP: Bento, Broadsheet, Console, Poster and Signal. All seven are in tools/scope_check.py's MAINTAINED, so a contributor's change to one is refused and proposed in an issue; a design dropped from designs/ leaves that list too. tools/check_built.py now refuses a footer credit whose author link is the project's own address, with a defeat case: Plain's old credit. His designs are built to two bars of his: each looks finished and deliberate (simple is allowed, unfinished is not), and any two differ in at least three of five dimensions (layout and structure; type; colour palette; shapes and ornament; density and rhythm), always in layout or palette. | The owner's decision of 2026-10-24 and his two additions of that date, through the portfolio architecture chat's Brief 14; the five dimensions are the chat's way of making his "at least 40-50%" checkable. Maintaining the five, as Default and Plain are, is the implementing seat's call, which the brief left to it; reported in Report 14 for him to overrule. |

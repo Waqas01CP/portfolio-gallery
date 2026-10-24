@@ -275,10 +275,15 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
     for links in page.credit_links:
         # The credit names this project and the design's author, each
         # linked (ADR-0016, D2); config.json may leave it out altogether.
-        # The author's link is the second; Plain's author is the project.
+        # The author's link is the second, and it is a person's: every
+        # design, the project's own among them, is credited to its author
+        # (ADR-0013, Changes, 2026-10-24).
         if len(links) < 2 or links[0] != PROJECT_URL or urlsplit(links[1]).scheme != "https":
             problems.append("the footer credit does not link both portfolio-gallery and the "
                             "design's author (ADR-0016, D2)")
+        elif links[1].rstrip("/") == PROJECT_URL.rstrip("/"):
+            problems.append("the footer credit names the project as the design's author; credit "
+                            "the person who made it (ADR-0013, Changes, 2026-10-24)")
     for url in page.loads:
         # A gallery's previews, and its showcase's served copies, are made
         # after the build, by the screenshot job (tools/screenshots.py);

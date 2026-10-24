@@ -250,6 +250,12 @@ def entry_copies(site: Path, shots: Path, skip: tuple[str, ...] = ()) -> None:
             (shots / "showcase" / login / "full.webp").write_bytes(served_webp())
 
 
+def demo_names(site: Path) -> list[str]:
+    """Every design a built gallery shows, for the pictures the screenshot
+    job would supply."""
+    return sorted(p.parent.name for p in (site / "designs").glob("*/index.html"))
+
+
 def build_site(copy: Path, *mode: str) -> Path:
     out = copy / "_out"
     code, text = run(copy, "build.py", "--as-of", "2026-10", *mode, "--out", out)
@@ -402,7 +408,7 @@ def file_cases():
                 plant_entry(copy)
             site = build_site(copy, "--gallery")
             shots = copy / "_shots"
-            for name in ("default", "plain"):
+            for name in demo_names(site):
                 (shots / "designs" / name).mkdir(parents=True)
                 data = b"RIFF\0\0\0\0WEBPVP8 " + (b"\0" * (310_000 if big and name == "plain" else 64))
                 (shots / "designs" / name / "preview.webp").write_bytes(data)
@@ -674,6 +680,15 @@ def file_cases():
         ', design {{ design.name }} by <a href="{{ design.author_url }}">{{ design.author }}</a>', "",
         "footer.html.j2"), "the footer credit does not link both")
 
+    def project_as_author(copy):
+        # Plain's credit until 2026-10-24: the project's own address.
+        edit(copy / "designs/plain/design.json", '"author_url": "https://github.com/Waqas01CP"',
+             '"author_url": "https://github.com/Waqas01CP/portfolio-gallery"')
+        return ["tools/check_built.py", build_site(copy, "--gallery")]
+
+    yield ("built: the credit naming the project as the design's author", project_as_author,
+           "names the project as the design's author")
+
     # Each card's picture keeps its shape within the limits, and its box is
     # reserved at the size of its copy (ADR-0016, Changes, 2026-10-20).
     def shaped(files, old=None, new=None, where="build.py"):
@@ -698,7 +713,7 @@ def file_cases():
         def plant(copy):
             plant_entry(copy, files=files)
             out = build_site(copy, "--gallery")
-            for name in ("default", "plain"):
+            for name in demo_names(out):
                 (out / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
             if gallery:
                 (out / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
@@ -899,6 +914,23 @@ def axe_file(argv: list[str]) -> Path | None:
     return Path(argv[at]).resolve()
 
 
+# Each browser case builds a gallery and runs a browser check over every
+# design in it. Each is built to defeat a check on the engine or on Plain,
+# so its copy keeps the two designs the cases were written against, and a
+# run stays as long as it was with two (2026-10-24, when five more joined).
+# The browser control below, and the standing checks, cover every design.
+KEPT_FOR_BROWSER = ("default", "plain")
+
+
+def lean(plant):
+    def planted(copy: Path):
+        for folder in (copy / "designs").iterdir():
+            if folder.is_dir() and folder.name not in KEPT_FOR_BROWSER:
+                shutil.rmtree(folder)
+        return plant(copy)
+    return planted
+
+
 def browser_cases(axe: Path | None):
     def gallery(plant_fn, only):
         def plant(copy):
@@ -1074,7 +1106,7 @@ def main(argv: list[str]) -> int:
     cases = list(file_cases())
     axe = axe_file(argv)
     if "--browser" in argv:
-        cases += list(browser_cases(axe))
+        cases += [(label, lean(plant), expected) for label, plant, expected in browser_cases(axe)]
     work = Path(tempfile.mkdtemp(prefix="pg-prove-"))
     unproven, ran = [], 0
     try:
@@ -1085,7 +1117,7 @@ def main(argv: list[str]) -> int:
         run(copy, "build.py", "--as-of", "2026-10", "--gallery", "--out", gallery_out)
         (copy / "_scope.tsv").write_text("added\tdesigns/probe/design.css\nadded\tdesigns/probe/design.json\n")
         shots = copy / "_shots"
-        for name in ("default", "plain"):
+        for name in demo_names(gallery_out):
             (shots / "designs" / name).mkdir(parents=True)
             (shots / "designs" / name / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)
         (shots / "preview.webp").write_bytes(b"RIFF\0\0\0\0WEBPVP8 " + b"\0" * 64)

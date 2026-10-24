@@ -24,7 +24,8 @@ The rules:
     designs/<name>/ folder, the same for all;
   - each is a file the design format allows: design.css, design.json,
     fonts/*.woff2, fonts/*.txt, img/*.png, *.webp, *.jpg, *.jpeg;
-  - the folder is not one the project maintains (default, plain);
+  - the folder is not one the project maintains: default, plain and the
+    owner's other designs (ADR-0013, Changes, 2026-10-24);
   - at most 40 files.
 
 Or, for a showcase entry:
@@ -69,7 +70,9 @@ DESIGN_PATH_RE = re.compile(
 SHOWCASE_PATH_RE = re.compile(
     r"^showcase/(?P<login>[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38})/"
     r"(?:entry\.json|(?i:[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)))$")
-MAINTAINED = {"default", "plain"}
+# The project's own designs, each credited to the owner (ADR-0013,
+# Changes, 2026-10-24). A design dropped from designs/ leaves this list too.
+MAINTAINED = {"default", "plain", "bento", "broadsheet", "console", "poster", "signal"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 AS_CONTRIBUTOR = "[scope: as contributor]"
 FILE_LIMIT = 40
