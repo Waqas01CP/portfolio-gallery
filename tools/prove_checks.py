@@ -914,6 +914,23 @@ def axe_file(argv: list[str]) -> Path | None:
     return Path(argv[at]).resolve()
 
 
+# Each browser case builds a gallery and runs a browser check over every
+# design in it. Each is built to defeat a check on the engine or on Plain,
+# so its copy keeps the two designs the cases were written against, and a
+# run stays as long as it was with two (2026-10-24, when five more joined).
+# The browser control below, and the standing checks, cover every design.
+KEPT_FOR_BROWSER = ("default", "plain")
+
+
+def lean(plant):
+    def planted(copy: Path):
+        for folder in (copy / "designs").iterdir():
+            if folder.is_dir() and folder.name not in KEPT_FOR_BROWSER:
+                shutil.rmtree(folder)
+        return plant(copy)
+    return planted
+
+
 def browser_cases(axe: Path | None):
     def gallery(plant_fn, only):
         def plant(copy):
@@ -1089,7 +1106,7 @@ def main(argv: list[str]) -> int:
     cases = list(file_cases())
     axe = axe_file(argv)
     if "--browser" in argv:
-        cases += list(browser_cases(axe))
+        cases += [(label, lean(plant), expected) for label, plant, expected in browser_cases(axe)]
     work = Path(tempfile.mkdtemp(prefix="pg-prove-"))
     unproven, ran = [], 0
     try:
