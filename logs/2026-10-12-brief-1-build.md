@@ -2335,3 +2335,246 @@ clone of 42f5760 unless named.
   ending with the notice and no red, then Pages turned on and Deploy
   publishing; the chat reads it through the API before he deletes it.
 - Test 1 once more, on or after 2026-11-02.
+
+# Round 14, 2026-10-24 UTC: five designs of the owner's, and Plain raised to the same standard
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 040b028, the website merge of pull request 19;
+pull requests 17, 18 and 19 merged on 2026-10-23 (85f9244, d99b909,
+040b028), each merge's tree its head's, or its head's with pull request
+18's one file, and Checks and Deploy success on all three on main, read
+from GitHub's API this round; the owner's showcase card live with its new
+line. The two merges on top of the branch's base are the owner's, made on
+GitHub's website. Work on the branch more-designs. HEAD at end: the commit
+that adds this section. Mode: mutating.
+
+## What was asked
+
+The portfolio architecture chat's Brief 14, of 2026-10-24, stored word for
+word in place of Brief 13 (executed, ticked), read first for what it still
+says: the owner's aim for the showcase, carried since Brief 9. A gallery
+with two designs does not read as a gallery: five designs of his own, in
+Templates, built fast on the rules the project has, without a proposal
+round; he judges them once from screenshots before he merges and may drop
+any. His trade-off, in his words: "decrease quality by 10% in exchange for
+50% speed", but no cut that a check needs. His two additions of
+2026-10-24: a quality floor (of Plain: "very plain and the sites should not
+be like that"; simple allowed, unfinished not), and real difference: "all
+5 should differ from each other by at least 40-50%", made checkable by the
+chat as five dimensions (layout and structure; type; colour palette;
+shapes and ornament; density and rhythm), any two of the seven designs
+differing in at least three, always in layout or palette. Plain: its
+author becomes Waqas01CP (his decision: every design he commissions is
+credited to him), recorded, with check_built's credit rule, its defeat
+cases and the prompt's checked facts updated; its purpose kept (high
+contrast, system fonts, no motion, one column, a printout of every word)
+and its look raised to the floor; still maintained. Each new design within
+the contract and through every check a contributor's design must pass.
+Screenshots at 1366 and 390 px for him, with Plain before and after, and
+the difference table; how to drop a design. Proof on a fresh clone: every
+check, every defeat case, the gates, the pre-publish search, the gallery
+with all seven looked at.
+
+## Errors this seat made
+
+1. **Bento's first screen grid also styled the strip under it.** The rule
+   `.intro .wrap` matched the strip's paragraph, which carries the class
+   wrap too, so the strip took the hero tile's grid and background. Seen
+   in the first whole-page screenshot; fixed before any commit with
+   `.intro > .wrap`.
+2. **Three designs coloured the headline's separators in their rule
+   colour**, a colour meant never to be text: Plain #BDBDBD on white
+   (1.9:1), Broadsheet #A79F8E on newsprint (2.3:1), Console #3F6B3A on
+   black (3.1:1). Caught by reading the screenshots before axe ran, fixed
+   before any commit; axe then passed all seven.
+3. **Console's marks ran into the next word**: `"\25B8 "` in CSS ends the
+   escape with its space, so the mark and the title touched. Seen in a
+   screenshot; fixed with a second space before any commit.
+4. **The first file proofs left six controls unproven**: tools/prove_checks.py
+   planted previews for Default and Plain by name, so a gallery of seven
+   lacked five. Fixed in 5fdccd9: it plants one for every design a gallery
+   builds.
+5. **Poster set its In depth heading in forced capitals, and the keyboard
+   check failed it** on the full checks of a fresh clone of 4521c00, at
+   360 and 1366 px: "depth-tide-tracker's text did not enter the tree".
+   It had, in capitals: Chrome gives a heading's name in the case CSS
+   shows, and the check finds the panel by its heading's own text. Every
+   other check, axe included, and every other design had passed. The
+   seat's quick runs before the commit (axe, words, joins) had not
+   included the keyboard check. Fixed in e669723: the heading keeps its
+   own case; the keyboard check then passed on all seven, 28 runs. The
+   run was stopped, with the defeat harness it had started, and run
+   again on a fresh clone of e669723.
+
+## What was built
+
+- **Plain, raised** (5fdccd9): the same purpose and the same one column;
+  its look now from type and spacing alone: a name in heavy weight at up
+  to 80 px, small-capital labels, a 4 px rule over each section, hairlines
+  between entries in place of a 2 px box around everything, figures in
+  monospace, an 8 px rhythm, buttons square and solid. Black on white, or
+  white on black; its print styles kept. Author Waqas01CP, author_url his
+  profile. check_built.py refuses a footer credit whose author link is the
+  project's own address, with a defeat case planting Plain's old credit.
+- **Five designs** (f969f48), each credited to Waqas01CP, CSS only:
+  Bento, Broadsheet, Console, Poster and Signal (the table below). Bento
+  carries Nunito (variable, 39,128 bytes) and Poster Anton (18,612 bytes),
+  each from Fontsource 5.2.7 on npm, the latin subset, under the OFL with
+  Google Fonts' text; neither reserves a name, by the licence text and by
+  each WOFF2's name table, read with Node's Brotli. The other three use
+  the system's faces. Only Signal offers dark, with a switch; Console has
+  one theme, dark, setting color-scheme: dark on its own root.
+- **Maintained**: all seven in tools/scope_check.py's MAINTAINED, so a
+  contributor's change to one is refused and proposed in an issue; the
+  seat's call, which the brief left open. ADR-0013, Changes, 2026-10-24,
+  records the credit, the maintaining and the two bars.
+- **One theme may be dark**: the design contract, the design guide,
+  check_design.py's message, the template's comment and CAPABILITIES now
+  say that a design without dark has one theme, the same on every device,
+  which may be dark. The engine is unchanged: the page still declares
+  light and carries no switch; ADR-0006's decision is unchanged.
+- **The README** points to the gallery for the designs beyond its two
+  pictures, without a count, so dropping a design leaves it true; the
+  setup guide's step 8 expects a card per design. No checked fact in
+  either prompt named Plain's author or needed a change: both say "such
+  as designs/default/ and designs/plain/".
+- **Poster's In depth heading** (e669723) keeps its own case (Errors, 5).
+- **The browser proofs** (4521c00) keep Default and Plain in each case's
+  copy, the designs they were written against, so a run stays as long as
+  with two; the browser control and the standing checks run all seven.
+
+## The seven designs on five dimensions
+
+The seat's description of each, from the stylesheets and the screenshots;
+a judgment, not a measurement.
+
+| Design | Layout and structure | Type | Palette | Shapes and ornament | Density and rhythm |
+|---|---|---|---|---|---|
+| Default | A dark full first screen with the 3D knot; card grids two or three across; the timeline drawn to scale on a wide screen | Manrope, Instrument Serif italic, JetBrains Mono; large display sizes | Dark navy and lime; light or dark by the device | Rounded cards, glows, the knot, tilting cards, a moving strip | Spacious |
+| Plain | One narrow column at every width; the menu a row of links | The system's sans-serif and monospace; a fixed scale; small-capital labels | Black on white, or white on black; blue links | Square; a heavy rule over each section, hairlines between entries | Compact and even, an 8 px rhythm |
+| Broadsheet | A centred nameplate; text in ruled columns, two across; the degree boxed as a notice | The system's serifs (Georgia, Charter), bold and italic; narrow sans small capitals; a drop cap | Warm newsprint, ink black, a deep ink blue; light only | Hairline, double and heavy rules, double-ruled boxes, middots; no rounding | Dense: small type, tight leading |
+| Console | A side pane menu beside the content on a wide screen; the timeline as log lines | The system's monospace throughout, few sizes | Near-black with phosphor green, amber and cyan; always dark | Dashed boxes with labels set into the line, bracket and prompt marks, a block cursor, a status bar | Compact |
+| Signal | A red first screen; each section's title and huge number held in a left column while its entries run on the right | The system's grotesque (Helvetica, Arial) bold, from a 200 px name to 12 px spaced capitals | White, black and a signal-red field; dark offered | Heavy 6 px rules and huge numerals; square; nothing else | Airy, wide white space |
+| Bento | Rounded tiles on a tinted ground: a mosaic first screen; sections as tiles, two to a row on a wide screen | Nunito, a rounded sans-serif, at heavy weights | Lilac ground, white tiles, peach, mint, sky and butter, a violet accent; light only | Large radii, soft shadows, pills, round badges holding the engine's icons | Medium, generously padded |
+| Poster | Full-width colour bands, one per section; cards two across inside them | Anton, tall and condensed, in capitals at up to 232 px; the system's sans-serif for text; monospace labels | Saturated yellow, cobalt, hot pink and black on cream; light only | Thick black outlines, hard offset shadows, rotated stickers, a dot screen | Chunky: big type, heavy blocks |
+
+Dimensions in which each pair differs (L layout, T type, P palette, S
+shapes, D density), counted strictly: where two are close, they count as
+the same.
+
+| Pair | Differ in | Count |
+|---|---|---|
+| Default, Plain | L T P S D | 5 |
+| Default, Broadsheet | L T P S D | 5 |
+| Default, Console | L T S D (both dark with a green accent: P the same) | 4 |
+| Default, Signal | L P S (both grotesque, both roomy) | 3 |
+| Default, Bento | L T P (both rounded, both roomy) | 3 |
+| Default, Poster | L T P S | 4 |
+| Plain, Broadsheet | L T P (both ruled, both close-set) | 3 |
+| Plain, Console | L T P S | 4 |
+| Plain, Signal | L P D (both system sans, both ruled) | 3 |
+| Plain, Bento | L T P S D | 5 |
+| Plain, Poster | L T P S D | 5 |
+| Broadsheet, Console | L T P S | 4 |
+| Broadsheet, Signal | L T P D | 4 |
+| Broadsheet, Bento | L T P S D | 5 |
+| Broadsheet, Poster | L T P S D | 5 |
+| Console, Signal | L T P S D | 5 |
+| Console, Bento | L T P S D | 5 |
+| Console, Poster | L T P S D | 5 |
+| Signal, Bento | L T P S | 4 |
+| Signal, Poster | L T P S D | 5 |
+| Bento, Poster | L T P S D | 5 |
+
+All 21 pairs differ in at least three; every pair differs in layout, and
+all but one (Default and Console) in palette too.
+
+## Proofs
+
+All on 2026-10-24, one browser job at a time, Chrome 156, on a fresh
+clone of e669723 unless named.
+
+- **Every check with axe**, `tools/ci.py checks --axe`: exit 0 in 2,042 s;
+  the browser checks 1,997 s (tree 168 runs, keyboard 28, joins 14,
+  anchors 476, words 14, motion 8, packing 12, overlay 4, axe 96), 0
+  failures, at 360 and 1366 px, light, device dark and switched dark. The
+  design check passes all seven; two builds of the site (14 files) and of
+  the gallery (33 files) byte-identical; check_built 0 problems on both;
+  the content trace passes; 10 pictures made and checked, a preview for
+  each design among them; the prompt check passes on all four documents,
+  the README's 8 live addresses among it; the cleanup removes 61 files. On
+  a fresh clone of 4521c00 the same run failed the keyboard check on
+  Poster alone (Errors, 5), everything else passing: tree, joins, anchors,
+  words, motion, packing, overlay and axe, all seven designs.
+- **Every defeat case with the browser and axe**: exit 0 in 2,977 s; 168
+  defeat cases (145 file, 23 browser) fail as built, naming what failed;
+  12 controls, the browser and axe controls over all seven designs among
+  them, and 23 planted controls pass; 0 unproven. New: the credit naming
+  the project as the design's author.
+- **The gates**, on a scratch clone of 4521c00: 27 defeat cases refused, 5
+  controls passed, exit 0 in 452 s. e669723 changes Poster's stylesheet
+  alone and passed gates A, B and C on its commit.
+- **The pre-publish search**, every ref, pull request refs 1 to 19
+  fetched: PASS; 497 blobs at 491 paths across 78 commits, 78 commit
+  headers, 57 built files; the name only at LICENSE:3, README.md:344 and
+  showcase/waqas01cp/entry.json:1, and in his own website commit
+  messages, allowed; the contact address only at CODE_OF_CONDUCT.md:45.
+- **Before committing**, on a gallery built in the working tree: axe,
+  words and joins over all seven, 0 failures in 522 s (axe 96 runs); the
+  drop cap in Broadsheet passes words and joins. The file defeat cases:
+  145 and 19 planted controls, 0 unproven.
+- **The fonts**: Nunito's and Anton's licence texts carry no Reserved Font
+  Name; each WOFF2's name table (Node's Brotli) holds its copyright line
+  and the OFL address, nothing more.
+- **Looked at**: every design, whole, at 1366 and 390 px, light, and dark
+  for Default, Plain and Signal, and the gallery page with its seven cards
+  and their previews, light and dark, from the fresh clone's gallery;
+  none scrolls sideways. Plain before (main's) and after, at both widths
+  in both themes. 28 pictures kept for the owner in the gitignored briefs
+  folder, with a page to see them at once.
+
+## Cuts, for speed
+
+Each a cut the owner's trade-off allows, none of anything a check needs.
+What each saved is the seat's estimate, not a measurement.
+
+- **Light only: Broadsheet, Bento, Poster; dark only: Console.** Only
+  Signal offers both. Saved a second palette per design and its contrast
+  tuning in two more themes, about a third of each design's colour work.
+- **System fonts: Broadsheet, Console, Signal.** Saved sourcing, the
+  licence text, the name-table read and the preload for each; the cost is
+  Linux's faces in the previews the runner takes (STATE, Known
+  unverified).
+- **None of the engine's effects in the five** (the knot, tilting cards,
+  the moving strip, the scroll drift): nothing to tune for motion or to
+  stop under reduced motion.
+- **The timeline as a list in all five**, not drawn to scale as Default's
+  is: Default's to-scale timeline is the engine's most intricate layout.
+- **The menu as a row of links at every width**, not the engine's phone
+  bar, which is a disclosure menu needing its own styling in each design.
+- **No print styles in the five**; Plain keeps its printout.
+- **No images**: the dot screen, the hero tile's colour and the terminal's
+  dots are CSS gradients.
+
+## Rejected alternatives
+
+- **Console offering light too**: the engine's light theme is what a light
+  device shows by default, so the gallery's preview, taken light, would
+  not show the design; a Dark switch on a page already dark would do
+  nothing.
+- **Web fonts in every design**: each needs its source, licence text, a
+  name-table read and a preload; the system's serif, grotesque and
+  monospace faces carry Broadsheet, Signal and Console.
+- **A count of designs in the README**: it would go stale when one is
+  dropped or added.
+- **The browser defeat cases over all seven designs**: each builds a
+  gallery and runs a check over every design in it, so seven would make
+  the harness about three times as long (inferred from the two-design
+  run) for no more proof of the check failing.
+
+## Not done
+
+- Nothing pushed.
+- The owner's judgment of the five, from the screenshots; he may drop any.
+- The previews on the live gallery, taken by the deploy after the merge.
+- Test 1 once more, on or after 2026-11-02.
