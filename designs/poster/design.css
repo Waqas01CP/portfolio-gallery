@@ -253,7 +253,9 @@ strong { font-weight: 800; }
 .proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .depth { padding: clamp(18px, 2.4vw, 28px); background: var(--paper); }
 .depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
-.depth-head h3 { font-family: var(--display); font-size: 34px; font-weight: 400; text-transform: uppercase; }
+/* Not in forced capitals: Chrome gives a heading's name in the case shown,
+   and the keyboard check finds the open panel by its heading's own text. */
+.depth-head h3 { font-family: var(--display); font-size: 34px; font-weight: 400; letter-spacing: 0.01em; }
 /* No list markers: they would enter the tree only once laid out. The
    engine's own numbers, hidden from screen readers, stand in. */
 .depth-list { list-style: none; margin: 14px 0 0; padding: 0; }
