@@ -200,6 +200,15 @@ def checks(quick: bool, axe: Path | None) -> None:
     run("build.py", "--as-of", as_of, "--out", site)
     run("tools/check_built.py", site)
     run("tools/check_content.py", "--page", site / "index.html")
+    # Each sample person's own site, in the design it shows, built and traced
+    # to that person's CV as a user's site is; the gallery shows the same
+    # content in that design's demo (ADR-0018). A cleaned copy has none.
+    samples = ROOT / "samples"
+    for folder in sorted(samples.iterdir()) if samples.is_dir() else []:
+        own = ROOT / "_samples" / folder.name
+        run("build.py", "--as-of", as_of, "--content", folder, "--out", own)
+        run("tools/check_built.py", own)
+        run("tools/check_content.py", "--content", folder, "--page", own / "index.html")
     run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
     run("tools/check_built.py", gallery)
     # The pictures, as the deploy's screenshot job makes them: so a

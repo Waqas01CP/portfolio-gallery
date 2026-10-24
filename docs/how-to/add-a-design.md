@@ -43,6 +43,10 @@ Pick a name: lowercase letters, digits and single hyphens, such as
 }
 ```
 
+In the gallery your design is shown with the sample person in
+`content/`, Alex Example; the project's own templates made for a
+profession may be shown with their own (ADR-0018).
+
 `dark` says whether your design styles a dark theme. With `true`, the
 page follows the visitor's device and offers a Dark switch, and your CSS
 styles both themes (docs/reference/design-contract.md, "Light and dark").

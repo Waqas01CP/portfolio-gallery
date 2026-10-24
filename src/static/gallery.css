@@ -156,6 +156,7 @@ img { display: block; max-width: 100%; height: auto; }
 .g-name a:hover { text-decoration: underline; }
 .g-by { font-size: 15px; color: var(--muted); }
 .g-desc { color: var(--ink2); }
+.g-sample { font-size: 14px; color: var(--muted); }
 .g-use { font-size: 14px; color: var(--muted); }
 .g-inuse, .g-host { font-size: 15px; color: var(--muted); }
 .g-host { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }

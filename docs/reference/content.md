@@ -114,6 +114,21 @@ that is not `https:`, `http:` or `mailto:`, and a highlight or feature that
 names a missing item or source. It checks everything before writing
 anything, reports every failing item by id, and exits 1.
 
+## Sample people, for the gallery
+
+The gallery shows most templates with the sample person in content/. A
+template made for a profession may be shown with its own invented person
+instead (ADR-0018): `samples/<design>/` holds `config.json`, `cv.md`,
+`site.json` and `items.json`, a whole content folder in the shape above,
+whose config.json names that design and whose cv_source is
+`samples/<design>/cv.md`. Only the gallery reads it, for that design's
+demo; a site is always built from content/. The build refuses a sample for
+a design that does not exist, one naming another design, and a folder that
+is not a whole content folder; the checks build each sample person's own
+site and trace it to their CV, as yours is. Every sample person is
+invented and obviously so, every link goes to example.com, and a copy of
+the template removes samples/.
+
 ## Limits
 
 - **One degree on the timeline.** The band lane draws one degree; a second

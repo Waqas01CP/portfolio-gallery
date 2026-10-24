@@ -13,6 +13,10 @@ CODE_OF_CONDUCT.md
 # drops "in_use" from every design.json.
 showcase
 
+# The gallery's sample people, each shown with one template (ADR-0018). A
+# copy builds only its owner's site, from content/.
+samples
+
 # How the project is run: its records, logs, state and rules.
 docs/decisions
 docs/deferred

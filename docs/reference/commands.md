@@ -39,6 +39,7 @@ python build.py --design plain           the site, in another design
 python build.py --gallery                every design, and the gallery page
 python build.py --as-of 2026-10          as of a given month
 python build.py --out DIR                somewhere other than _site/
+python build.py --content samples/NAME   a sample person's site, from their own content
 ```
 
 Exit 0 on success. On any content failure it exits 1, names every failing
@@ -57,7 +58,7 @@ python tools/check_showcase.py --fetch-all       also every showcase site and In
 python tools/check_showcase.py --fetch-url URL [--login LOGIN]   one address's response
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_prompt.py [README]            the prompts for an AI, the README's and a copy's, and AGENTS.md, against the repository
-python tools/check_content.py [--cv FILE] [--page FILE]   the content trace
+python tools/check_content.py [--cv FILE] [--page FILE] [--content DIR]   the content trace
 python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
 python tools/screenshots.py [_site]              the gallery's previews, showcase copies and own picture
 python tools/ci.py pictures --gallery _site      those pictures made and checked
