@@ -6,12 +6,13 @@ status: current
 
 # STATE
 
-**Verified against commit e669723, the last commit before this file's
+**Verified against commit 20bf01c, the last commit before this file's
 update, 2026-10-24 UTC, by the Brief 1 implementing session's fourteenth
 round, under Brief 14**: a fresh clone of it through every check with
-axe on all seven designs, every defeat case with the browser and axe,
-and the cleanup; the gates proven on a clone of 4521c00, the commit
-before its one-design fix; the pre-publish search
+axe on all seven designs and the cleanup, and no page wider than the
+screen; every defeat case with the browser and axe on a fresh clone of
+e669723, which differs from it only in Poster's stylesheet; the gates
+proven on a clone of 4521c00; the pre-publish search
 (logs/2026-10-12-brief-1-build.md, Round 14). This is the only line in
 this file that names commits.
 
@@ -60,13 +61,14 @@ policy, provable only on or after 2026-11-02; ADR-0012, held.
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | The Actions policy allowing `pull_request_target` (step 5) | PARTIAL | [BELIEVED] set by the owner (the chat's report); until 2026-11-02 GitHub runs the scope check without the policy too | 2026-10-18 | ADR-0006, A2; setup Test 1 |
-| This branch, more-designs, merged to main | PENDING | the owner judges the five from Report 14's screenshots and may drop any; he pushes it and opens the pull request; checks and scope must pass | 2026-10-24 | 5fdccd9, f969f48, 4521c00, e669723 |
+| This branch, more-designs, merged to main | PENDING | the owner judges the five from Report 14's screenshots and may drop any; he pushes it and opens the pull request; checks and scope must pass | 2026-10-24 | 5fdccd9, f969f48, 4521c00, e669723, 20bf01c |
 
 ## Decisions waiting on the owner
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | Lighthouse in CI | PENDING | held as proposed by the owner; speed measured locally | 2026-10-15 | ADR-0012 |
+| A standing check that no page scrolls sideways | PENDING | recommended in Report 14: Poster scrolled sideways at 360 px and no check measures width; it would bind contributors' designs too, so it waits on the chat and the owner | 2026-10-24 | 2026-10-12-brief-1-build.md, Round 14 |
 
 ## Built, not yet complete
 
@@ -78,7 +80,7 @@ DONE rows are in docs/reference/completed.md.
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
 | The README's routes and prompt; the Showcase entry and Question forms | PARTIAL | [VERIFIED] the prompt check and its defeat cases; on main, GitHub's own page serves the prompt's block with its copy button's text and the three pictures through its image proxy (2026-10-23); the forms parsed; [BELIEVED] the four forms in the issue chooser, which needs a sign-in, until the owner looks | 2026-10-23 | 0ce2c71, pull request 15; ADR-0017 |
 | The showcase's overlay | PARTIAL | [VERIFIED] the overlay check at 390 and 1366 px, light and dark, axe open and closed, with scripts off, and its defeat cases; the tree at load the same as main's; on the live gallery the owner opened it and closed it each way (taken from Brief 14); [BELIEVED] in Safari and Firefox, whose dialog the seat cannot run | 2026-10-23 | 42f5760, pull request 17; ADR-0016, Changes |
-| Five designs of the owner's; Plain raised to the same standard; all seven credited to him and maintained | PARTIAL | [VERIFIED] check_design, the builds, every browser check with axe at 360 and 1366 px, light, device dark and switched dark, and every defeat case, on a fresh clone; the seven looked at whole at 1366 and 390 px; [BELIEVED] the previews the deploy takes after the merge, on the runner's Chrome with Linux's own faces for the three designs on system fonts | 2026-10-24 | 5fdccd9, f969f48, e669723; ADR-0013, Changes |
+| Five designs of the owner's; Plain raised to the same standard; all seven credited to him and maintained | PARTIAL | [VERIFIED] check_design, the builds, every browser check with axe at 360 and 1366 px, light, device dark and switched dark, and every defeat case, on a fresh clone; the seven looked at whole at 1366 and 390 px; [BELIEVED] the previews the deploy takes after the merge, on the runner's Chrome with Linux's own faces for the three designs on system fonts | 2026-10-24 | 5fdccd9, f969f48, e669723, 20bf01c; ADR-0013, Changes |
 
 ## Blocked, and on whom
 

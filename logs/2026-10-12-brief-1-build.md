@@ -2405,6 +2405,18 @@ with all seven looked at.
    own case; the keyboard check then passed on all seven, 28 runs. The
    run was stopped, with the defeat harness it had started, and run
    again on a fresh clone of e669723.
+6. **Poster scrolled sideways on a phone**, by 34 px at 360 px and 4 px at
+   390 px: its longest section title, Certifications, in Anton at its
+   52 px minimum, was wider than the space beside its sticker. The seat's
+   first width reading, in the screenshot script, measured each page at
+   load, while the sections below the first screen still skipped their
+   layout, so it saw nothing; and no standing check measures a page's
+   width. Found while checking the report's own claim, with every section
+   laid out; fixed in 20bf01c (the title sizes with the screen, from 38
+   px, and a longer word wraps). After it, no page scrolls sideways at
+   320, 360, 390 or 1366 px, light or dark. A standing check for it is
+   recommended to the chat, not added: it would raise the bar for
+   contributors' designs too.
 
 ## What was built
 
@@ -2438,7 +2450,8 @@ with all seven looked at.
   setup guide's step 8 expects a card per design. No checked fact in
   either prompt named Plain's author or needed a change: both say "such
   as designs/default/ and designs/plain/".
-- **Poster's In depth heading** (e669723) keeps its own case (Errors, 5).
+- **Poster's In depth heading** (e669723) keeps its own case (Errors, 5),
+  and its section titles size with the screen (20bf01c; Errors, 6).
 - **The browser proofs** (4521c00) keep Default and Plain in each case's
   copy, the designs they were written against, so a run stays as long as
   with two; the browser control and the standing checks run all seven.
@@ -2494,6 +2507,18 @@ all but one (Default and Console) in palette too.
 All on 2026-10-24, one browser job at a time, Chrome 156, on a fresh
 clone of e669723 unless named.
 
+- **Every check with axe on a fresh clone of 20bf01c**, Poster's title
+  fix, the branch's last code commit: exit 0 in 2,255 s, the browser
+  checks 2,205 s, the same runs as below, 0 failures. The first try, from
+  13:14Z, lasted 27,482 s and lost Chrome's DevTools connection in the
+  browser checks ("the browser closed the connection"), after every file
+  check, build and picture had passed; the machine had most likely slept.
+  The retry, on the same clone from 20:54Z, passed. On that clone's
+  gallery, the seat's width measurement with every section laid out: no
+  page scrolls sideways at 320, 360, 390 or 1366 px, light or dark, 8
+  pages. The defeat harness and the gates were not repeated for 20bf01c,
+  which changes Poster's stylesheet alone; no defeat case touches Poster.
+
 - **Every check with axe**, `tools/ci.py checks --axe`: exit 0 in 2,042 s;
   the browser checks 1,997 s (tree 168 runs, keyboard 28, joins 14,
   anchors 476, words 14, motion 8, packing 12, overlay 4, axe 96), 0
@@ -2528,8 +2553,8 @@ clone of e669723 unless named.
   and the OFL address, nothing more.
 - **Looked at**: every design, whole, at 1366 and 390 px, light, and dark
   for Default, Plain and Signal, and the gallery page with its seven cards
-  and their previews, light and dark, from the fresh clone's gallery;
-  none scrolls sideways. Plain before (main's) and after, at both widths
+  and their previews, light and dark, from the fresh clone's gallery.
+  Plain before (main's) and after, at both widths
   in both themes. 28 pictures kept for the owner in the gitignored briefs
   folder, with a page to see them at once.
 
@@ -2577,4 +2602,6 @@ What each saved is the seat's estimate, not a measurement.
 - Nothing pushed.
 - The owner's judgment of the five, from the screenshots; he may drop any.
 - The previews on the live gallery, taken by the deploy after the merge.
+- A standing check that no page scrolls sideways: recommended to the
+  chat (Errors, 6), not built, since it would bind contributors too.
 - Test 1 once more, on or after 2026-11-02.
