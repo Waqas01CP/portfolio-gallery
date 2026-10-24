@@ -1,0 +1,18 @@
+{
+  "name": "Sentinel",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "For security work: a clearance card as the first screen, then a dashboard of bracketed panels on a graphite ground, signal orange for what matters. Always dark.",
+  "preload": [
+    "fonts/chakra-petch-latin-600-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/chakra-petch-latin-600-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/ChakraPetch-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/chakra-petch@5.2.7/files/chakra-petch-latin-600-normal.woff2"
+    }
+  ]
+}

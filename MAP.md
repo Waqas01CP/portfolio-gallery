@@ -11,7 +11,8 @@ edit this file; edit the file's frontmatter and run the generator. The
 pre-commit hook refuses a commit that leaves it stale (ADR-0008).
 
 Every tracked Markdown file is listed except this one, GitHub's own
-templates under `.github/`, and the site's own content under `content/`.
+templates under `.github/`, and a site's own content under `content/` and
+`samples/`.
 Decision records have no `type`; their `topic` is shown.
 
 ## (root)

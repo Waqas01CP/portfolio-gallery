@@ -20,7 +20,10 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # The browser checks run every design, about five minutes each on this
+    # machine's runner and the seat's: with twelve designs, near an hour
+    # (2026-10-24). The limit grows with the gallery; the checks never shrink.
+    timeout-minutes: 90
     env:
       # Ubuntu 24.04 restricts the user namespaces Chrome's sandbox uses.
       # This job holds no write token and no secret (ADR-0010).

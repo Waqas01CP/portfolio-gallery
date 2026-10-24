@@ -1,0 +1,49 @@
+{
+  "name": "Morgan Placeholder",
+  "headline": ["Security analyst", "Incident response", "Detection engineering"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to security analyst roles",
+  "summary": "Security analyst who turns noisy logs into clear alerts. Writes detections that are tested before they ship, keeps response playbooks short, and can show the evidence behind every number on this page.",
+  "intro": "This is a sample portfolio. Morgan Placeholder is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "log-sentinel",
+      "from": "log-sentinel/bullets/1",
+      "before": "Median alert triage time",
+      "figure": "8 minutes",
+      "text": "by grouping related alerts"
+    },
+    {
+      "item": "log-sentinel",
+      "from": "log-sentinel/bullets/3",
+      "before": "Reduced false positives by",
+      "figure": "62%",
+      "text": "over 3 months"
+    },
+    {
+      "item": "phish-drill",
+      "from": "phish-drill/bullets/2",
+      "before": "Staff who reported a test email",
+      "figure": "12% to 71%",
+      "text": "over the 4 exercises"
+    }
+  ],
+  "feature": {
+    "item": "log-sentinel",
+    "from": "log-sentinel/bullets/2",
+    "label": "Detection rules",
+    "figure": "140",
+    "text": "detection rules",
+    "note": "each with a test log that must trigger it, run on every change."
+  },
+  "skills": [
+    {"label": "Detection", "items": ["SIEM queries", "Sigma rules", "Log analysis"]},
+    {"label": "Tools", "items": ["Wireshark", "Nmap", "Burp Suite"]},
+    {"label": "Languages", "items": ["Python", "Bash", "PowerShell"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:morgan@example.com", "text": "morgan@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Write-ups of past investigations."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Detection rules and tools."}
+  ]
+}

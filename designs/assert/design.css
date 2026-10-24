@@ -1,0 +1,296 @@
+/* Assert: a portfolio for QA work, set as a test report. Everything sits
+   in a matrix of hairline cells: the first screen a run summary, its
+   figures as passed checks; projects, work and the timeline as rows of a
+   table with their columns aligned; skills and contact as grids of cells.
+   Green marks a pass, the only colour the report needs. Light only.
+
+   One font file, Public Sans's variable weights, preloaded and shown with
+   font-display: optional (ADR-0014). No motion and none of the engine's
+   effects. It styles the engine's fixed HTML
+   (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Public Sans";
+  src: url("fonts/public-sans-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional;
+}
+
+:root {
+  --page: #EEF1F4;
+  --cell: #FFFFFF;
+  --head: #F6F8FA;
+  --ink: #101828;
+  --muted: #475467;    /* 7.6:1 on white */
+  --rule: #D0D5DD;     /* cell edges, never text */
+  --pass: #067647;     /* 5.8:1 on white */
+  --pass-bg: #ECFDF3;
+  --link: #175CD3;
+  --fail: #B42318;
+  --sans: "Public Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+button { font: inherit; color: inherit; }
+strong { font-weight: 700; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 32px); }
+.skip { padding: 10px 16px; background: var(--ink); color: var(--cell); font-weight: 700; }
+.skip:focus { color: var(--cell); }
+.proj, .job, .degree, .cert { scroll-margin-top: 16px; }
+
+/* Column labels: small monospace capitals. */
+.result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-lane, .tl-dates,
+.degree-courses h4, .cert-view, .foot-credit, .skill h3, .sec-n {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .skill-n, .route-top .i { display: none; }
+
+/* Buttons: square, bordered, a pass green for the first. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--cell);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: var(--head); border-color: var(--muted); color: var(--ink); }
+.btn-acc { background: var(--pass); border-color: var(--pass); color: #FFFFFF; }
+.btn-acc:hover { background: #054F31; border-color: #054F31; color: #FFFFFF; }
+.btn-sm, .depth-toggle { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.depth-toggle::after { content: "\25B8" / ""; font-size: 12px; }
+.depth-toggle[aria-expanded="true"]::after { content: "\25BE" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.chips li { padding: 0 8px; border: 1px solid var(--rule); border-radius: 4px; background: var(--head); font-family: var(--mono); font-size: 13px; line-height: 1.8; }
+
+/* The menu: a row of tabs on the report's edge. */
+.dnav { background: var(--ink); }
+.dnav-list { list-style: none; max-width: 1160px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 32px); display: flex; flex-wrap: wrap; }
+.dnav-list a { display: block; padding: 11px 14px; color: #D0D5DD; font-size: 14px; font-weight: 600; text-decoration: none; }
+.dnav-list a:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.06); }
+.dnav-list a[aria-current] { color: #FFFFFF; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 -3px 0 #32D583; }
+.dnav :focus-visible { outline-color: #FFFFFF; outline-offset: -3px; }
+
+/* Intro: the run summary. */
+.intro { padding: clamp(22px, 3vw, 36px) 0 0; }
+.intro > .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: min(1096px, calc(100% - 2 * clamp(14px, 3vw, 32px)));
+  max-width: none;
+  padding: 0;
+  border: 1px solid var(--rule);
+  background: var(--cell);
+}
+.avail, .intro-name, .headline { margin-left: clamp(18px, 3vw, 32px); margin-right: clamp(18px, 3vw, 32px); }
+.avail { justify-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 2px 10px; border: 1px solid #ABEFC6; border-radius: 999px; background: var(--pass-bg); color: var(--pass); font-size: 13px; font-weight: 700; }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pass); }
+.intro-name { margin-top: 14px; font-size: clamp(40px, 5.6vw, 68px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.headline { margin-top: 10px; margin-bottom: 22px; font-family: var(--mono); font-size: 14px; color: var(--muted); }
+.sep { color: var(--rule); }
+.intro-grid { display: grid; border-top: 1px solid var(--rule); }
+.intro-main { padding: 22px clamp(18px, 3vw, 32px); }
+.facts { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--rule); font-size: 14px; }
+.facts li { display: flex; gap: 10px; padding: 6px 10px; }
+.facts li + li { border-top: 1px solid var(--rule); }
+.arrow { color: var(--pass); }
+.lede { margin-top: 14px; max-width: 64ch; }
+.cta { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+/* The figures as passed checks, each a cell with its tick. */
+.results { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+.result { position: relative; padding: 18px 20px 18px 62px; }
+.result + .result { border-top: 1px solid var(--rule); }
+.result::before {
+  content: "\2713" / "";
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--pass);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 800;
+}
+.result-label { color: var(--muted); }
+.result-fig { margin-top: 4px; display: flex; flex-direction: column; font-size: 14px; color: var(--muted); }
+.result-num, .result-word { font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; color: var(--ink); }
+.result-suffix { font-size: 0.5em; letter-spacing: 0; }
+.strip { max-width: 1160px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 32px); }
+.strip-static { display: flex; flex-wrap: wrap; gap: 2px 24px; padding: 8px 14px; border: 1px solid var(--rule); border-top: 0; background: var(--head); font-family: var(--mono); font-size: 13px; color: var(--muted); }
+@media (min-width: 960px) {
+  .intro-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); border-top: 1px solid var(--rule); }
+  .results { border-top: 0; border-left: 1px solid var(--rule); align-content: start; }
+}
+
+/* Sections: a table's caption bar. */
+.sec { padding: clamp(32px, 4vw, 52px) 0 0; }
+.sec-last { padding-bottom: clamp(32px, 4vw, 52px); }
+.sec-head { display: flex; align-items: center; padding: 12px 16px; border: 1px solid var(--rule); border-bottom: 0; background: var(--head); }
+.sec-title { display: flex; align-items: baseline; gap: 12px; }
+.sec-n { padding: 1px 6px; border: 1px solid var(--rule); border-radius: 4px; background: var(--cell); color: var(--muted); }
+.sec-title h2 { font-size: 22px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
+
+/* Projects: a table, one row per project. */
+.feature { padding: 16px; border: 1px solid var(--rule); border-bottom: 0; background: var(--pass-bg); display: grid; gap: 2px; }
+.feature-label { color: var(--pass); }
+.feature-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.feature-num { font-size: 52px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--pass); }
+.feature-text { font-size: 20px; font-weight: 700; }
+.feature-note { color: var(--muted); }
+.proj-grid { display: grid; border: 1px solid var(--rule); background: var(--cell); }
+.proj { padding: 18px 16px; }
+.proj + .depth, .proj + .proj, .depth + .proj { border-top: 1px solid var(--rule); }
+.proj.is-open { background: var(--head); }
+.proj-dates, .job-dates, .cert-top { color: var(--muted); }
+.proj h3 { margin-top: 4px; font-size: 20px; font-weight: 800; line-height: 1.25; }
+.proj-sub { color: var(--muted); }
+.proj-summary { margin-top: 8px; max-width: 70ch; }
+.proj-side { margin-top: 12px; display: grid; gap: 10px; align-content: start; }
+.proj-fact { position: relative; padding-left: 24px; font-weight: 600; }
+.proj-fact::before { content: "\2713" / ""; position: absolute; left: 0; top: 0; color: var(--pass); font-weight: 800; }
+@media (min-width: 900px) {
+  .proj-body { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 0; }
+  .proj-head { padding-right: 24px; }
+  .proj-side { margin-top: 0; padding-left: 24px; border-left: 1px solid var(--rule); }
+}
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.depth { padding: 16px; background: var(--head); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.depth-head h3 { font-size: 18px; font-weight: 800; }
+/* No list markers: they would enter the tree only once laid out. The
+   engine's own numbers, hidden from screen readers, stand in. */
+.depth-list { list-style: none; margin: 12px 0 0; padding: 0; border: 1px solid var(--rule); background: var(--cell); }
+.depth-list li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); }
+.depth-list li + li { border-top: 1px solid var(--rule); }
+.depth-list p { padding: 8px 12px; }
+.depth-n { padding: 8px 0; border-right: 1px solid var(--rule); font-family: var(--mono); font-size: 13px; text-align: center; color: var(--muted); background: var(--head); }
+
+/* Timeline: a log table. */
+.tl-lanes { padding: 10px 16px; border: 1px solid var(--rule); border-bottom: 0; background: var(--cell); }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.tl-filter { min-height: 34px; font-size: 14px; }
+.tl-filter .shape { width: 10px; height: 10px; border-radius: 2px; background: var(--link); }
+.tl-filter.lane-work .shape { background: var(--pass); }
+.tl-filter.lane-certifications .shape { background: #B54708; }
+.tl-filter[aria-pressed="false"] { color: var(--muted); background: var(--head); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 0; padding: 12px 16px; border: 1px solid var(--rule); border-bottom: 0; background: var(--cell); font-weight: 700; }
+.tl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--rule); background: var(--cell); }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 8px 16px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--pass-bg); }
+.tl-entry { order: 2; }
+.tl-entry + .tl-entry { border-top: 1px solid var(--rule); }
+.tl-band-label { display: flex; flex-wrap: wrap; gap: 0 12px; font-weight: 700; color: var(--pass); }
+.tl-band-label a { color: var(--pass); }
+.tl-card summary { list-style: none; display: grid; gap: 2px 0; padding: 10px 16px; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-card summary:hover { background: var(--head); }
+.tl-meta { display: flex; justify-content: space-between; gap: 8px; }
+.tl-lane { color: var(--muted); }
+.tl-sign::before { content: "\25B8" / ""; color: var(--muted); }
+.tl-card[open] .tl-sign::before { content: "\25BE" / ""; }
+.tl-dates { color: var(--muted); }
+.tl-title { font-weight: 700; }
+.tl-org { color: var(--muted); }
+.tl-pop { padding: 0 16px 12px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+@media (min-width: 760px) {
+  .tl-card summary { grid-template-columns: 12em 14em minmax(0, 1fr) 11em; align-items: baseline; padding: 0; }
+  .tl-card summary > * { padding: 10px 16px; }
+  .tl-card summary > * + * { border-left: 1px solid var(--rule); }
+  .tl-card summary > .vh { padding: 0; border: 0; }
+  .tl-meta { flex-direction: row-reverse; justify-content: flex-end; gap: 8px; }
+  .tl-pop { padding: 10px 16px 12px calc(26em + 64px); border-top: 1px dashed var(--rule); }
+}
+
+/* Work and Education. */
+.jobs { display: grid; border: 1px solid var(--rule); background: var(--cell); }
+.job { padding: 18px 16px; }
+.job + .job { border-top: 1px solid var(--rule); }
+.job h3, .degree h3 { margin-top: 4px; font-size: 20px; font-weight: 800; line-height: 1.25; }
+.job-org, .degree-org { font-weight: 600; }
+.job-loc, .degree-cgpa { color: var(--muted); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 6px; padding-left: 24px; }
+.job-list li::before { content: "\2713" / ""; position: absolute; left: 0; top: 0; color: var(--pass); font-weight: 800; }
+@media (min-width: 900px) {
+  .job { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 0 24px; }
+  .job-list { margin-top: 0; padding-left: 24px; border-left: 1px solid var(--rule); }
+  .job-list li:first-child { margin-top: 0; }
+}
+.degree { padding: 18px 16px; border: 1px solid var(--rule); background: var(--cell); }
+.degree-courses { margin-top: 14px; }
+.degree-courses h4 { margin-bottom: 8px; color: var(--muted); }
+
+/* Certifications: rows of the table. */
+.certs { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--rule); background: var(--cell); }
+.certs li + li { border-top: 1px solid var(--rule); }
+.cert { display: grid; gap: 2px 16px; padding: 14px 16px; color: var(--ink); text-decoration: none; }
+.cert:hover { background: var(--head); }
+.cert-title { font-weight: 700; color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cert-org { display: block; color: var(--muted); }
+.cert-view { color: var(--pass); }
+@media (min-width: 760px) {
+  .cert { grid-template-columns: 9em minmax(0, 1fr) auto; align-items: baseline; }
+}
+
+/* Skills: a three-column matrix. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1px; border: 1px solid var(--rule); background: var(--rule); }
+.skill { padding: 14px 16px; background: var(--cell); }
+.skill h3 { margin-bottom: 10px; color: var(--muted); }
+
+/* Contact: a row of cells. */
+.routes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1px; border: 1px solid var(--rule); background: var(--rule); }
+.route { display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 18px 16px; background: var(--cell); color: var(--ink); text-decoration: none; }
+.route:hover { background: var(--pass-bg); }
+.route-label { font-size: 20px; font-weight: 800; }
+.route-line { color: var(--muted); }
+.route-addr { margin-top: 4px; font-family: var(--mono); font-size: 14px; color: var(--link); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+
+/* Footer. */
+.foot { max-width: 1160px; margin: 0 auto; padding: 22px clamp(14px, 3vw, 32px) 40px; display: grid; gap: 4px; color: var(--muted); }
+.foot-name { font-size: 20px; font-weight: 800; color: var(--ink); }
+.foot-credit { margin-top: 8px; }

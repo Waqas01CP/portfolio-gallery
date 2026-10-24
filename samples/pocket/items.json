@@ -1,0 +1,133 @@
+[
+  {
+    "id": "bus-buddy",
+    "lane": "builds",
+    "title": "Bus Buddy: live bus times for a small town",
+    "start": "2026-03",
+    "end": "present",
+    "source": "Projects / Bus Buddy: live bus times for a small town",
+    "tier": 1,
+    "stack": ["Kotlin", "Jetpack Compose", "Room"],
+    "status": "On the example app store with 4,800 installs since May 2026.",
+    "layer2": "Live bus times that still show the last timetable when the signal drops.",
+    "layer1": "Opens in under 1 second on a 5-year-old phone.",
+    "detail": "On the example app store with 4,800 installs.",
+    "bullets": [
+      "Opens in under <strong>1 second</strong> on a 5-year-old phone, measured over 50 cold starts.",
+      "Keeps the last timetable on the phone, so <strong>100%</strong> of stops still show times offline.",
+      "Holds a <strong>4.7 rating</strong> from 600 example reviews, with crash-free sessions above 99.8%."
+    ],
+    "proof": [
+      {"label": "Store page", "url": "https://example.com/bus-buddy"},
+      {"label": "Code", "url": "https://example.com/bus-buddy/code"}
+    ]
+  },
+  {
+    "id": "pocket-ledger",
+    "lane": "builds",
+    "title": "Pocket Ledger: an offline budget app",
+    "start": "2025-10",
+    "end": "2026-02",
+    "source": "Projects / Pocket Ledger: an offline budget app",
+    "tier": 2,
+    "stack": ["Swift", "SwiftUI"],
+    "status": "Finished.",
+    "layer1": "Logs a purchase in 2 taps from the home screen.",
+    "detail": "Logs a purchase in 2 taps.",
+    "bullets": [
+      "Logs a purchase in 2 taps from the home screen, tested with 8 example users.",
+      "Cut the app's size from 38 MB to <strong>11 MB</strong> by dropping two libraries."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/pocket-ledger"}
+    ]
+  },
+  {
+    "id": "club-pass",
+    "lane": "builds",
+    "title": "Club Pass: one app for both stores",
+    "start": "2025-06",
+    "end": "2025-08",
+    "date_style": "full",
+    "source": "Projects / Club Pass: one app for both stores",
+    "tier": 3,
+    "stack": ["Flutter", "Dart"],
+    "layer2": "A members' pass for an example sports club,",
+    "layer1": "built once in Flutter for Android and iOS.",
+    "bullets": [
+      "A members' pass for an example sports club, built once in Flutter for Android and iOS."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/club-pass"}
+    ]
+  },
+  {
+    "id": "mobile-developer",
+    "lane": "work",
+    "title": "Mobile Developer",
+    "org": "Sample Apps Ltd",
+    "org_short": "Sample Apps",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / Mobile Developer, Sample Apps Ltd",
+    "detail": "Ship an update to 3 example client apps every 2 weeks.",
+    "bullets": [
+      "Ship an update to 3 example client apps every 2 weeks, each tested on 6 real phones.",
+      "Brought the main app's crash rate from 1.9% to 0.3% of sessions in 4 months."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "android-intern",
+    "lane": "work",
+    "title": "Android Intern",
+    "org": "Placeholder Studio",
+    "location": "Remote",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / Android Intern, Placeholder Studio",
+    "bullets": [
+      "Rebuilt 5 screens of an example shopping app in Jetpack Compose."
+    ],
+    "no_proof": "Client work under an agreement that keeps it private."
+  },
+  {
+    "id": "bsc-software-engineering",
+    "lane": "band",
+    "title": "BSc Software Engineering",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Software Engineering, Example University",
+    "grade": "3.7 / 4.0 CGPA",
+    "coursework": ["Mobile Computing", "Human-Computer Interaction", "Operating Systems", "Software Testing"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-android-development",
+    "lane": "certifications",
+    "title": "Example Certificate in Android Development",
+    "org": "Example Academy",
+    "start": "2025-05",
+    "end": "2025-05",
+    "source": "Certifications / Example Certificate in Android Development",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/android-development"}
+    ]
+  },
+  {
+    "id": "cert-mobile-accessibility",
+    "lane": "certifications",
+    "title": "Example Certificate in Mobile Accessibility",
+    "org": "Example Academy",
+    "start": "2024-12",
+    "end": "2024-12",
+    "source": "Certifications / Example Certificate in Mobile Accessibility",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/mobile-accessibility"}
+    ]
+  }
+]

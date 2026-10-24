@@ -1,0 +1,18 @@
+{
+  "name": "Latent",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "For machine learning work: a split screen, a dark field of soft colour held on the left with the name and figures, the sections scrolling on a white sheet beside it. Light only.",
+  "preload": [
+    "fonts/space-grotesk-latin-wght-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/space-grotesk-latin-wght-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/SpaceGrotesk-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/space-grotesk@5.2.10/files/space-grotesk-latin-wght-normal.woff2"
+    }
+  ]
+}

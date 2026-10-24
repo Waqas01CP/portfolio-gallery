@@ -1,0 +1,134 @@
+[
+  {
+    "id": "checkout-suite",
+    "lane": "builds",
+    "title": "Checkout Suite: end-to-end tests for a web shop",
+    "start": "2026-01",
+    "end": "present",
+    "source": "Projects / Checkout Suite: end-to-end tests for a web shop",
+    "tier": 1,
+    "stack": ["Playwright", "TypeScript", "GitHub Actions"],
+    "status": "Runs on every change to an example shop since February 2026.",
+    "layer2": "Covers the paths a customer takes from search to payment, in 3 browsers.",
+    "layer1": "Caught 23 release-blocking bugs before they reached customers.",
+    "detail": "Runs on every change to an example shop.",
+    "bullets": [
+      "Caught <strong>23 release-blocking bugs</strong> before they reached customers in the first 6 months.",
+      "Cut the suite's run time from 41 to <strong>9 minutes</strong> by running tests in 6 parallel workers.",
+      "Brought flaky failures down to <strong>0.4%</strong> of runs by replacing fixed waits with checks on the page."
+    ],
+    "proof": [
+      {"label": "Report", "url": "https://example.com/checkout-suite"},
+      {"label": "Code", "url": "https://example.com/checkout-suite/code"}
+    ]
+  },
+  {
+    "id": "flaky-finder",
+    "lane": "builds",
+    "title": "Flaky Finder: a report of unstable tests",
+    "start": "2025-08",
+    "end": "2025-12",
+    "date_style": "full",
+    "source": "Projects / Flaky Finder: a report of unstable tests",
+    "tier": 2,
+    "stack": ["Python", "SQLite"],
+    "status": "Finished.",
+    "layer1": "Flags a test as flaky after 3 mixed results in 20 runs.",
+    "detail": "Flags a test as flaky.",
+    "bullets": [
+      "Flags a test as flaky after 3 mixed results in 20 runs, and opens an issue with the failing logs.",
+      "Found <strong>31 flaky tests</strong> in an example team's suite in its first week."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/flaky-finder"}
+    ]
+  },
+  {
+    "id": "contract-check",
+    "lane": "builds",
+    "title": "Contract Check: API contract tests",
+    "start": "2025-05",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Projects / Contract Check: API contract tests",
+    "tier": 3,
+    "stack": ["Python", "Pytest"],
+    "layer2": "Contract tests for 12 endpoints of an example booking API,",
+    "layer1": "run before each deploy.",
+    "bullets": [
+      "Contract tests for 12 endpoints of an example booking API, run before each deploy."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/contract-check"}
+    ]
+  },
+  {
+    "id": "qa-engineer",
+    "lane": "work",
+    "title": "QA Engineer",
+    "org": "Sample Retail Ltd",
+    "org_short": "Sample Retail",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / QA Engineer, Sample Retail Ltd",
+    "detail": "Own the test plan for an example online shop's releases.",
+    "bullets": [
+      "Own the test plan for an example online shop's releases, 2 a week, with a go or no-go report for each.",
+      "Taught 4 developers to write their own end-to-end tests, now 40% of the suite."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "test-intern",
+    "lane": "work",
+    "title": "Test Intern",
+    "org": "Placeholder Software",
+    "location": "Remote",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / Test Intern, Placeholder Software",
+    "bullets": [
+      "Wrote 120 manual test cases for an example payroll app, and automated 35 of them."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "bsc-information-technology",
+    "lane": "band",
+    "title": "BSc Information Technology",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Information Technology, Example University",
+    "grade": "3.4 / 4.0 CGPA",
+    "coursework": ["Software Testing", "Databases", "Web Development", "Software Quality"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-software-testing",
+    "lane": "certifications",
+    "title": "Example Certificate in Software Testing",
+    "org": "Example Academy",
+    "start": "2025-01",
+    "end": "2025-01",
+    "source": "Certifications / Example Certificate in Software Testing",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/software-testing"}
+    ]
+  },
+  {
+    "id": "cert-test-automation",
+    "lane": "certifications",
+    "title": "Example Certificate in Test Automation",
+    "org": "Example Academy",
+    "start": "2024-09",
+    "end": "2024-09",
+    "source": "Certifications / Example Certificate in Test Automation",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/test-automation"}
+    ]
+  }
+]

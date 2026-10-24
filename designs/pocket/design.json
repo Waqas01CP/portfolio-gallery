@@ -1,0 +1,18 @@
+{
+  "name": "Pocket",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "For mobile work: the page as a phone app, framed on a bright gradient on a wide screen, with an app bar of chips, widgets, grouped lists and bottom sheets. Light only.",
+  "preload": [
+    "fonts/plus-jakarta-sans-latin-wght-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/plus-jakarta-sans-latin-wght-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/PlusJakartaSans-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/plus-jakarta-sans@5.2.8/files/plus-jakarta-sans-latin-wght-normal.woff2"
+    }
+  ]
+}
