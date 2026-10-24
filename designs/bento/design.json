@@ -1,0 +1,18 @@
+{
+  "name": "Bento",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "Soft and friendly: rounded tiles on lilac in pastel colours, a round sans-serif face, and on a wide screen a mosaic first screen with the sections side by side. Light only.",
+  "preload": [
+    "fonts/nunito-latin-wght-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/nunito-latin-wght-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/Nunito-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/nunito@5.2.7/files/nunito-latin-wght-normal.woff2"
+    }
+  ]
+}

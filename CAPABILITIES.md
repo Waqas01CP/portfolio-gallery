@@ -206,9 +206,10 @@ dependency without a record; designs are CSS only (ADR-0006).
   starts enforcing its block.
 - **Light only, or light and dark, by the design's word.** A design says
   in design.json whether it offers dark (ADR-0006, Changes, 2026-10-18).
-  A light-only design's page stays light on every device and has no Dark
-  switch; one that offers dark follows the device and carries the switch,
-  and is checked in both.
+  A design that does not offer dark has one theme, the same on every
+  device, and no Dark switch: light, or dark where its own CSS says so,
+  as Console's does; one that offers dark follows the device and carries
+  the switch, and is checked in both.
 - **`pull_request_target` needs the owner's Actions policy.** GitHub blocks
   it by default in public repositories from 2026-11-02; without the policy
   the scope check stops running (docs/setup-on-github.md, step 5).

@@ -346,7 +346,7 @@ def meta_problems(name: str, texts: dict[str, str], files: dict[str, Path]) -> l
              "this design (ADR-0016)")
     if not isinstance(meta.get("dark"), bool):
         fail("dark must be true or false: true if the design styles a dark theme, which gives "
-             "the page the Dark switch; false keeps it light on every device")
+             "the page the Dark switch; false gives it one theme, the same on every device")
     fonts = sorted(f for f in files if f.endswith(".woff2"))
     images = sorted(f for f in files if f.startswith("img/"))
     licence_texts = sorted(f for f in files if f.endswith(".txt"))

@@ -194,8 +194,8 @@ on the **Variables** tab of **Settings**, **Secrets and variables**,
 **Actions** (not a secret, and not in an environment), named exactly
 `PORTFOLIO_GALLERY`, with the value `true`, then run this step again. Then
 open https://waqas01cp.github.io/portfolio-gallery/:
-the gallery, with two cards, Default and Plain, each with its screenshot,
-and a "Live demo" link that opens the design. Also open
+the gallery, with a card for each design in designs/, Default first, each
+with its screenshot and a "Live demo" link that opens the design. Also open
 https://waqas01cp.github.io/portfolio-gallery (no slash at the end): it
 should arrive at the same page.
 
