@@ -72,7 +72,8 @@ the usual place. They start their own headless Chrome with an empty
 temporary profile and never touch your browser. A full browser run on the
 gallery's two designs took 487 s on the seat's Windows machine on
 2026-10-12, about four minutes per design, and 623 s with `--axe` on
-2026-10-16; on its seven designs, 1,997 s with `--axe` on 2026-10-24.
+2026-10-16; on its seven designs, 1,997 s with `--axe` on 2026-10-24,
+and on twelve, 3,606 s on 2026-10-25.
 `--quick` is for iterating and is not a pass.
 
 To prove the checks can fail, run each on the case built to defeat it:
