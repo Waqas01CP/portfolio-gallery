@@ -61,6 +61,7 @@ itself a decision.
 | [0015](0015-a-copy-cleans-itself-once.md) | A copy cleans itself up, once | Accepted |
 | [0016](0016-templates-then-a-showcase.md) | Templates first, then a showcase of contributors' own sites | Accepted |
 | [0017](0017-documents-for-people-and-their-ai.md) | Documents a person and their AI can both follow | Accepted |
+| [0018](0018-a-template-shown-with-its-own-sample-person.md) | A template shown with its own sample person | Accepted |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
 on 2026-10-12 by the implementing seat from the brief that recorded them;

@@ -1,0 +1,52 @@
+{
+  "name": "Noor Sample",
+  "headline": ["Machine learning engineer", "Computer vision", "MLOps"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to machine learning roles",
+  "summary": "Machine learning engineer who ships small models that run where the data is. Measures every model against a plain baseline first, and keeps every result on this page reproducible.",
+  "intro": "This is a sample portfolio. Noor Sample is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "leaf-lens",
+      "from": "leaf-lens/bullets/1",
+      "before": "Reached",
+      "figure": "94%",
+      "text": "accuracy on a held-out set of 2,400 photos"
+    },
+    {
+      "item": "leaf-lens",
+      "from": "leaf-lens/bullets/2",
+      "before": "Cut the model to",
+      "figure": "8 MB",
+      "text": "by quantisation"
+    },
+    {
+      "item": "queue-forecast",
+      "from": "queue-forecast/bullets/2",
+      "before": "Beat a baseline by",
+      "figure": "35%",
+      "text": "in mean absolute error"
+    }
+  ],
+  "feature": {
+    "item": "leaf-lens",
+    "from": "leaf-lens/bullets/3",
+    "label": "Labelled photos",
+    "figure": "900",
+    "text": "photos of rare diseases",
+    "note": "measured their agreement before training.",
+    "pairs": [
+      {"figure": "2", "text": "example agronomists"}
+    ]
+  },
+  "skills": [
+    {"label": "Modelling", "items": ["PyTorch", "scikit-learn", "Statistics"]},
+    {"label": "Data", "items": ["Python", "SQL", "Pandas"]},
+    {"label": "Deployment", "items": ["ONNX", "Docker", "FastAPI"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:noor@example.com", "text": "noor@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Notes on models and results."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Notebooks and model code."}
+  ]
+}

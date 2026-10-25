@@ -1,0 +1,134 @@
+[
+  {
+    "id": "log-sentinel",
+    "lane": "builds",
+    "title": "Log Sentinel: alert triage for a small security team",
+    "start": "2026-01",
+    "end": "present",
+    "source": "Projects / Log Sentinel: alert triage for a small security team",
+    "tier": 1,
+    "stack": ["Python", "Sigma", "SQLite"],
+    "status": "In use by an example team of 6 analysts since February 2026.",
+    "layer2": "A triage queue that groups related alerts and shows each one's evidence on one page.",
+    "layer1": "Cut median alert triage time from 25 to 8 minutes.",
+    "detail": "In use by an example team of 6 analysts.",
+    "bullets": [
+      "Cut median alert triage time from 25 to <strong>8 minutes</strong> by grouping related alerts into one case.",
+      "Wrote <strong>140 detection rules</strong> in Sigma, each with a test log that must trigger it, run on every change.",
+      "Reduced false positives by <strong>62%</strong> over 3 months by tuning the 20 noisiest rules."
+    ],
+    "proof": [
+      {"label": "Write-up", "url": "https://example.com/log-sentinel"},
+      {"label": "Code", "url": "https://example.com/log-sentinel/code"}
+    ]
+  },
+  {
+    "id": "phish-drill",
+    "lane": "builds",
+    "title": "Phish Drill: phishing practice for a small office",
+    "start": "2025-09",
+    "end": "2025-12",
+    "date_style": "full",
+    "source": "Projects / Phish Drill: phishing practice for a small office",
+    "tier": 2,
+    "stack": ["Python", "Flask"],
+    "status": "Finished.",
+    "layer1": "Ran 4 phishing exercises for an example office of 30 staff.",
+    "detail": "Ran 4 phishing exercises for an example office.",
+    "bullets": [
+      "Ran 4 phishing exercises for an example office of 30 staff, with a short lesson after each click.",
+      "Raised the share of staff who reported a test email from 12% to <strong>71%</strong> over the 4 exercises."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/phish-drill"}
+    ]
+  },
+  {
+    "id": "port-map",
+    "lane": "builds",
+    "title": "Port Map: a home lab network inventory",
+    "start": "2025-06",
+    "end": "2025-07",
+    "date_style": "full",
+    "source": "Projects / Port Map: a home lab network inventory",
+    "tier": 3,
+    "stack": ["Python", "Nmap"],
+    "layer2": "A scanner that keeps an inventory of a home lab's devices and open ports,",
+    "layer1": "with weekly change reports.",
+    "bullets": [
+      "A scanner that keeps an inventory of a home lab's devices and open ports, with weekly change reports."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/port-map"}
+    ]
+  },
+  {
+    "id": "security-analyst",
+    "lane": "work",
+    "title": "Security Analyst",
+    "org": "Sample Bank Ltd",
+    "org_short": "Sample Bank",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / Security Analyst, Sample Bank Ltd",
+    "detail": "Triage about 300 alerts a week.",
+    "bullets": [
+      "Triage about 300 alerts a week in the bank's example security monitoring, and write up each confirmed incident within a day.",
+      "Wrote 6 incident response playbooks, now used in every example tabletop exercise."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "it-support-intern",
+    "lane": "work",
+    "title": "IT Support Intern",
+    "org": "Placeholder Clinic",
+    "location": "Example City",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / IT Support Intern, Placeholder Clinic",
+    "bullets": [
+      "Moved 45 example staff accounts to multi-factor sign-in with no lost access."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "bsc-cybersecurity",
+    "lane": "band",
+    "title": "BSc Cybersecurity",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Cybersecurity, Example University",
+    "grade": "3.5 / 4.0 CGPA",
+    "coursework": ["Network Security", "Digital Forensics", "Cryptography", "Secure Software Development"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-incident-handling",
+    "lane": "certifications",
+    "title": "Example Certificate in Incident Handling",
+    "org": "Example Academy",
+    "start": "2025-04",
+    "end": "2025-04",
+    "source": "Certifications / Example Certificate in Incident Handling",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/incident-handling"}
+    ]
+  },
+  {
+    "id": "cert-network-defence",
+    "lane": "certifications",
+    "title": "Example Certificate in Network Defence",
+    "org": "Example Academy",
+    "start": "2024-10",
+    "end": "2024-10",
+    "source": "Certifications / Example Certificate in Network Defence",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/network-defence"}
+    ]
+  }
+]

@@ -1,0 +1,330 @@
+/* Sentinel: a portfolio for security work. The first screen is a clearance
+   card, the rest a dashboard of panels marked with targeting brackets, on
+   a graphite ground ruled like a radar screen. Signal orange marks what
+   matters; green and amber tell the timeline's lanes apart. Always dark:
+   design.json's dark is false, one theme, set here.
+
+   One font file, Chakra Petch, for names, titles and labels, preloaded and
+   shown with font-display: optional (ADR-0014); the text is the system's
+   own sans-serif. No motion and none of the engine's effects. It styles
+   the engine's fixed HTML (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Chakra Petch";
+  src: url("fonts/chakra-petch-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: optional;
+}
+
+:root {
+  --bg: #0F1217;
+  --panel: #161B22;
+  --raise: #1D242D;
+  --line: #2C3642;     /* panel edges, never text */
+  --ink: #E6EAF0;
+  --muted: #9AA6B5;
+  --accent: #FF6B2C;   /* 6.6:1 on the ground */
+  --ok: #3DDC97;
+  --amber: #F5C04A;
+  --tech: "Chakra Petch", "Bahnschrift", "DIN Alternate", "Arial Narrow", sans-serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  /* Targeting brackets: four corners drawn in the accent. */
+  --brackets:
+    linear-gradient(var(--accent), var(--accent)) top left / 14px 2px,
+    linear-gradient(var(--accent), var(--accent)) top left / 2px 14px,
+    linear-gradient(var(--accent), var(--accent)) top right / 14px 2px,
+    linear-gradient(var(--accent), var(--accent)) top right / 2px 14px,
+    linear-gradient(var(--accent), var(--accent)) bottom left / 14px 2px,
+    linear-gradient(var(--accent), var(--accent)) bottom left / 2px 14px,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 14px 2px,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 2px 14px;
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 40px);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+strong { color: #FFFFFF; font-weight: 700; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); }
+.skip { padding: 10px 16px; background: var(--accent); color: var(--bg); font-weight: 700; }
+.skip:focus { color: var(--bg); }
+.proj, .job, .degree, .cert { scroll-margin-top: 16px; }
+
+/* Labels: the technical face, spaced capitals. */
+.avail, .result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-lane, .tl-dates,
+.degree-courses h4, .dnav-list a, .cert-view, .foot-credit, .strip-static, .skill h3 {
+  font-family: var(--tech);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .skill-n, .route-top .i { display: none; }
+
+/* Buttons: angled tabs, filled or outlined. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--tech);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+/* The angled corners clip anything drawn outside, so focus is drawn within. */
+.btn:focus-visible, .depth-toggle:focus-visible, .tl-filter:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: rgba(255, 107, 44, 0.14); color: var(--ink); }
+.btn-acc { background: var(--accent); color: #14100C; }
+.btn-acc:hover { background: var(--ink); color: var(--bg); }
+.btn-sm, .depth-toggle { min-height: 38px; padding: 0 14px; font-size: 13px; }
+.depth-toggle::after { content: "+" / ""; font-size: 18px; line-height: 1; }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { padding: 1px 10px; border: 1px solid var(--line); background: var(--raise); font-family: var(--mono); font-size: 13px; color: var(--ink); }
+
+/* The menu: a console tab bar under an orange line. */
+.dnav { border-top: 3px solid var(--accent); border-bottom: 1px solid var(--line); background: rgba(15, 18, 23, 0.92); }
+.dnav-list { list-style: none; max-width: 1200px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); display: flex; flex-wrap: wrap; gap: 0 4px; }
+.dnav-list a { display: block; padding: 12px 12px 10px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; }
+.dnav-list a:hover { color: var(--ink); }
+.dnav-list a[aria-current] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* Intro: a clearance card across the page, then the briefing beside the
+   findings. The card is drawn behind its first three rows. */
+.intro { padding: clamp(28px, 4vw, 56px) 0 0; }
+.intro > .wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+.intro > .wrap::before {
+  content: "" / "";
+  grid-column: 1;
+  grid-row: 1 / 4;
+  background:
+    var(--brackets),
+    linear-gradient(90deg, var(--accent) 0 6px, transparent 6px),
+    linear-gradient(135deg, var(--raise), var(--panel) 60%);
+  background-repeat: no-repeat;
+  border: 1px solid var(--line);
+}
+.avail, .intro-name, .headline { grid-column: 1; margin-left: clamp(24px, 4vw, 48px); margin-right: clamp(20px, 4vw, 48px); }
+.avail { grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 10px; margin-top: clamp(22px, 3vw, 36px); padding: 4px 12px; border: 1px solid rgba(61, 220, 151, 0.5); color: var(--ok); }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px rgba(61, 220, 151, 0.18); }
+.intro-name {
+  grid-row: 2;
+  margin-top: 18px;
+  font-family: var(--tech);
+  /* Sized to the screen, so a long surname in capitals fits a 320 px phone;
+     a longer one still wraps, never scrolls. */
+  font-size: clamp(32px, 10.4vw, 92px);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+}
+.intro-name .serif { color: var(--accent); }
+.headline { grid-row: 3; margin-top: 14px; margin-bottom: clamp(22px, 3vw, 36px); font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.sep { color: var(--accent); }
+.intro-grid { grid-column: 1; display: grid; gap: 24px; margin-top: 24px; }
+.intro-main { padding: 24px; background: var(--panel); border: 1px solid var(--line); }
+.facts { list-style: none; margin: 0; padding: 0 0 14px; border-bottom: 1px dashed var(--line); display: grid; gap: 4px; font-family: var(--mono); font-size: 14px; color: var(--muted); }
+.facts li { display: flex; gap: 10px; }
+.arrow { color: var(--accent); }
+.lede { margin-top: 14px; max-width: 66ch; }
+.cta { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+/* Findings: each with a severity bar on its left edge. */
+.results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; align-content: start; }
+.result { position: relative; padding: 16px 18px 16px 24px; background: var(--panel); border: 1px solid var(--line); }
+.result::before { content: "" / ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--accent); }
+.result:nth-child(3n + 2)::before { background: var(--amber); }
+.result:nth-child(3n + 3)::before { background: var(--ok); }
+.result-label { color: var(--muted); }
+.result-fig { margin-top: 6px; display: flex; flex-direction: column; font-size: 14px; color: var(--muted); }
+.result-num, .result-word { font-family: var(--tech); font-size: clamp(36px, 3.6vw, 48px); font-weight: 600; line-height: 1.05; color: var(--ink); }
+.result-suffix { font-size: 0.5em; }
+.strip { max-width: 1200px; margin: 24px auto 0; padding: 0 clamp(16px, 3vw, 40px); }
+.strip-static { display: flex; flex-wrap: wrap; gap: 4px 28px; padding: 10px 16px; border: 1px solid var(--line); border-left: 6px solid var(--ok); color: var(--muted); }
+@media (min-width: 960px) {
+  .intro-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+}
+
+/* Sections: the number, the title, a line running to the edge. */
+.sec { padding: clamp(48px, 6vw, 80px) 0 0; }
+.sec-last { padding-bottom: clamp(48px, 6vw, 80px); }
+.sec-head { margin-bottom: 24px; }
+.sec-title { display: flex; align-items: center; gap: 14px; }
+.sec-title::after { content: "" / ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+.sec-n { font-family: var(--mono); font-size: 14px; color: var(--accent); }
+.sec-n::before { content: "0x" / ""; color: var(--muted); }
+.sec-title h2 { font-family: var(--tech); font-size: clamp(26px, 3vw, 36px); font-weight: 600; line-height: 1.1; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* Panels: the dashboard's one shape, bracketed at the corners. */
+.proj, .depth, .job, .degree, .skill, .feature {
+  background: var(--brackets), var(--panel);
+  background-repeat: no-repeat;
+  border: 1px solid var(--line);
+}
+
+/* Projects. */
+.feature { margin-bottom: 20px; padding: 22px 26px; display: grid; gap: 6px; }
+.feature-label { color: var(--accent); }
+.feature-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; }
+.feature-num { font-family: var(--tech); font-size: clamp(56px, 6vw, 80px); font-weight: 600; line-height: 1; color: var(--accent); }
+.feature-text { font-family: var(--tech); font-size: 24px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.feature-note { color: var(--muted); }
+.proj-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.proj-grid > * { grid-column: 1 / -1; }
+@media (min-width: 760px) {
+  .js .proj-grid { grid-auto-flow: row dense; }
+  .js .proj-grid > .proj { grid-column: span var(--span-mid); }
+  .js .proj-grid > .proj-lead { grid-column: 1 / -1; }
+}
+.proj { min-width: 0; padding: 22px 24px; }
+.proj.is-open { border-color: var(--accent); }
+.proj-dates, .job-dates, .cert-top { color: var(--muted); }
+.proj h3 { margin-top: 8px; font-family: var(--tech); font-size: 24px; font-weight: 600; line-height: 1.15; letter-spacing: 0.02em; }
+.proj-lead h3 { font-size: clamp(28px, 3vw, 38px); }
+.proj-sub { color: var(--muted); }
+.proj-summary { margin-top: 10px; }
+.proj-side { margin-top: 14px; display: grid; gap: 12px; align-content: start; }
+.proj-fact { padding-left: 12px; border-left: 3px solid var(--accent); }
+@media (min-width: 900px) {
+  .proj-lead .proj-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; }
+  .proj-lead .proj-side { margin-top: 0; }
+}
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { padding: 22px 24px; border-color: var(--accent); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.depth-head h3 { font-family: var(--tech); font-size: 22px; font-weight: 600; letter-spacing: 0.02em; }
+/* No list markers: they would enter the tree only once laid out. The
+   engine's own numbers, hidden from screen readers, stand in. */
+.depth-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 3em minmax(0, 1fr); padding: 10px 0; border-top: 1px dashed var(--line); }
+.depth-n { font-family: var(--mono); color: var(--accent); }
+
+/* Timeline: an audit log, one line per event on a wide screen. */
+.tl-lanes { margin-bottom: 16px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-filter { min-height: 38px; font-size: 13px; }
+.tl-filter .shape { width: 10px; height: 10px; background: var(--accent); }
+.tl-filter.lane-work .shape { background: var(--ok); }
+.tl-filter.lane-certifications .shape { background: var(--amber); }
+.tl-filter[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 12px 0; color: var(--amber); }
+.tl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 10px 16px; background: var(--raise); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-left: 4px solid var(--muted); }
+.tl-entry { order: 2; border-left: 4px solid var(--accent); }
+.tl-entry + .tl-entry { border-top: 1px solid var(--line); }
+.tl-entry.lane-work { border-left-color: var(--ok); }
+.tl-entry.lane-certifications { border-left-color: var(--amber); }
+.tl-band-label { display: flex; flex-wrap: wrap; gap: 0 14px; font-family: var(--mono); font-size: 14px; color: var(--muted); }
+.tl-band-label a { color: var(--ink); }
+.tl-card summary { list-style: none; display: grid; gap: 2px 20px; padding: 12px 16px; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-card summary:hover { background: var(--raise); }
+.tl-meta { display: flex; justify-content: space-between; gap: 8px; }
+.tl-lane { color: var(--muted); }
+.tl-sign::before { content: "+" / ""; font-family: var(--mono); color: var(--accent); }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-dates { color: var(--muted); }
+.tl-title { font-weight: 700; }
+.tl-org { color: var(--muted); }
+.tl-pop { padding: 0 16px 14px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+@media (min-width: 760px) {
+  .tl-card summary { grid-template-columns: 13em 15em minmax(0, 1fr) auto; align-items: baseline; }
+  .tl-pop { padding-left: calc(28em + 56px); }
+}
+
+/* Work and Education. */
+.jobs { display: grid; gap: 16px; }
+.job, .degree { padding: 22px 24px; }
+.job h3, .degree h3 { margin-top: 8px; font-family: var(--tech); font-size: 24px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.15; }
+.job-org, .degree-org { color: var(--accent); font-weight: 600; }
+.job-loc, .degree-cgpa { color: var(--muted); font-family: var(--mono); font-size: 14px; }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 8px; padding-left: 20px; }
+.job-list li::before { content: "" / ""; position: absolute; left: 0; top: 0.6em; width: 8px; height: 8px; border: 1px solid var(--accent); transform: rotate(45deg); }
+.degree-courses { margin-top: 14px; }
+.degree-courses h4 { margin-bottom: 8px; color: var(--muted); }
+@media (min-width: 900px) {
+  .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .degree { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+  .degree-courses { margin-top: 0; }
+}
+
+/* Certifications: badges with a cut corner. */
+.certs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.cert {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 20px 22px;
+  background: linear-gradient(135deg, transparent 16px, var(--panel) 16px);
+  border-left: 4px solid var(--amber);
+  color: var(--ink);
+  text-decoration: none;
+}
+.cert-acc { border-left-color: var(--accent); }
+.cert-title { font-family: var(--tech); font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: 0.02em; color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
+.cert-org { display: block; margin-top: 2px; color: var(--muted); }
+.cert-view { margin-top: auto; padding-top: 8px; color: var(--accent); }
+.cert:hover .cert-title { color: var(--accent); }
+
+/* Skills. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.skill { padding: 18px 20px; }
+.skill h3 { margin-bottom: 12px; color: var(--accent); }
+
+/* Contact: channels, each a panel that lights up. */
+.routes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.route { display: flex; flex-direction: column; gap: 4px; height: 100%; padding: 22px 24px; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--accent); color: var(--ink); text-decoration: none; }
+.route:hover { background: var(--raise); }
+.route-label { font-family: var(--tech); font-size: 22px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.route-line { color: var(--muted); }
+.route-addr { margin-top: 6px; font-family: var(--mono); font-size: 14px; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+
+/* Footer. */
+.foot { max-width: 1200px; margin: 0 auto; padding: 28px clamp(16px, 3vw, 40px) 48px; border-top: 1px solid var(--line); display: grid; gap: 6px; color: var(--muted); }
+.foot-name { font-family: var(--tech); font-size: 26px; font-weight: 600; color: var(--ink); text-transform: uppercase; letter-spacing: 0.04em; }
+.foot-credit { margin-top: 10px; }

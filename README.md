@@ -162,6 +162,8 @@ HOW THE REPOSITORY IS ORGANISED
 - `build.py`: builds the site, or with --gallery every design and the gallery.
 - `tools/`: the checks.
 - `showcase/`: the showcase, one folder per person, named by their GitHub login.
+- `samples/`: the gallery's invented people, one folder per template made for a
+  profession, each a whole content folder shown only in that template's demo.
 - `.github/workflows/`: the GitHub Actions that check, build and publish.
 - `docs/`: the guides, records and references. `CONTRIBUTING.md` holds the rules.
 

@@ -11,7 +11,8 @@ edit this file; edit the file's frontmatter and run the generator. The
 pre-commit hook refuses a commit that leaves it stale (ADR-0008).
 
 Every tracked Markdown file is listed except this one, GitHub's own
-templates under `.github/`, and the site's own content under `content/`.
+templates under `.github/`, and a site's own content under `content/` and
+`samples/`.
 Decision records have no `type`; their `topic` is shown.
 
 ## (root)
@@ -54,6 +55,7 @@ Decision records have no `type`; their `topic` is shown.
 | `docs/decisions/0015-a-copy-cleans-itself-once.md` | decision (build) | accepted | A copy made with Use this template removes the project's own files once, by a workflow that holds contents: write and never runs here or in a fork; the user guide lists the same files for when it does not run. Read before changing what a copy keeps, the cleanup workflow, or a project-only workflow. |
 | `docs/decisions/0016-templates-then-a-showcase.md` | decision (process) | accepted | The gallery shows templates first, each with an optional In use link to its author's own site, then a showcase of contributors' own sites, each a folder of one entry and one screenshot, checked as files and, never rendered, by its response on the pull request and weekly. The footer credit names the design and its author. Read before changing the showcase, its checks or limits, the gallery's order, or the credit. |
 | `docs/decisions/0017-documents-for-people-and-their-ai.md` | decision (process) | accepted | The README routes every kind of visitor to their path and carries a self-contained prompt a person gives their own AI assistant; tools/check_prompt.py holds the prompt to the repository it restates. Since 2026-10-23 an AGENTS.md routes other coding agents, and a copy receives its own AGENTS.md and a prompt of its own (Changes). Read before changing the README's table or prompt, the issue forms, or what an AI arriving at the repository is told. |
+| `docs/decisions/0018-a-template-shown-with-its-own-sample-person.md` | decision (content) | accepted | A template may be shown in the gallery with its own invented person, one of the profession it suits, from samples/<design>/, a whole content folder held to the same build rules and content trace as content/. Every other template, and every user's site, keeps one content folder for all designs. Read before adding or changing a sample person, or a template made for a profession. |
 | `docs/decisions/README.md` | index | current | The decision record index for portfolio-gallery, with the fixed topic list and the Pending list of decisions identified but not concluded. |
 
 ## docs/deferred

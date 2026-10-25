@@ -1,0 +1,49 @@
+{
+  "name": "Jamie Demo",
+  "headline": ["Mobile developer", "Android and iOS", "Flutter"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to mobile developer roles",
+  "summary": "Mobile developer who builds apps that open fast and keep working offline. Tests on old phones as well as new ones, and measures every number on this page on a real device.",
+  "intro": "This is a sample portfolio. Jamie Demo is an invented person, and every employer, school, app and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "bus-buddy",
+      "from": "bus-buddy/bullets/1",
+      "before": "Opens in under",
+      "figure": "1 second",
+      "text": "on a 5-year-old phone"
+    },
+    {
+      "item": "bus-buddy",
+      "from": "bus-buddy/bullets/3",
+      "before": "Holds a",
+      "figure": "4.7 rating",
+      "text": "from 600 example reviews"
+    },
+    {
+      "item": "pocket-ledger",
+      "from": "pocket-ledger/bullets/2",
+      "before": "Cut the app's size from",
+      "figure": "38 MB to 11 MB",
+      "text": "by dropping two libraries"
+    }
+  ],
+  "feature": {
+    "item": "bus-buddy",
+    "from": "bus-buddy/bullets/2",
+    "label": "Offline",
+    "figure": "100%",
+    "text": "of stops still show times offline",
+    "note": "Keeps the last timetable on the phone."
+  },
+  "skills": [
+    {"label": "Android", "items": ["Kotlin", "Jetpack Compose", "Room"]},
+    {"label": "iOS", "items": ["Swift", "SwiftUI", "Xcode"]},
+    {"label": "Cross-platform", "items": ["Flutter", "Dart", "Firebase"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:jamie@example.com", "text": "jamie@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Release notes for every app."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "App code and samples."}
+  ]
+}

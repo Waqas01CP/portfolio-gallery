@@ -1,0 +1,49 @@
+{
+  "name": "Taylor Sandbox",
+  "headline": ["DevOps engineer", "Cloud infrastructure", "CI/CD"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to DevOps and platform roles",
+  "summary": "DevOps engineer who makes deploys boring. Builds infrastructure from code, watches costs as closely as uptime, and takes every number on this page from a real dashboard.",
+  "intro": "This is a sample portfolio. Taylor Sandbox is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "blue-green",
+      "from": "blue-green/bullets/1",
+      "before": "Shipped",
+      "figure": "140",
+      "text": "deploys with no downtime"
+    },
+    {
+      "item": "blue-green",
+      "from": "blue-green/bullets/2",
+      "before": "Cut deploy time from",
+      "figure": "35 to 6 minutes",
+      "text": "by building images once"
+    },
+    {
+      "item": "cost-watch",
+      "from": "cost-watch/bullets/2",
+      "before": "Cut monthly cloud bill by",
+      "figure": "28%",
+      "text": "in 4 months"
+    }
+  ],
+  "feature": {
+    "item": "blue-green",
+    "from": "blue-green/bullets/3",
+    "label": "Uptime",
+    "figure": "99.95%",
+    "text": "uptime over 6 months",
+    "note": "measured by an outside example monitor."
+  },
+  "skills": [
+    {"label": "Cloud", "items": ["Terraform", "Kubernetes", "Docker"]},
+    {"label": "Delivery", "items": ["GitHub Actions", "Argo CD", "Helm"]},
+    {"label": "Watching", "items": ["Prometheus", "Grafana", "Bash"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:taylor@example.com", "text": "taylor@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Write-ups of incidents and fixes."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Infrastructure code and templates."}
+  ]
+}

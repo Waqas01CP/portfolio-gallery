@@ -1,0 +1,49 @@
+{
+  "name": "Casey Testcase",
+  "headline": ["QA engineer", "Test automation", "API testing"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to QA engineer roles",
+  "summary": "QA engineer who finds the bug before the customer does. Writes tests that fail for one reason only, keeps the suite fast, and takes every number on this page from a real run.",
+  "intro": "This is a sample portfolio. Casey Testcase is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "checkout-suite",
+      "from": "checkout-suite/bullets/1",
+      "before": "Caught",
+      "figure": "23",
+      "text": "release-blocking bugs before they reached customers"
+    },
+    {
+      "item": "checkout-suite",
+      "from": "checkout-suite/bullets/2",
+      "before": "Cut the suite's run time from",
+      "figure": "41 to 9 minutes",
+      "text": "by running tests in 6 parallel workers"
+    },
+    {
+      "item": "checkout-suite",
+      "from": "checkout-suite/bullets/3",
+      "before": "Flaky failures down to",
+      "figure": "0.4%",
+      "text": "of runs"
+    }
+  ],
+  "feature": {
+    "item": "flaky-finder",
+    "from": "flaky-finder/bullets/2",
+    "label": "Flaky tests",
+    "figure": "31",
+    "text": "flaky tests",
+    "note": "in an example team's suite in its first week."
+  },
+  "skills": [
+    {"label": "Automation", "items": ["Playwright", "Pytest", "Selenium"]},
+    {"label": "APIs", "items": ["REST", "Postman", "Contract testing"]},
+    {"label": "Practice", "items": ["Test planning", "Exploratory testing", "Bug reports"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:casey@example.com", "text": "casey@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Notes on testing and quality."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Test suites and tools."}
+  ]
+}

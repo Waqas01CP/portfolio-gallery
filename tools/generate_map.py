@@ -23,8 +23,8 @@ GitHub shows to every visitor (README.md, CONTRIBUTING.md,
 CODE_OF_CONDUCT.md, SECURITY.md) open instead with the same keys inside an
 HTML comment, `<!--` to `-->`, which GitHub does not display, so a visitor
 does not meet a table of metadata at the top. Files under .github/ are
-GitHub's own templates, and files under content/ are a site's own content
-(the sample CV), so neither is listed.
+GitHub's own templates, and files under content/ and samples/ are a site's
+own content (the sample CVs, ADR-0018), so none is listed.
 
 Standard library only. Frontmatter is read line by line rather than with a
 YAML library: `key: value`, blank lines and `#` comment lines; decision
@@ -57,7 +57,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAP = "MAP.md"
 EXCLUDED = {MAP}
-EXCLUDED_PREFIXES = (".github/", "content/")
+EXCLUDED_PREFIXES = (".github/", "content/", "samples/")
 YAML_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
 COMMENT_RE = re.compile(r"\A<!--\r?\n(.*?)\r?\n-->\r?\n", re.DOTALL)
 KEY_RE = re.compile(r"^([A-Za-z][\w-]*):\s*(.*)$")
@@ -77,7 +77,8 @@ edit this file; edit the file's frontmatter and run the generator. The
 pre-commit hook refuses a commit that leaves it stale (ADR-0008).
 
 Every tracked Markdown file is listed except this one, GitHub's own
-templates under `.github/`, and the site's own content under `content/`.
+templates under `.github/`, and a site's own content under `content/` and
+`samples/`.
 Decision records have no `type`; their `topic` is shown.
 """
 

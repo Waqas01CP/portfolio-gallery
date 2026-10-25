@@ -2605,3 +2605,196 @@ What each saved is the seat's estimate, not a measurement.
 - A standing check that no page scrolls sideways: recommended to the
   chat (Errors, 6), not built, since it would bind contributors too.
 - Test 1 once more, on or after 2026-11-02.
+
+# Round 15, 2026-10-24 to 25 UTC: five designs for five professions, each with its own sample person
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 3ec3c74, the end of Round 14 on the branch
+more-designs, not pushed. Work on the branch profession-designs, cut from
+it, so that it holds Round 14's commits until those merge. HEAD at end:
+the commit that adds this section. Mode: mutating. No brief: the owner's
+instruction in this conversation, which ranks first (CLAUDE.md).
+
+## What was asked
+
+The owner, on 2026-10-24 UTC (2026-10-25 in his local time), after
+judging Round 14's screenshots: he approves those five and will push
+them, though he may take them down later; rather than asking for changes
+to them, new designs, "like 5 more or maybe 3 more", because "most of the
+sites looks like a look-alike which i do not want as all sites should be
+distinct and for the people of profession". Within the technical world:
+"a portfolio for a cybersecurity professional, AI, or mobile deleveloper,
+SE or QA engineer or ML and so on". His principles kept: responsive, on
+a phone, a desktop and a desktop in portrait orientation; "you should not
+take my taste as i require variety". He asked the seat to state back its
+understanding and ask what it needed. The seat stated it back and named
+the limit: every demo showed the same sample person, so a design for a
+profession would still show a junior software engineer's page. Asked two
+questions; his answers: each new template is shown with its own sample
+person of its profession (ADR-0018), and five designs, for
+cybersecurity, AI and ML, mobile development, QA and DevOps.
+
+## Errors this seat made
+
+1. **The first commit of the engine change named samples/ in the README's
+   prompt before any sample existed.** Gate B refused it (the prompt check:
+   "it names samples/, which does not exist"); the line went in with the
+   samples.
+2. **A commit of the Checks time limit was refused by gate C** (MAP.md
+   stale while the map generator's own change was unstaged), and the
+   staged file then went into the designs commit, whose message did not
+   say so; amended before any push, to 3f65c4f.
+3. **Latent's held panel centred content taller than the window**, so the
+   name was cut off at the top and could not be scrolled to. Seen in the
+   first screenshot; the panel now starts at the top when it overflows.
+4. **Pipeline's first header was dark navy with a green accent**, close to
+   Default's dark first screen with lime; seen in the screenshots and
+   made light, a status page's white header and green banner.
+5. **Pocket**: its feature card set white text on a light orange
+   gradient, about 2.3:1, fixed by eye before any check; its status pill
+   was 3.8:1 and its first targets could not reach a 72 px margin under
+   the app bar, both found by the browser checks on the five new designs;
+   fixed (a darker green; every margin the bar's own 64 px).
+6. **Sentinel scrolled sideways at 320 px**, by 16 px: the surname
+   Placeholder in Chakra Petch capitals at the name's 42 px minimum. Found
+   by the width measurement on the fresh clone; fixed in 1cb1d44 (the name
+   sizes with the screen from 32 px, and a longer one wraps).
+
+## What was built
+
+- **A template shown with its own sample person** (ceae4f1; ADR-0018):
+  samples/<design>/ holds config.json, cv.md, site.json and items.json, a
+  whole content folder naming that design. The gallery builds that
+  design's demo from it, with its own layout.css beside the demo; every
+  other demo, and every user's site, from content/, byte-identical to
+  before when there is no sample. build.py refuses a sample for a design
+  that does not exist, one naming another design, and one that is not a
+  whole content folder; build.py and check_content.py take --content; ci.py
+  checks builds each sample person's own site and traces it to their CV.
+  Each gallery card names its person. A copy removes samples/. Four new
+  proofs.
+- **Five sample people** (3f65c4f), invented and obviously so, every link
+  to example.com, each traced to their own CV with 0 untraced blocks:
+  Morgan Placeholder, security analyst; Noor Sample, machine learning
+  engineer; Jamie Demo, mobile developer; Casey Testcase, QA engineer;
+  Taylor Sandbox, DevOps engineer.
+- **Five designs** (3f65c4f), each credited to Waqas01CP, maintained, CSS
+  only, one OFL font each from Fontsource 5.2.x with Google Fonts' licence
+  text, none reserving a name by the text and the WOFF2 name table:
+  Sentinel (security; Chakra Petch), Latent (machine learning; Space
+  Grotesk), Pocket (mobile; Plus Jakarta Sans), Assert (QA; Public Sans),
+  Pipeline (DevOps; Barlow Semi Condensed). Structure first: a clearance
+  card and bracketed panels; a split screen with a held panel; the page as
+  a phone app in a bezel; a test matrix of hairline cells; a status header
+  over a pipeline's rail.
+- **Sentinel's name sizes with the screen** (1cb1d44; Errors, 6).
+- **Checks may run 90 minutes** (3f65c4f): twelve designs take near an
+  hour; the checks are unchanged.
+- The map leaves samples/ out, as content/; ADR-0013 records the five.
+
+## The twelve designs, pairwise
+
+The five new designs on the five dimensions (the seven before them are in
+Round 14's table); the seat's judgment, not a measurement.
+
+| Design | Layout and structure | Type | Palette | Shapes and ornament | Density and rhythm |
+|---|---|---|---|---|---|
+| Sentinel | A clearance card across the first screen; bracketed panels in a dashboard; the timeline an audit log | Chakra Petch, squared, in capitals; system sans text; monospace data | Graphite, signal orange, green and amber; always dark | Targeting brackets at panel corners, angled buttons, severity bars, a radar grid | Medium |
+| Latent | A split screen: a dark panel held on the left at the window's height, the sections scrolling on a white sheet | Space Grotesk; monospace labels | A deep indigo field lit cyan and violet; a white sheet with indigo blue | Soft light in the field, metric bars, gently rounded cards | Airy |
+| Pocket | The page as a phone app in a bezel, centred on a gradient; a sticky app bar of chips; widgets; grouped lists | Plus Jakarta Sans at heavy weights | Coral to pink to violet around an app's grey and white, blue controls | Large radii, app icons, chevrons, a bottom sheet's grabber, the bezel | Compact list rows |
+| Assert | A test report: every section a table of hairline cells, the figures as passed checks | Public Sans; monospace capitals for column labels | White and cool grey, a navy menu, one pass green | Hairline cells, ticks in circles, square corners | Dense, tabular |
+| Pipeline | A status header with a green banner, then the sections as numbered stages down a rail | Barlow Semi Condensed in capitals; system sans text | White and blue-grey, a green banner, blue, a navy footer | Rail and nodes, uptime bars, status lights | Medium |
+
+How many of the five dimensions each pair differs in, counted strictly
+(where two are close, the same):
+
+| | Defa | Plai | Broa | Cons | Sign | Bent | Post | Sent | Late | Pock | Asse | Pipe |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Default | - | 5 | 5 | 4 | 3 | 3 | 4 | 5 | 3 | 5 | 5 | 5 |
+| Plain | 5 | - | 3 | 4 | 3 | 5 | 5 | 5 | 5 | 5 | 3 | 4 |
+| Broadsheet | 5 | 3 | - | 4 | 4 | 5 | 5 | 5 | 5 | 5 | 4 | 5 |
+| Console | 4 | 4 | 4 | - | 5 | 5 | 5 | 4 | 5 | 5 | 5 | 5 |
+| Signal | 3 | 3 | 4 | 5 | - | 4 | 5 | 5 | 4 | 5 | 5 | 5 |
+| Bento | 3 | 5 | 5 | 5 | 4 | - | 5 | 5 | 3 | 3 | 5 | 4 |
+| Poster | 4 | 5 | 5 | 5 | 5 | 5 | - | 4 | 5 | 5 | 5 | 5 |
+| Sentinel | 5 | 5 | 5 | 4 | 5 | 5 | 4 | - | 5 | 5 | 5 | 3 |
+| Latent | 3 | 5 | 5 | 5 | 4 | 3 | 5 | 5 | - | 5 | 5 | 5 |
+| Pocket | 5 | 5 | 5 | 5 | 5 | 3 | 5 | 5 | 5 | - | 5 | 5 |
+| Assert | 5 | 3 | 4 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | - | 4 |
+| Pipeline | 5 | 4 | 5 | 5 | 5 | 4 | 5 | 3 | 5 | 5 | 4 | - |
+
+All 66 pairs differ in at least three; every pair in layout. The nine at
+three: Default with Signal, Bento and Latent; Plain with Broadsheet,
+Signal and Assert; Bento with Latent and Pocket; Sentinel with Pipeline.
+
+## Proofs
+
+On 2026-10-24 and 25 UTC, one browser job at a time, Chrome 156, on a
+fresh clone of 3f65c4f unless named.
+
+- **The gates**, on a scratch clone of 3f65c4f: 27 defeat cases refused, 5
+  controls passed, exit 0 in 599 s (22:54Z on the 24th).
+- **The first run of the checks did not count**: the machine hibernated
+  during it; it lasted 32,050 s and lost Chrome's DevTools connection in
+  the browser checks, after every file check, build, sample person's
+  trace and picture had passed. The defeat harness that followed ran
+  across the same sleep and was stopped, with all 18 of its processes,
+  before it ended. Both ran again on the same clone, under a wrapper that
+  asks Windows not to sleep for idleness while it runs.
+- **Every check with axe** (the retry, from 10:33Z on the 25th): exit 0 in
+  3,676 s; the browser checks 3,606 s (tree 288 runs, keyboard 48, joins
+  24, anchors 816, words 24, motion 13, packing 12, overlay 4, axe 156),
+  0 failures, all twelve designs. Two builds of the gallery, 58 files,
+  byte-identical; each sample person's own site built, its files checked
+  and traced to their own CV; 15 pictures made and checked; the cleanup
+  removes 82 files, samples/ among them.
+- **Every defeat case with the browser and axe**: exit 0 in 3,698 s; 171
+  defeat cases (148 file, 23 browser) fail as built, naming what failed;
+  12 controls, the browser and axe controls over all twelve designs among
+  them, and 24 planted controls pass; 0 unproven. New: a sample for a
+  design that does not exist; a sample naming another design; a sample
+  person's fact not in their CV; and the control of a demo shown with its
+  own sample person.
+- **Width**, the seat's measurement with every section laid out, on that
+  clone's gallery: no page scrolls sideways at 320, 360, 390, 1080 or 1366
+  px, light or dark, but Sentinel at 320 px (Errors, 6). After 1cb1d44,
+  on a gallery built in the working tree: no page at any of the five,
+  and Sentinel's tree, keyboard, joins, anchors, words and axe checks, 0
+  failures in 342 s. 1cb1d44 changes Sentinel's stylesheet alone and
+  passed gates A, B and C on its commit.
+- **The pre-publish search** at 3f65c4f, every ref, pull request refs 1 to
+  19: PASS; 571 blobs, 83 commits, 87 built files.
+- **Before committing**: every browser check with axe on a gallery of the
+  five new demos, 0 failures but Pocket's two (Errors, 5) and the
+  showcase pictures that gallery lacked by construction; after Pocket's
+  fix, its anchors and axe 0 failures in 213 s. Each sample person traced
+  before writing the next: about 190 blocks each, 0 untraced, every CV
+  line on the page. The fonts: no Reserved Font Name in the licence texts
+  or the WOFF2 name tables.
+- **Looked at**: each new design whole at 1366, 390 and 1080 by 1920, and
+  the gallery with its twelve cards; 18 pictures kept for the owner in the
+  gitignored briefs folder, with a page to see them at once.
+
+## Rejected alternatives
+
+- **The same sample person for every design**: every demo would still
+  read as a junior software engineer's page, the look-alike the owner
+  named.
+- **Sections of each profession's own**: a change to the engine's page and
+  content model for every site; the owner chose the sample person alone.
+- **Sample content inside the design folder**: a design is CSS, fonts and
+  images (ADR-0006), and the scope check would let a contributor's design
+  bring words; samples/ is the project's own, outside what a contributor's
+  pull request may change.
+- **Fewer checks to fit the 45-minute limit**: the limit grows instead.
+
+## Not done
+
+- Nothing pushed. more-designs (Round 14) and profession-designs (this
+  round) both wait on the owner; profession-designs holds more-designs'
+  commits, so its pull request shows only this round's once more-designs
+  is merged.
+- The owner's judgment of the five, from the screenshots.
+- A standing check that no page scrolls sideways (Round 14), still for the
+  chat and the owner.
+- Test 1 once more, on or after 2026-11-02.

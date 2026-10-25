@@ -50,9 +50,11 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 CONTENT_DIR = ROOT / "content"
-CONFIG = CONTENT_DIR / "config.json"
-SITE = CONTENT_DIR / "site.json"
-ITEMS = CONTENT_DIR / "items.json"
+CONTENT_FILES = {"config.json", "cv.md", "site.json", "items.json"}
+# A template the gallery shows with its own invented person: samples/<design>/
+# holds that person's content, a whole content folder naming that design.
+# Only the gallery reads it; a site is always built from content/ (ADR-0018).
+SAMPLES = ROOT / "samples"
 TEMPLATES = ROOT / "src" / "templates"
 STATIC_SRC = ROOT / "src" / "static"
 DESIGNS = ROOT / "designs"
@@ -1015,10 +1017,12 @@ def copy_design(design: dict, target: Path) -> None:
         shutil.copyfile(DESIGNS / design["slug"] / relative, destination)
 
 
-def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> str:
-    config = load_config(CONFIG)
-    items, axis_start = load_items(ITEMS, as_of, config)
-    site = load_site(SITE, items)
+def load_content(folder: Path, as_of: str) -> dict:
+    """One person's content, from a content folder, and what the page derives
+    from it: the sections shown, the project grid, the timeline."""
+    config = load_config(folder / "config.json")
+    items, axis_start = load_items(folder / "items.json", as_of, config)
+    site = load_site(folder / "site.json", items)
     by_lane = {lane: [i for i in items if i["lane"] == lane] for lane in LANE_LABELS}
     project_grid(by_lane["builds"])
     timeline = timeline_layout(items, as_of, axis_start)
@@ -1029,14 +1033,7 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
     sections = [{"id": sid, "label": label} for sid, label in SECTIONS if shown[sid]]
     for n, section in enumerate(sections, start=1):
         section["n"] = f"{n:02d}"
-    cv_pdf = config["cv_pdf"] or None
-
-    names = design_names() if gallery else [design_override or config["design"]]
-    designs = [load_design(name) for name in names]
-    showcase = load_showcase() if gallery else []
-    env = environment()
-
-    base = {
+    page = {
         "as_of": as_of,
         "site": site,
         "sections": sections,
@@ -1051,21 +1048,77 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
         "project_name": PROJECT_NAME,
         "project_url": PROJECT_URL,
     }
+    return {"config": config, "items": items, "page": page,
+            "layout": layout_css(by_lane["builds"], timeline), "cv_pdf": config["cv_pdf"] or None,
+            "sample": {"name": site["name"], "role": site["headline"][0]}}
+
+
+def load_samples(as_of: str) -> dict[str, dict]:
+    """Each sample person's content, by the design it shows (ADR-0018). A
+    sample is a whole content folder for a design that exists, and names it."""
+    if not SAMPLES.exists():
+        return {}
+    samples = {}
+    for folder in sorted(SAMPLES.iterdir()):
+        where = f"samples/{folder.name}"
+        if folder.is_symlink() or not folder.is_dir():
+            raise BuildError(f"{where}: samples/ holds only folders, one per design")
+        if not (DESIGNS / folder.name / "design.json").is_file():
+            raise BuildError(f"{where}/ shows a design that does not exist: there is no "
+                             f"designs/{folder.name}/. Remove the sample with its design")
+        files = {p.name for p in folder.iterdir()}
+        if files != CONTENT_FILES:
+            raise BuildError(f"{where}/ must hold exactly {', '.join(sorted(CONTENT_FILES))}, "
+                             f"a whole content folder (docs/reference/content.md)")
+        try:
+            content = load_content(folder, as_of)
+        except BuildError as error:
+            raise BuildError(f"{where}/: {error}") from None
+        if content["config"]["design"] != folder.name:
+            raise BuildError(f"{where}/config.json: design must be \"{folder.name}\", the design "
+                             f"this sample shows")
+        samples[folder.name] = content
+    return samples
+
+
+def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
+          content_dir: Path = CONTENT_DIR) -> str:
+    main = load_content(content_dir, as_of)
+    config, items, base = main["config"], main["items"], main["page"]
+    samples = load_samples(as_of) if gallery else {}
+
+    names = design_names() if gallery else [design_override or config["design"]]
+    designs = [load_design(name) for name in names]
+    showcase = load_showcase() if gallery else []
+    env = environment()
+
     pages: dict[str, str] = {}
+    # The generated stylesheets: the layout of content/ for every page shown
+    # with it, and in the gallery one beside each demo shown with its own
+    # sample person, whose project grid and timeline differ.
+    layouts = {"static/layout.css": main["layout"]}
+    pdfs = {main["cv_pdf"]} - {None}
     if gallery:
         for design in designs:
+            own = design["slug"] in samples
+            shown = samples[design["slug"]] if own else main
+            design["sample"] = shown["sample"]
+            if own:
+                layouts[f"designs/{design['slug']}/layout.css"] = shown["layout"]
+                pdfs |= {shown["cv_pdf"]} - {None}
             pages[f"designs/{design['slug']}/index.html"] = render(env, "base.html.j2", {
-                **base, "root": DEMO_ROOT, "design": design, "design_href": "",
-                "cv": f"{DEMO_ROOT}{cv_pdf}" if cv_pdf else None, "demo": True})
+                **shown["page"], "root": DEMO_ROOT, "design": design, "design_href": "",
+                "layout_href": "layout.css" if own else f"{DEMO_ROOT}static/layout.css",
+                "cv": f"{DEMO_ROOT}{shown['cv_pdf']}" if shown["cv_pdf"] else None, "demo": True})
         pages["index.html"] = render(env, "gallery.html.j2", {
             "as_of": as_of, "csp": CSP, "designs": designs, "project_name": PROJECT_NAME,
             "project_url": PROJECT_URL, "preview_file": PREVIEW_FILE,
-            "preview_size": PREVIEW_SIZE, "sample_name": site["name"], "showcase": showcase})
+            "preview_size": PREVIEW_SIZE, "sample_name": base["site"]["name"], "showcase": showcase})
     else:
         design = designs[0]
         pages["index.html"] = render(env, "base.html.j2", {
             **base, "root": "", "design": design, "design_href": "design/",
-            "cv": cv_pdf, "demo": False})
+            "layout_href": "static/layout.css", "cv": main["cv_pdf"], "demo": False})
 
     # Everything is rendered; now write, into a fresh folder that replaces
     # the old output only once it is complete.
@@ -1080,8 +1133,9 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
         static.mkdir()
         for name in ("site.js", "knot.js", "base.css"):
             shutil.copyfile(STATIC_SRC / name, static / name)
-        (static / "layout.css").write_text(layout_css(by_lane["builds"], timeline),
-                                           encoding="utf-8", newline="\n")
+        for relative, text in layouts.items():
+            (staging / relative).parent.mkdir(parents=True, exist_ok=True)
+            (staging / relative).write_text(text, encoding="utf-8", newline="\n")
         if gallery:
             for name in ("gallery.css", "gallery.js"):
                 shutil.copyfile(STATIC_SRC / name, static / name)
@@ -1091,10 +1145,10 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool) -> 
             # job, as the previews do; the authors' own files stay here.
         else:
             copy_design(designs[0], staging / "design")
-        if cv_pdf:
-            target = staging / cv_pdf
+        for pdf in sorted(pdfs):
+            target = staging / pdf
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(ROOT / cv_pdf, target)
+            shutil.copyfile(ROOT / pdf, target)
         # A file GitHub Pages reads: serve the files as they are, without
         # Jekyll. The deploy workflow uploads this folder as the site.
         (staging / ".nojekyll").write_text("", encoding="utf-8")
@@ -1121,11 +1175,14 @@ def main(argv: list[str] | None = None) -> int:
                       help="build every design and the gallery page")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, metavar="DIR",
                         help="where to write; default: _site/")
+    parser.add_argument("--content", type=Path, default=CONTENT_DIR, metavar="DIR",
+                        help="the content folder; default: content/. A sample person's, "
+                             "samples/<design>/, builds that person's site")
     args = parser.parse_args(argv)
     as_of = args.as_of or datetime.now(timezone.utc).strftime("%Y-%m")
     try:
         check_environment()
-        print(build(args.out.resolve(), as_of, args.design, args.gallery))
+        print(build(args.out.resolve(), as_of, args.design, args.gallery, args.content.resolve()))
     except BuildError as error:
         print(f"build failed:\n{error}", file=sys.stderr)
         return 1

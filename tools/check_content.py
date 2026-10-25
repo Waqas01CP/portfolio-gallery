@@ -1,6 +1,7 @@
 """Trace every piece of text on the built page to your CV, and back.
 
   python tools/check_content.py [--cv content/cv.md] [--page _site/index.html]
+                                [--content samples/<design>]
 
 Your CV is the source of truth for what your site claims. This reads it,
 in the Markdown shape docs/reference/cv-format.md describes, and the built
@@ -57,9 +58,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CONFIG = ROOT / "content" / "config.json"
-SITE = ROOT / "content" / "site.json"
-ITEMS = ROOT / "content" / "items.json"
+CONTENT = ROOT / "content"
 PAGE = ROOT / "_site" / "index.html"
 
 LONG_MONTHS = {"january": "jan", "february": "feb", "march": "mar", "april": "apr",
@@ -395,15 +394,19 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Trace the built page to your CV, and back.")
     parser.add_argument("--cv", type=Path, help="your CV; default: config.json's cv_source")
     parser.add_argument("--page", type=Path, default=PAGE, help="the built page; default _site/index.html")
+    parser.add_argument("--content", type=Path, default=CONTENT,
+                        help="the content folder the page was built from; default content/. "
+                             "A sample person's is samples/<design>/ (ADR-0018)")
     # Page text can hold characters the console cannot write, as on Windows;
     # write them escaped rather than stop the report.
     sys.stdout.reconfigure(errors="backslashreplace")
     args = parser.parse_args(argv)
-    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    folder = args.content
+    config = json.loads((folder / "config.json").read_text(encoding="utf-8"))
     if args.cv is None:
         if not config.get("content_trace", True):
-            print("Content trace is off in content/config.json (content_trace: false); "
-                  "nothing was checked.")
+            print(f"Content trace is off in {folder.name}/config.json (content_trace: false); "
+                  f"nothing was checked.")
             return 0
         args.cv = ROOT / config.get("cv_source", "")
     if not args.cv.is_file():
@@ -418,8 +421,8 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError:
         shown = str(args.cv)
     cv = CV(args.cv.read_text(encoding="utf-8"))
-    site = json.loads(SITE.read_text(encoding="utf-8"))
-    items = json.loads(ITEMS.read_text(encoding="utf-8"))
+    site = json.loads((folder / "site.json").read_text(encoding="utf-8"))
+    items = json.loads((folder / "items.json").read_text(encoding="utf-8"))
     owned = [t for route in site.get("contact", []) for k in ("label", "line", "cta")
              if (t := route.get(k))]
     owned += [link["label"] for item in items for link in item.get("proof", [])]

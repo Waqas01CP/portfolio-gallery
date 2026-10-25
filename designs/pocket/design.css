@@ -1,0 +1,290 @@
+/* Pocket: a portfolio for mobile work, built as a phone app. On a wide
+   screen the whole page stands in a phone's frame, centred on a bright
+   gradient; on a phone it simply is the app. A sticky app bar with the
+   sections as chips, the headline figures as home-screen widgets, the
+   sections as grouped lists with chevrons, and the In depth panels as
+   bottom sheets. Light only.
+
+   One font file, Plus Jakarta Sans's variable weights, preloaded and
+   shown with font-display: optional (ADR-0014). No motion and none of the
+   engine's effects. It styles the engine's fixed HTML
+   (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("fonts/plus-jakarta-sans-latin-wght-normal.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: optional;
+}
+
+:root {
+  --app: #F2F2F7;
+  --card: #FFFFFF;
+  --ink: #121217;
+  --muted: #5E5E6E;    /* 6:1 on the app's grey */
+  --hair: #E2E2EA;     /* separators, never text */
+  --blue: #1456E0;     /* 6.1:1 on white */
+  --pink: #FF3D77;
+  --green: #0B6B3A;    /* 5:1 on its own pale wash */
+  --sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --bar: 64px;         /* the app bar's height, and every target's margin */
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: linear-gradient(160deg, #FF8A5B 0%, #FF3D77 45%, #7B4DFF 100%);
+}
+body {
+  margin: 0;
+  background: var(--app);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+}
+/* The phone: the page itself, framed, on any screen wider than one. */
+@media (min-width: 560px) {
+  body {
+    max-width: 440px;
+    margin: 48px auto;
+    border-radius: 46px;
+    box-shadow: 0 0 0 11px #121217, 0 0 0 13px #3A3A44, 0 40px 90px rgba(40, 0, 80, 0.45);
+  }
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* A link inside running text is underlined, so colour is not its only mark. */
+.lede a, .proj-summary a, .depth-list a, .job-list a, .tl-detail a, .foot a { text-decoration: underline; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 10px; }
+button { font: inherit; color: inherit; }
+strong { font-weight: 800; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { padding: 0 18px; }
+.skip { padding: 10px 16px; border-radius: 12px; background: var(--ink); color: var(--card); font-weight: 700; }
+.skip:focus { color: var(--card); }
+/* Every target lands just under the sticky app bar; no more, or the page's
+   first targets could never reach their margin. */
+[id] { scroll-margin-top: var(--bar); }
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .skill-n, .route-top .i, .fade-word { display: none; }
+
+/* Buttons: rounded app buttons. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(20, 86, 224, 0.1);
+  color: var(--blue);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: rgba(20, 86, 224, 0.18); color: var(--blue); text-decoration: none; }
+.btn-acc { background: var(--blue); color: #FFFFFF; }
+.btn-acc:hover { background: #0E3FA8; color: #FFFFFF; }
+.btn-sm, .depth-toggle { min-height: 38px; padding: 0 14px; font-size: 14px; border-radius: 12px; }
+.depth-toggle::after { content: "\203A" / ""; font-size: 20px; line-height: 1; }
+.depth-toggle[aria-expanded="true"]::after { transform: rotate(90deg); }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { padding: 2px 10px; border-radius: 999px; background: var(--app); font-size: 13px; font-weight: 600; }
+
+/* The app bar: sticky, the sections as a row of chips that scrolls. */
+.dnav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--bar);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--hair);
+  background: rgba(242, 242, 247, 0.94);
+}
+@media (min-width: 560px) {
+  .dnav { border-radius: 46px 46px 0 0; }
+}
+.dnav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 14px;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dnav-list a { display: block; padding: 7px 14px; border-radius: 999px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.dnav-list a:hover { text-decoration: none; background: #E7E7EE; }
+.dnav-list a[aria-current] { background: var(--ink); color: var(--card); }
+.dnav :focus-visible { outline-offset: -3px; }
+
+/* Intro: a large title, then widgets. */
+.intro { padding: 24px 0 8px; }
+.avail { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: rgba(18, 128, 74, 0.12); color: var(--green); font-size: 13px; font-weight: 700; }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.intro-name { margin-top: 14px; font-size: 40px; font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; }
+.intro-name .serif { background: linear-gradient(90deg, #E8366C, #6B3FE6); -webkit-background-clip: text; background-clip: text; color: #9C2A70; -webkit-text-fill-color: transparent; }
+.headline { margin-top: 8px; font-size: 16px; font-weight: 600; color: var(--muted); }
+.sep { color: var(--hair); }
+.intro-grid { display: grid; gap: 16px; margin-top: 20px; }
+.intro-main { padding: 18px; border-radius: 22px; background: var(--card); }
+.facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 14px; color: var(--muted); }
+.facts li { display: flex; gap: 8px; }
+.arrow { color: var(--pink); }
+.lede { margin-top: 12px; }
+.cta { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cta li:first-child { grid-column: 1 / -1; }
+.cta .btn { width: 100%; }
+/* Widgets: the first wide, the next two square, like a home screen. */
+.results { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.result { display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; padding: 16px; border-radius: 22px; background: var(--card); }
+.result:first-child { grid-column: 1 / -1; min-height: 0; background: linear-gradient(135deg, #2A1B5E, #121217); color: #FFFFFF; }
+.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.result:first-child .result-label { color: #D9D4F2; }
+.result-fig { margin-top: 8px; display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }
+.result:first-child .result-fig { color: #D9D4F2; }
+.result-num, .result-word { font-size: 32px; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; color: var(--ink); }
+.result:first-child .result-num { font-size: 44px; color: #FFFFFF; }
+.result-suffix { font-size: 0.5em; letter-spacing: 0; }
+.strip { margin: 16px 18px 0; }
+.strip-static { display: flex; flex-wrap: wrap; gap: 2px 14px; padding: 12px 16px; border-radius: 16px; background: var(--card); font-size: 13px; font-weight: 600; color: var(--muted); }
+
+/* Sections: a big title, then grouped cards. */
+.sec { padding: 30px 0 0; }
+.sec-last { padding-bottom: 30px; }
+.sec-head { margin-bottom: 14px; }
+.sec-title { display: flex; align-items: baseline; gap: 8px; }
+.sec-n { order: 2; font-size: 13px; font-weight: 700; color: var(--muted); }
+.sec-title h2 { font-size: 28px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+
+/* Projects: app store cards, each with an icon. */
+.feature { margin-bottom: 14px; padding: 18px; border-radius: 22px; background: linear-gradient(135deg, #C2185B, #6B3FE6); color: #FFFFFF; display: grid; gap: 4px; }
+.feature-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.feature-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.feature-num { font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; }
+.feature-text { font-size: 18px; font-weight: 700; }
+.feature-note { font-size: 14px; }
+.proj-grid { display: grid; gap: 12px; }
+.proj { position: relative; padding: 18px 18px 18px 86px; border-radius: 22px; background: var(--card); }
+.proj::before {
+  content: "" / "";
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1456E0, #6B3FE6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+.proj:nth-of-type(3n + 2)::before { background: linear-gradient(135deg, #FF8A5B, #FF3D77); }
+.proj:nth-of-type(3n + 3)::before { background: linear-gradient(135deg, #12804A, #0BB3A4); }
+.proj.is-open { box-shadow: 0 0 0 2px var(--blue); }
+.proj-dates, .job-dates, .cert-top { font-size: 13px; font-weight: 600; color: var(--muted); }
+.proj h3 { margin-top: 2px; font-size: 20px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
+.proj-sub { font-size: 14px; color: var(--muted); }
+.proj-summary { margin-top: 8px; font-size: 15px; }
+.proj-side { margin-top: 12px; display: grid; gap: 10px; }
+.proj-fact { font-size: 15px; font-weight: 700; }
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* In depth: a bottom sheet, its grabber on top. */
+.depth { position: relative; margin-top: -4px; padding: 26px 18px 18px; border-radius: 26px 26px 22px 22px; background: var(--card); box-shadow: 0 -8px 24px rgba(18, 18, 23, 0.08); }
+.depth::before { content: "" / ""; position: absolute; top: 9px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: #CFCFD8; }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.depth-head h3 { font-size: 18px; font-weight: 800; }
+/* No list markers: they would enter the tree only once laid out. The
+   engine's own numbers, hidden from screen readers, stand in. */
+.depth-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 8px; padding: 10px 0; border-top: 1px solid var(--hair); font-size: 15px; }
+.depth-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--app); font-size: 11px; font-weight: 800; }
+
+/* Timeline: a list of rows, like notifications. */
+.tl-lanes { margin-bottom: 12px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.tl-filter { min-height: 36px; padding: 0 12px; font-size: 13px; border-radius: 999px; }
+.tl-filter .shape { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+.tl-filter.lane-work .shape { background: var(--pink); }
+.tl-filter.lane-certifications .shape { background: var(--green); }
+.tl-filter[aria-pressed="false"] { background: var(--card); color: var(--muted); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 12px 0; font-weight: 700; }
+.tl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-radius: 22px; background: var(--card); overflow: hidden; }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 12px 16px; background: #EDEBFA; font-size: 14px; }
+.tl-entry { order: 2; }
+.tl-entry + .tl-entry, .tl-band + .tl-entry { border-top: 1px solid var(--hair); }
+.tl-band-label { display: flex; flex-wrap: wrap; gap: 0 10px; font-weight: 700; }
+.tl-card summary { list-style: none; position: relative; display: grid; gap: 0; padding: 12px 40px 12px 34px; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-card summary::before { content: "" / ""; position: absolute; left: 14px; top: 19px; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); }
+.lane-work .tl-card summary::before { background: var(--pink); }
+.lane-certifications .tl-card summary::before { background: var(--green); }
+.tl-card summary:hover { background: #F7F7FA; }
+.tl-meta { display: flex; justify-content: space-between; }
+.tl-lane { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.tl-sign { position: absolute; right: 16px; top: 50%; margin-top: -12px; }
+.tl-sign::before { content: "\203A" / ""; display: inline-block; font-size: 22px; line-height: 1; color: #A0A0AE; }
+.tl-card[open] .tl-sign::before { transform: rotate(90deg); }
+.tl-dates { font-size: 13px; color: var(--muted); }
+.tl-title { font-weight: 800; }
+.tl-org { font-size: 14px; color: var(--muted); }
+.tl-pop { padding: 0 16px 14px 34px; font-size: 15px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-weight: 700; }
+
+/* Work and Education: cards. */
+.jobs { display: grid; gap: 12px; }
+.job, .degree { padding: 18px; border-radius: 22px; background: var(--card); }
+.job h3, .degree h3 { margin-top: 2px; font-size: 20px; font-weight: 800; line-height: 1.2; }
+.job-org, .degree-org { font-weight: 700; color: var(--blue); }
+.job-loc, .degree-cgpa { font-size: 14px; color: var(--muted); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 8px; padding-left: 18px; font-size: 15px; }
+.job-list li::before { content: "" / ""; position: absolute; left: 2px; top: 0.55em; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); }
+.degree-courses { margin-top: 12px; }
+.degree-courses h4 { margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+
+/* Certifications and contact: grouped rows with chevrons. */
+.certs, .routes { list-style: none; margin: 0; padding: 0; border-radius: 22px; background: var(--card); overflow: hidden; }
+.certs li + li, .routes li + li { border-top: 1px solid var(--hair); }
+.cert, .route { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 14px 44px 14px 18px; color: var(--ink); }
+.cert::after, .route::after { content: "\203A" / ""; position: absolute; right: 18px; top: 50%; margin-top: -14px; font-size: 26px; line-height: 1; color: #A0A0AE; }
+.cert:hover, .route:hover { background: #F7F7FA; text-decoration: none; }
+.cert-title { font-weight: 800; line-height: 1.3; }
+.cert-org { display: block; font-size: 14px; color: var(--muted); }
+.cert-view { font-size: 14px; font-weight: 700; color: var(--blue); }
+.route-label { font-size: 17px; font-weight: 800; }
+.route-line { font-size: 14px; color: var(--muted); }
+.route-addr { font-size: 14px; font-weight: 700; color: var(--blue); overflow-wrap: anywhere; }
+
+/* Skills: three small cards. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.skill { padding: 16px 18px; border-radius: 22px; background: var(--card); }
+.skill h3 { margin-bottom: 8px; font-size: 16px; font-weight: 800; }
+
+/* Footer: the app's last screen, the frame's bottom corners. */
+.foot { padding: 22px 18px 34px; border-top: 1px solid var(--hair); display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+@media (min-width: 560px) {
+  .foot { border-radius: 0 0 46px 46px; }
+}
+.foot-name { font-size: 20px; font-weight: 800; color: var(--ink); }
+.foot-credit { margin-top: 8px; font-size: 13px; }

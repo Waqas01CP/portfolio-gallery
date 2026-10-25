@@ -20,6 +20,7 @@ __pycache__/
 # built is committed (ADR-0004).
 _site*/
 _gallery/
+_samples/
 .build-*/
 
 # axe-core, fetched for the checks on your own computer

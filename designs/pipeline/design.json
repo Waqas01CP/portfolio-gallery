@@ -1,0 +1,18 @@
+{
+  "name": "Pipeline",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "For DevOps and cloud work: a navy status header with uptime bars, then the sections as numbered stages down a pipeline's rail. Light only.",
+  "preload": [
+    "fonts/barlow-semi-condensed-latin-600-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/barlow-semi-condensed-latin-600-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/BarlowSemiCondensed-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource/barlow-semi-condensed@5.2.7/files/barlow-semi-condensed-latin-600-normal.woff2"
+    }
+  ]
+}

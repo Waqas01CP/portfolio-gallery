@@ -1,0 +1,18 @@
+{
+  "name": "Assert",
+  "author": "Waqas01CP",
+  "author_url": "https://github.com/Waqas01CP",
+  "dark": false,
+  "description": "For QA and testing work: a test report, every section a table of hairline cells, the headline figures as passed checks, green the only colour it needs. Light only.",
+  "preload": [
+    "fonts/public-sans-latin-wght-normal.woff2"
+  ],
+  "assets": [
+    {
+      "file": "fonts/public-sans-latin-wght-normal.woff2",
+      "licence": "OFL-1.1",
+      "licence_file": "fonts/PublicSans-OFL.txt",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/public-sans@5.2.7/files/public-sans-latin-wght-normal.woff2"
+    }
+  ]
+}

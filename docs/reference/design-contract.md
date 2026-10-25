@@ -17,6 +17,8 @@ every design (ADR-0006). To see the HTML, build the site and open
 Each page loads, in order: the design's `design.css`; the engine's
 `static/base.css`; `static/layout.css`, which the build writes from the
 content. base.css comes after the design, so on equal terms its rules win.
+A gallery demo shown with its own sample person (ADR-0018) loads that
+person's `layout.css` from beside it instead, written from their content.
 
 ## The page
 

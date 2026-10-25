@@ -1,0 +1,133 @@
+[
+  {
+    "id": "blue-green",
+    "lane": "builds",
+    "title": "Blue Green: zero-downtime deploys for a booking site",
+    "start": "2026-02",
+    "end": "present",
+    "source": "Projects / Blue Green: zero-downtime deploys for a booking site",
+    "tier": 1,
+    "stack": ["Terraform", "Docker", "GitHub Actions"],
+    "status": "Deploys an example clinic's booking site since March 2026.",
+    "layer2": "Two identical environments, with traffic switched only after health checks pass.",
+    "layer1": "Shipped 140 deploys with no downtime.",
+    "detail": "Deploys an example clinic's booking site.",
+    "bullets": [
+      "Shipped <strong>140 deploys</strong> with no downtime in the first 6 months.",
+      "Cut deploy time from 35 to <strong>6 minutes</strong> by building images once and promoting them.",
+      "Held <strong>99.95%</strong> uptime over 6 months, measured by an outside example monitor."
+    ],
+    "proof": [
+      {"label": "Write-up", "url": "https://example.com/blue-green"},
+      {"label": "Code", "url": "https://example.com/blue-green/code"}
+    ]
+  },
+  {
+    "id": "cost-watch",
+    "lane": "builds",
+    "title": "Cost Watch: a weekly cloud cost report",
+    "start": "2025-09",
+    "end": "2026-01",
+    "source": "Projects / Cost Watch: a weekly cloud cost report",
+    "tier": 2,
+    "stack": ["Python", "SQL"],
+    "status": "Finished.",
+    "layer1": "Sends each team a weekly cost report with its 3 biggest changes.",
+    "detail": "Sends each team a weekly cost report.",
+    "bullets": [
+      "Sends each team a weekly cost report with its 3 biggest changes and who made them.",
+      "Helped cut an example company's monthly cloud bill by <strong>28%</strong> in 4 months."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/cost-watch"}
+    ]
+  },
+  {
+    "id": "pipeline-kit",
+    "lane": "builds",
+    "title": "Pipeline Kit: shared CI templates",
+    "start": "2025-05",
+    "end": "2025-07",
+    "date_style": "full",
+    "source": "Projects / Pipeline Kit: shared CI templates",
+    "tier": 3,
+    "stack": ["YAML", "Bash"],
+    "layer2": "Shared CI templates that give a new service build, test and deploy steps",
+    "layer1": "in one file.",
+    "bullets": [
+      "Shared CI templates that give a new service build, test and deploy steps in one file."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/pipeline-kit"}
+    ]
+  },
+  {
+    "id": "devops-engineer",
+    "lane": "work",
+    "title": "DevOps Engineer",
+    "org": "Sample Cloud Ltd",
+    "org_short": "Sample Cloud",
+    "location": "Example City",
+    "start": "2025-08",
+    "end": "present",
+    "source": "Experience / DevOps Engineer, Sample Cloud Ltd",
+    "detail": "Run the example company's 40 services on Kubernetes.",
+    "bullets": [
+      "Run the example company's 40 services on Kubernetes, with every change made through code review.",
+      "Wrote on-call runbooks for the 10 most common alerts, which cut median recovery time from 50 to 18 minutes."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "platform-intern",
+    "lane": "work",
+    "title": "Platform Intern",
+    "org": "Placeholder Hosting",
+    "location": "Remote",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / Platform Intern, Placeholder Hosting",
+    "bullets": [
+      "Moved 12 example websites from hand-built servers to containers."
+    ],
+    "no_proof": "Client work under an agreement that keeps it private."
+  },
+  {
+    "id": "bsc-computer-engineering",
+    "lane": "band",
+    "title": "BSc Computer Engineering",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Computer Engineering, Example University",
+    "grade": "3.6 / 4.0 CGPA",
+    "coursework": ["Operating Systems", "Computer Networks", "Distributed Systems", "Cloud Computing"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-cloud-architecture",
+    "lane": "certifications",
+    "title": "Example Certificate in Cloud Architecture",
+    "org": "Example Academy",
+    "start": "2025-06",
+    "end": "2025-06",
+    "source": "Certifications / Example Certificate in Cloud Architecture",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/cloud-architecture"}
+    ]
+  },
+  {
+    "id": "cert-kubernetes-administration",
+    "lane": "certifications",
+    "title": "Example Certificate in Kubernetes Administration",
+    "org": "Example Academy",
+    "start": "2025-01",
+    "end": "2025-01",
+    "source": "Certifications / Example Certificate in Kubernetes Administration",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/kubernetes-administration"}
+    ]
+  }
+]

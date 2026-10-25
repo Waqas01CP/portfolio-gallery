@@ -1,0 +1,133 @@
+[
+  {
+    "id": "leaf-lens",
+    "lane": "builds",
+    "title": "Leaf Lens: plant disease detection from phone photos",
+    "start": "2026-02",
+    "end": "present",
+    "source": "Projects / Leaf Lens: plant disease detection from phone photos",
+    "tier": 1,
+    "stack": ["PyTorch", "ONNX", "FastAPI"],
+    "status": "In use at 12 example community farms since April 2026.",
+    "layer2": "A model that names 9 common leaf diseases from one photo and runs on a mid-range phone.",
+    "layer1": "Reached 94% accuracy on a held-out set of 2,400 photos.",
+    "detail": "In use at 12 example community farms.",
+    "bullets": [
+      "Reached <strong>94% accuracy</strong> on a held-out set of 2,400 photos with a small vision model, against 71% for a colour histogram baseline.",
+      "Cut the model to <strong>8 MB</strong> by quantisation, so it answers in 120 ms on a mid-range phone.",
+      "Labelled <strong>900 photos</strong> of rare diseases with 2 example agronomists, and measured their agreement before training."
+    ],
+    "proof": [
+      {"label": "Model card", "url": "https://example.com/leaf-lens"},
+      {"label": "Code", "url": "https://example.com/leaf-lens/code"}
+    ]
+  },
+  {
+    "id": "queue-forecast",
+    "lane": "builds",
+    "title": "Queue Forecast: visitor forecasts for a library",
+    "start": "2025-08",
+    "end": "2026-01",
+    "source": "Projects / Queue Forecast: visitor forecasts for a library",
+    "tier": 2,
+    "stack": ["Python", "scikit-learn"],
+    "status": "Finished.",
+    "layer1": "Forecast daily visitors a week ahead for an example library.",
+    "detail": "Forecast daily visitors a week ahead.",
+    "bullets": [
+      "Forecast daily visitors a week ahead for an example library, within 9% on average over 3 months.",
+      "Beat a same day last week baseline by <strong>35%</strong> in mean absolute error."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/queue-forecast"}
+    ]
+  },
+  {
+    "id": "tiny-tagger",
+    "lane": "builds",
+    "title": "Tiny Tagger: a text classifier for support emails",
+    "start": "2025-05",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Projects / Tiny Tagger: a text classifier for support emails",
+    "tier": 3,
+    "stack": ["Python", "PyTorch"],
+    "layer2": "A distilled text classifier that sorts support emails into 6 queues,",
+    "layer1": "small enough to run on a laptop.",
+    "bullets": [
+      "A distilled text classifier that sorts support emails into 6 queues, small enough to run on a laptop."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/tiny-tagger"}
+    ]
+  },
+  {
+    "id": "machine-learning-engineer",
+    "lane": "work",
+    "title": "Machine Learning Engineer",
+    "org": "Sample Analytics Ltd",
+    "org_short": "Sample Analytics",
+    "location": "Example City",
+    "start": "2025-08",
+    "end": "present",
+    "source": "Experience / Machine Learning Engineer, Sample Analytics Ltd",
+    "detail": "Retrain and monitor 3 forecasting models each week.",
+    "bullets": [
+      "Retrain and monitor 3 forecasting models each week, with an alert when accuracy drifts by more than 5%.",
+      "Moved model training to a shared pipeline, which cut a retrain from 6 hours to 40 minutes."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "data-science-intern",
+    "lane": "work",
+    "title": "Data Science Intern",
+    "org": "Placeholder Labs",
+    "location": "Remote",
+    "start": "2024-06",
+    "end": "2024-09",
+    "date_style": "full",
+    "source": "Experience / Data Science Intern, Placeholder Labs",
+    "bullets": [
+      "Cleaned and documented 14 example datasets for the lab's first shared data catalogue."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "msc-artificial-intelligence",
+    "lane": "band",
+    "title": "MSc Artificial Intelligence",
+    "org": "Example University",
+    "start": "2023-09",
+    "end": "2025-07",
+    "date_style": "full",
+    "source": "Education / MSc Artificial Intelligence, Example University",
+    "grade": "Distinction",
+    "coursework": ["Machine Learning", "Computer Vision", "Probabilistic Models", "Data Engineering"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-deep-learning",
+    "lane": "certifications",
+    "title": "Example Certificate in Deep Learning",
+    "org": "Example Academy",
+    "start": "2025-02",
+    "end": "2025-02",
+    "source": "Certifications / Example Certificate in Deep Learning",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/deep-learning"}
+    ]
+  },
+  {
+    "id": "cert-mlops",
+    "lane": "certifications",
+    "title": "Example Certificate in MLOps",
+    "org": "Example Academy",
+    "start": "2024-11",
+    "end": "2024-11",
+    "source": "Certifications / Example Certificate in MLOps",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/mlops"}
+    ]
+  }
+]

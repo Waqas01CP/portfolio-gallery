@@ -463,6 +463,47 @@ def file_cases():
     yield ("build: no proof route", build_case('"no_proof": "Checked with the university on request."', '"grade2": "x"'),
            "no proof link")
 
+    # A sample person (ADR-0018): a whole content folder, for a design that
+    # exists and naming it, traced to its own CV like a user's.
+    def plant_sample(copy, name="plain", design=None):
+        folder = copy / "samples" / name
+        folder.mkdir(parents=True, exist_ok=True)
+        for file in ("cv.md", "site.json", "items.json"):
+            shutil.copyfile(copy / "content" / file, folder / file)
+        config = json.loads((copy / "content" / "config.json").read_text(encoding="utf-8"))
+        config.update({"design": design or name, "cv_pdf": "", "cv_source": f"samples/{name}/cv.md"})
+        (folder / "config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
+        return folder
+
+    def sample_case(name, design=None):
+        def plant(copy):
+            plant_sample(copy, name, design)
+            return ["build.py", "--as-of", "2026-10", "--gallery", "--out", copy / "_out"]
+        return plant
+
+    yield ("build: a sample for a design that does not exist", sample_case("ghost"),
+           "shows a design that does not exist")
+    yield "build: a sample naming another design", sample_case("plain", "default"), 'design must be "plain"'
+
+    def sample_trace(copy):
+        folder = plant_sample(copy)
+        edit(folder / "site.json", '"location": "Example City, Exampleland"',
+             '"location": "Elsewhere Town, Exampleland"')
+        out = copy / "_sample"
+        run(copy, "build.py", "--as-of", "2026-10", "--content", folder, "--out", out)
+        return ["tools/check_content.py", "--content", folder, "--page", out / "index.html"]
+
+    yield "trace: a sample person's fact not in their CV", sample_trace, "NOT TRACED"
+
+    def sample_demo(copy):
+        plant_sample(copy)
+        out = copy / "_out"
+        run(copy, "build.py", "--as-of", "2026-10", "--gallery", "--out", out)
+        return ["tools/check_built.py", out]
+
+    yield ("control: a demo shown with its own sample person builds and checks", sample_demo,
+           Passes("0 problem(s)"))
+
     def workflow(old, new):
         def plant(copy):
             edit(copy / ".github/workflows/deploy.yml", old, new)
@@ -924,9 +965,10 @@ KEPT_FOR_BROWSER = ("default", "plain")
 
 def lean(plant):
     def planted(copy: Path):
-        for folder in (copy / "designs").iterdir():
-            if folder.is_dir() and folder.name not in KEPT_FOR_BROWSER:
-                shutil.rmtree(folder)
+        for kind in ("designs", "samples"):
+            for folder in (copy / kind).glob("*"):
+                if folder.is_dir() and folder.name not in KEPT_FOR_BROWSER:
+                    shutil.rmtree(folder)
         return plant(copy)
     return planted
 
