@@ -23,6 +23,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -46,10 +47,17 @@ def tracked() -> list[str]:
     return sorted(set(names) | {p for p in other.stdout.decode().split("\0") if p})
 
 
+def writable(func, path, _error) -> None:
+    """Delete what Windows refuses because it is read-only, as git's own
+    object files are in a copy a case made a repository."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
 def fresh_copy(work: Path) -> Path:
     copy = work / "repo"
     if copy.exists():
-        shutil.rmtree(copy)
+        shutil.rmtree(copy, onexc=writable)
     for name in tracked():
         source = ROOT / name
         if source.is_file():
@@ -938,12 +946,109 @@ def file_cases():
         "    runs-on: ubuntu-24.04\n", "    runs-on: ubuntu-24.04\n    permissions:\n      issues: write\n"),
         "so it may grant itself no permissions")
 
+    def weekly(old, new):
+        def plant(copy):
+            edit(copy / ".github/workflows/checks-weekly.yml", old, new)
+            return ["tools/check_workflows.py"]
+        return plant
+
+    yield ("workflows: the weekly run fetching another axe-core version", weekly(
+        'AXE_VERSION: "4.14.0"', 'AXE_VERSION: "4.13.0"'), "the workflows fetch different axe-core")
+    yield ("workflows: the weekly run checking another SHA-512", weekly(
+        "AXE_SHA512: f564d9c4", "AXE_SHA512: 0564d9c4"), "the workflows fetch different axe-core")
+
     def twice(copy):
         edit(copy / "build.py", '        (staging / ".nojekyll").write_text("", encoding="utf-8")',
              '        (staging / ".nojekyll").write_text(str(__import__("time").time_ns()), encoding="utf-8")')
         return ["tools/ci.py", "checks", "--quick"]
 
     yield "build twice: output that depends on the clock", twice, "two builds of the site differ"
+
+    # The browser checks on what a change touches (ADR-0019). The copy
+    # becomes a repository whose last commit is the change, and `ci.py
+    # changes` names what the browser checks would look at. Each case is a
+    # change a wrong selection would skip, or a doubt that must check every
+    # page. The designs are this tree's, read when the cases are made.
+    everyone = sorted(p.name for p in (ROOT / "designs").iterdir() if (p / "design.json").is_file())
+    alex = [n for n in everyone if not (ROOT / "samples" / n).is_dir()]
+    nobody = f"  check: no design\n  unchanged, passed at the base: {', '.join(everyone)}\n"
+
+    def since(change, before=None, base="HEAD~1"):
+        def plant(copy):
+            env = {**os.environ, "GIT_AUTHOR_NAME": "case", "GIT_AUTHOR_EMAIL": "case@example.com",
+                   "GIT_COMMITTER_NAME": "case", "GIT_COMMITTER_EMAIL": "case@example.com"}
+
+            def git(*args):
+                subprocess.run(["git", *args], cwd=copy, env=env, check=True, capture_output=True)
+            if before:
+                before(copy)
+            git("init", "-q")
+            git("add", "-A")
+            git("commit", "-q", "-m", "base")
+            change(copy)
+            git("add", "-A")
+            git("commit", "-q", "--allow-empty", "-m", "change")
+            return ["tools/ci.py", "changes", "--since", base]
+        return plant
+
+    def drop_availability(folder):
+        def change(copy):
+            path = copy / folder / "site.json"
+            site = json.loads(path.read_text(encoding="utf-8"))
+            del site["availability"]
+            path.write_text(json.dumps(site, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        return change
+
+    def append(path, text):
+        def change(copy):
+            with open(copy / path, "a", encoding="utf-8") as out:
+                out.write(text)
+        return change
+
+    yield ("changes: one design's stylesheet checks that design alone", since(
+        append("designs/plain/design.css", "\n/* a change */\n")), Passes("  check: plain\n"))
+    yield ("changes: the shared sample content checks every design shown with it, and no other", since(
+        drop_availability("content")), Passes(f"  check: {', '.join(alex)}\n"))
+    yield ("changes: a sample person's content checks their design alone", since(
+        drop_availability("samples/latent")), Passes("  check: latent\n"))
+    yield ("changes: a template checks every design", since(
+        append("src/templates/footer.html.j2", "\n")), Passes(f"  check: {', '.join(everyone)}\n"))
+    yield ("changes: the engine's stylesheet checks every page", since(
+        append("src/static/base.css", "\n/* a change */\n")),
+        Passes("every page is checked: the engine's shared files differ"))
+    yield ("changes: a file that decides how pages are checked checks every page", since(
+        append("tools/cdp.py", "\n# a change\n")), Passes("every page is checked: tools/cdp.py changed"))
+    yield ("changes: a base not in the clone checks every page", since(
+        lambda copy: None, base="0123456789abcdef0123456789abcdef01234567"), Passes("is not in this clone"))
+
+    # The gallery build reads every design's design.json, so a broken one
+    # in the base stops the base's build.
+    def broken(copy):
+        path = copy / "designs/plain/design.json"
+        (copy / "_kept.json").write_bytes(path.read_bytes())
+        path.write_text("{", encoding="utf-8")
+
+    def mended(copy):
+        (copy / "_kept.json").replace(copy / "designs/plain/design.json")
+
+    yield ("changes: a base that does not build checks every page", since(mended, before=broken),
+           Passes("does not build"))
+    yield ("changes: a showcase entry checks the gallery page and no design", since(plant_entry),
+           Passes(nobody + "  the gallery page: checked"))
+    yield ("changes: documentation alone checks no page", since(
+        append("docs/reference/commands.md", "\nA change.\n")), Passes(nobody + "  the gallery page: unchanged"))
+
+    def narrowed(*args):
+        def plant(copy):
+            return ["tools/check_browser.py", build_site(copy, "--gallery"), *args]
+        return plant
+
+    yield "browser: a design the gallery lacks", narrowed("--designs", "ghost"), "names no design in this gallery"
+
+    def narrowed_site(copy):
+        return ["tools/check_browser.py", build_site(copy), "--designs", "plain"]
+
+    yield "browser: designs named for a site, not a gallery", narrowed_site, "apply to a built gallery only"
 
 
 def axe_file(argv: list[str]) -> Path | None:
@@ -994,6 +1099,21 @@ def browser_cases(axe: Path | None):
     yield ("words: a design hiding a section", gallery(lambda c: edit(
         c / "designs/plain/design.css", "/* Footer. */", "#skills { display: none; }\n/* Footer. */"), "words"),
            "changes the page's words")
+
+    # A run narrowed to the designs a change touches (ADR-0019) still fails
+    # on a fault in a design it checks; the control shows it checks no other.
+    def narrowed(names):
+        def plant(copy):
+            edit(copy / "designs/plain/design.css", "/* Footer. */",
+                 '.foot-name::after { content: " for hire"; }\n/* Footer. */')
+            out = build_site(copy, "--gallery")
+            return ["tools/check_browser.py", out, "--only", "words", "--quick", "--designs", names,
+                    "--skip-gallery-page"]
+        return plant
+
+    yield "narrowed: a fault in the design checked", narrowed("plain"), "changes the page's words"
+    yield ("control: narrowed, a fault in a design not checked is not looked at", narrowed("default"),
+           Passes("designs not checked, as asked: plain"))
     yield ("requests: a design loading from another origin", gallery(lambda c: edit(
         c / "src/templates/footer.html.j2", "</footer>", '<img src="https://example.org/x.png" alt=""></footer>'),
         "motion"), "from another origin")
@@ -1209,7 +1329,7 @@ def main(argv: list[str]) -> int:
             if not caught:
                 unproven.append(f"{label}: exit {code}\n{text[-1200:]}")
     finally:
-        shutil.rmtree(work, ignore_errors=True)
+        shutil.rmtree(work, onexc=writable)
     print(f"\n{ran} defeat case(s), {passing} planted control(s); {len(unproven)} unproven")
     for item in unproven:
         print(f"\nUNPROVEN {item}")

@@ -1,7 +1,15 @@
 # The content checks (ADR-0006, layer 2): every design, two builds each of
 # the site and the gallery compared byte for byte, the built files, the
-# content trace and the browser checks on every design, axe-core included
-# (ADR-0011).
+# content trace and the browser checks, axe-core included (ADR-0011).
+#
+# The browser checks look only at the pages a change alters (ADR-0019): on
+# a pull request, against the base it merges into; on a push to main,
+# against the main before it. The gallery is built from that base too, and
+# a page whose built files are the same is not checked again. Every page
+# is checked when the checks themselves change, when the base cannot be
+# read or built, and when the run is started by hand (Actions, Checks, Run
+# workflow); checks-weekly.yml checks every page each Monday. The job
+# keeps its name, checks, which the ruleset requires, and always runs.
 #
 # On a pull request from a fork, GitHub runs this with a read-only token and
 # no secrets, from the pull request's own copy of this file and of the
@@ -13,6 +21,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,9 +29,9 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-24.04
-    # The browser checks run every design, about five minutes each on this
-    # machine's runner and the seat's: with twelve designs, near an hour
-    # (2026-10-24). The limit grows with the gallery; the checks never shrink.
+    # A run that checks every page takes about four to five minutes a design
+    # on this runner: 3,020 s for twelve on 2026-10-25. A pull request that
+    # changes one design checks that design's page alone.
     timeout-minutes: 90
     env:
       # Ubuntu 24.04 restricts the user namespaces Chrome's sandbox uses.
@@ -59,5 +68,22 @@ jobs:
             "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
           echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
           tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
-      - name: Run every check, axe included
-        run: .venv/bin/python tools/ci.py checks --axe "$RUNNER_TEMP/package/axe.min.js"
+      # The base to compare with. A pull request's is the merge's first
+      # parent, already here. A push's is the main before it, fetched; a new
+      # branch, or a fetch that fails, leaves none, and every page is
+      # checked. A run started by hand has none either.
+      - name: Find the base this change is compared with
+        id: base
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            echo "since=HEAD^1" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT" = push ] && git fetch --quiet --no-tags --depth=1 origin "$BEFORE"; then
+            echo "since=$BEFORE" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run every check, axe included, the browser checks on what changed
+        env:
+          SINCE: ${{ steps.base.outputs.since }}
+        run: .venv/bin/python tools/ci.py checks --axe "$RUNNER_TEMP/package/axe.min.js" ${SINCE:+--since "$SINCE"}

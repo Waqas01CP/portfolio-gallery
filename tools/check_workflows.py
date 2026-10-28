@@ -26,6 +26,10 @@ at the top and none in its jobs. A scheduled run starts with nobody's
 review, so it may write nothing (ADR-0016, the owner's answer Q2 of
 2026-10-19).
 
+Every workflow that fetches axe-core must pin the same version and
+SHA-512 (AXE_VERSION, AXE_SHA512): the weekly run of every page and the
+checks of each change judge pages by the same rules (ADR-0019).
+
 A workflow that publishes with actions/deploy-pages must ask first
 whether GitHub Pages is on (the owner's decision of 2026-10-23; ADR-0015,
 Changes): a job named pages running `tools/ci.py pages`; the publishing
@@ -344,6 +348,13 @@ def check_file(path: Path) -> list[str]:
     return problems
 
 
+def axe_pin(text: str) -> tuple[str | None, str | None]:
+    """The axe-core version and SHA-512 a workflow fetches, if it does."""
+    version = re.search(r'^\s*AXE_VERSION:\s*"?([^"\s]+)"?\s*$', text, re.M)
+    sha = re.search(r"^\s*AXE_SHA512:\s*([0-9a-f]+)\s*$", text, re.M)
+    return (version.group(1) if version else None, sha.group(1) if sha else None)
+
+
 def main(argv: list[str]) -> int:
     sys.stdout.reconfigure(errors="backslashreplace")
     if any(a.startswith("-") for a in argv):
@@ -355,11 +366,18 @@ def main(argv: list[str]) -> int:
         print(f"no workflow file: {', '.join(missing) or WORKFLOWS}", file=sys.stderr)
         return 2
     problems = []
+    pins = {}
     for path in files:
         found = check_file(path)
         problems += found
         shown = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
         print(f"{'FAIL' if found else 'ok  '} {shown}")
+        pin = axe_pin(path.read_text(encoding="utf-8"))
+        if pin != (None, None):
+            pins[shown] = pin
+    if len(set(pins.values())) > 1:
+        problems.append("the workflows fetch different axe-core: " + "; ".join(
+            f"{shown} {version} {(sha or 'no SHA-512')[:12]}" for shown, (version, sha) in sorted(pins.items())))
     for problem in problems:
         print(f"  {problem}")
     print(f"\n{len(files)} workflow(s), {len(problems)} problem(s)")

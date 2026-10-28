@@ -1,6 +1,7 @@
 """The standing checks that need a browser, run in headless Chrome.
 
   python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAME[,NAME]]
+                                [--designs NAME[,NAME]] [--skip-gallery-page]
 
 Serves a built site or gallery on 127.0.0.1 and checks every page in
 headless Chrome, each in a fresh browsing context of a browser with its
@@ -65,6 +66,11 @@ docs/reference/standing-checks.md with the case built to defeat it.
 --quick runs one load per cell and the narrow width only where a check
 allows it, for iterating; a pass with --quick is not a pass of the
 standing checks.
+
+--designs checks only the named designs' demos in a gallery, and
+--skip-gallery-page leaves out the gallery page's own checks: tools/ci.py
+passes them when a run looks only at what a change alters (ADR-0019). A
+name the gallery lacks is a usage error, so a typo cannot check nothing.
 
 Exit 0 when every check run passes; 1 when any fails, each failure printed
 with its page and cell; 2 when the folder holds no built page. Chrome
@@ -893,6 +899,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--quick", action="store_true")
     parser.add_argument("--axe", type=Path, metavar="FILE", help="axe.min.js, to run axe-core")
     parser.add_argument("--only", help="comma-separated checks to run")
+    parser.add_argument("--designs", metavar="NAME[,NAME]",
+                        help="in a gallery, check only these designs' demos; empty for none")
+    parser.add_argument("--skip-gallery-page", action="store_true",
+                        help="in a gallery, leave out the gallery page's own checks")
     parser.add_argument("--loads", type=int, default=2, help="loads per cell in the tree check")
     # Page text can hold characters the console cannot write, as on Windows;
     # write them escaped rather than stop the report.
@@ -904,11 +914,33 @@ def main(argv: list[str]) -> int:
         return 2
     demos = sorted(p.relative_to(root).as_posix() for p in (root / "designs").glob("*/index.html"))
     gallery = bool(demos)
+    report = Report()
+    page = gallery
+    # A run narrowed to the designs a change touches (tools/ci.py, ADR-0019).
+    # A name the gallery lacks is refused, so a typo cannot check nothing.
+    if args.designs is not None or args.skip_gallery_page:
+        if not gallery:
+            print("--designs and --skip-gallery-page apply to a built gallery only", file=sys.stderr)
+            return 2
+        names = [n for n in args.designs.split(",") if n] if args.designs is not None else None
+        if names is not None:
+            known = {d.split("/")[1] for d in demos}
+            missing = sorted(set(names) - known)
+            if missing:
+                print(f"--designs names no design in this gallery: {', '.join(missing)}", file=sys.stderr)
+                return 2
+            left = sorted(known - set(names))
+            demos = [d for d in demos if d.split("/")[1] in names]
+            if left:
+                report.notes.append(f"designs not checked, as asked: {', '.join(left)}")
+        if args.skip_gallery_page:
+            page = False
+            report.notes.append("the gallery page not checked, as asked")
     sites = demos if gallery else ["index.html"]
+    pages = sites + (["index.html"] if page else [])
     chosen = set(args.only.split(",")) if args.only else {
         "tree", "keyboard", "joins", "anchors", "words", "motion", "packing", "overlay", "axe"}
     loads = 1 if args.quick else args.loads
-    report = Report()
     started = time.monotonic()
     work = Path(tempfile.mkdtemp(prefix="pg-check-"))
     try:
@@ -917,11 +949,12 @@ def main(argv: list[str]) -> int:
         origins = {name: server.origin for name, server in servers.items()}
         try:
             with Chrome() as probe:
-                print(f"{probe.version()}; pages: {', '.join(sites)}{' and the gallery page' if gallery else ''}")
+                print(f"{probe.version()}; pages: {', '.join(sites) or 'no design'}"
+                      f"{' and the gallery page' if page else ''}")
             if "tree" in chosen:
                 check_tree(sites, origins, report, loads, args.quick)
             if "keyboard" in chosen:
-                check_keyboard(sites + (["index.html"] if gallery else []), origins["built"], report, args.quick)
+                check_keyboard(pages, origins["built"], report, args.quick)
             if "joins" in chosen:
                 check_joins(sites, origins["built"], report, args.quick)
             if "anchors" in chosen:
@@ -929,15 +962,15 @@ def main(argv: list[str]) -> int:
             if "words" in chosen and gallery:
                 check_words(demos, origins, report)
             if "motion" in chosen:
-                check_motion(sites + (["index.html"] if gallery else []), origins["built"], report)
-            if "packing" in chosen and gallery:
+                check_motion(pages, origins["built"], report)
+            if "packing" in chosen and page:
                 check_packing(origins["built"], report)
-            if "overlay" in chosen and gallery:
+            if "overlay" in chosen and page:
                 check_overlay(origins["built"], report,
                               args.axe.read_text(encoding="utf-8") if args.axe and "axe" in chosen else None)
             if "axe" in chosen:
                 if args.axe:
-                    check_axe(sites + (["index.html"] if gallery else []), origins["built"], report,
+                    check_axe(pages, origins["built"], report,
                               args.axe.read_text(encoding="utf-8"))
                 else:
                     report.notes.append("axe: not run; pass --axe FILE, axe.min.js fetched as "

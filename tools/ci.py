@@ -19,6 +19,19 @@
       .github/workflows/checks.yml runs this, always with --axe, after
       fetching axe-core and checking its SHA-512 (ADR-0011).
 
+  python tools/ci.py checks --since REF [--quick] [--axe FILE]
+      The same, with the browser checks only on the pages the change since
+      REF alters (ADR-0019): the gallery is built from REF too, and a
+      design's demo is checked when any of its built files or the engine's
+      shared ones differ; the gallery page when it or the showcase does.
+      Every other check runs in full. Every page is checked when a file
+      that decides how pages are checked changed (CHECKING below), or when
+      REF cannot be read or built. checks.yml passes the merge's base on a
+      pull request and the previous main on a push.
+
+  python tools/ci.py changes --since REF
+      Only what `checks --since REF` would check, and why.
+
   python tools/ci.py build --mode site|gallery [--out DIR]
       The deploy workflow's build: the site, or the gallery, built and its
       files checked, with the content trace for a site. No browser.
@@ -63,6 +76,7 @@ from __future__ import annotations
 
 import argparse
 import filecmp
+import io
 import json
 import os
 import re
@@ -70,6 +84,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import tarfile
 import tempfile
 import urllib.error
 import urllib.request
@@ -96,6 +111,13 @@ PAGES_OFF_STEPS = ("In this repository: Settings, then Pages, and under Build an
                    "GitHub Actions. Then Actions, Deploy, Run workflow, or commit any change: the next run "
                    "publishes.")
 PAGES_SETTING = "Settings, Pages, Build and deployment, Source: GitHub Actions"
+
+# The files that decide how a page is checked rather than what it is: a
+# change to any of them means every page is checked (ADR-0019). The pages
+# themselves are compared as built, so the engine, the designs, the content
+# and the samples need no entry here.
+CHECKING = ("build.py", "requirements.txt", "tools/ci.py", "tools/check_browser.py", "tools/cdp.py",
+            ".github/workflows/checks.yml")
 
 
 def pages_verdict(mode: str, status: int, build_type: str | None) -> tuple[str, str]:
@@ -182,7 +204,98 @@ def twice(as_of: str, *mode: str) -> None:
         print(f"=== two builds of {what}: {count} files, byte-identical")
 
 
-def checks(quick: bool, axe: Path | None) -> None:
+class Selection:
+    """What the browser checks look at after a change (ADR-0019): every page,
+    with the reason; or the designs whose demos changed, those that did not,
+    and whether the gallery page did."""
+
+    def __init__(self, reason: str = "", check: list[str] | None = None,
+                 unchanged: list[str] | None = None, page: bool = True) -> None:
+        self.everything = check is None
+        self.reason = reason
+        self.check = check or []
+        self.unchanged = unchanged or []
+        self.page = page
+
+    def lines(self, base: str) -> list[str]:
+        if self.everything:
+            return [f"since {base}: every page is checked: {self.reason}"]
+        return [f"since {base}:",
+                f"  check: {', '.join(self.check) or 'no design'}",
+                f"  unchanged, passed at the base: {', '.join(self.unchanged) or 'none'}",
+                f"  the gallery page: {'checked' if self.page else 'unchanged'}"]
+
+
+def git(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True)
+
+
+def differs(a: Path, b: Path) -> bool:
+    """Whether two built folders differ, a missing one counting as different."""
+    return not (a.is_dir() and b.is_dir()) or bool(same_tree(a, b))
+
+
+def select(since: str, as_of: str, gallery: Path) -> Selection:
+    """Compare the gallery built from this tree with the one built from
+    `since`. Any doubt checks every page: the base unreadable or unbuildable,
+    or a change to how pages are checked."""
+    found = git("rev-parse", "--verify", "--quiet", f"{since}^{{commit}}")
+    if found.returncode != 0:
+        return Selection(f"the base {since} is not in this clone")
+    sha = found.stdout.decode().strip()
+    # Names separated by NUL, so a name with spaces, as a screenshot's often
+    # has, or one git would quote, stays whole.
+    listed = git("diff", "--name-only", "-z", sha)
+    extra = git("ls-files", "--others", "--exclude-standard", "-z")
+    if listed.returncode != 0 or extra.returncode != 0:
+        return Selection("git could not list what changed")
+    changed = {n for n in (listed.stdout + extra.stdout).decode("utf-8", "surrogateescape").split("\0") if n}
+    deciding = sorted(changed & set(CHECKING))
+    if deciding:
+        return Selection(f"{', '.join(deciding)} changed, which decides how pages are checked")
+    with tempfile.TemporaryDirectory(prefix="pg-base-") as tmp:
+        source, out = Path(tmp) / "source", Path(tmp) / "out"
+        tree = git("archive", "--format=tar", sha)
+        if tree.returncode != 0:
+            return Selection(f"git could not read the base {sha[:7]}")
+        with tarfile.open(fileobj=io.BytesIO(tree.stdout)) as tar:
+            tar.extractall(source, filter="data")
+        built = subprocess.run([sys.executable, "build.py", "--as-of", as_of, "--gallery", "--out", str(out)],
+                               cwd=source, capture_output=True, text=True)
+        if built.returncode != 0:
+            last = (built.stdout + built.stderr).strip().splitlines()[-1:] or ["no output"]
+            return Selection(f"the base {sha[:7]} does not build: {last[0]}")
+        if differs(gallery / "static", out / "static"):
+            return Selection("the engine's shared files differ")
+        names = sorted(p.parent.name for p in (gallery / "designs").glob("*/index.html"))
+        check = [n for n in names if differs(gallery / "designs" / n, out / "designs" / n)]
+        # The gallery page: its own files, everything outside designs/, and
+        # the showcase's sources, whose served copies the screenshots make.
+        def outside(root: Path) -> set[str]:
+            return {p.relative_to(root).as_posix() for p in root.rglob("*")
+                    if p.is_file() and p.relative_to(root).parts[0] != "designs"}
+        here, there = outside(gallery), outside(out)
+        page = (here != there or any(not filecmp.cmp(gallery / n, out / n, shallow=False) for n in here)
+                or any(n.startswith("showcase/") for n in changed))
+        return Selection(check=check, unchanged=[n for n in names if n not in check], page=page)
+
+
+def chosen(since: str | None, as_of: str, gallery: Path) -> Selection | None:
+    """The selection for a run, printed, and written to the run's summary on
+    GitHub; None for a run with no base, which checks every page."""
+    if not since:
+        return None
+    selection = select(since, as_of, gallery)
+    lines = selection.lines(since)
+    print("\n=== the browser checks, " + "\n".join(lines), flush=True)
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as out:
+            out.write("### What the browser checks looked at\n\n" + "\n".join(lines) + "\n")
+    return selection
+
+
+def checks(quick: bool, axe: Path | None, since: str | None = None) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
     run("tools/check_workflows.py")
     run("tools/check_design.py")
@@ -211,6 +324,8 @@ def checks(quick: bool, axe: Path | None) -> None:
         run("tools/check_content.py", "--content", folder, "--page", own / "index.html")
     run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
     run("tools/check_built.py", gallery)
+    # Compared before the pictures are added to it, as the base is built.
+    selection = chosen(since, as_of, gallery)
     # The pictures, as the deploy's screenshot job makes them: so a
     # showcase screenshot Chrome cannot read fails here, on its pull
     # request, before it can reach main (ADR-0016, Changes, 2026-10-20).
@@ -227,6 +342,13 @@ def checks(quick: bool, axe: Path | None) -> None:
         browser.append("--quick")
     if axe:
         browser += ["--axe", axe]
+    if selection and not selection.everything:
+        if not selection.check and not selection.page:
+            print("\n=== the browser checks: no page changed; nothing to check")
+            return
+        browser += ["--designs", ",".join(selection.check)]
+        if not selection.page:
+            browser.append("--skip-gallery-page")
     run(*browser)
 
 
@@ -342,6 +464,9 @@ def main(argv: list[str]) -> int:
     c = sub.add_parser("checks")
     c.add_argument("--quick", action="store_true")
     c.add_argument("--axe", type=Path)
+    c.add_argument("--since", metavar="REF")
+    w = sub.add_parser("changes")
+    w.add_argument("--since", metavar="REF", required=True)
     b = sub.add_parser("build")
     b.add_argument("--mode", choices=("site", "gallery"), required=True)
     b.add_argument("--out", type=Path, default=ROOT / "_site")
@@ -355,7 +480,13 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "checks":
-            checks(args.quick, args.axe)
+            checks(args.quick, args.axe, args.since)
+        elif args.command == "changes":
+            as_of = datetime.now(timezone.utc).strftime("%Y-%m")
+            with tempfile.TemporaryDirectory(prefix="pg-head-") as tmp:
+                run("build.py", "--as-of", as_of, "--gallery", "--out", Path(tmp) / "gallery")
+                chosen(args.since, as_of, Path(tmp) / "gallery")
+            return 0
         elif args.command == "build":
             build(args.mode, args.out.resolve())
         elif args.command == "pictures":

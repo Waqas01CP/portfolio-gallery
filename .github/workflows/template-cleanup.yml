@@ -53,13 +53,13 @@ jobs:
         if: ${{ steps.clean.outputs.cleaned == 'true' }}
         run: |
           git rm -q --ignore-unmatch .github/workflows/scope.yml .github/workflows/showcase-links.yml \
-            .github/workflows/template-cleanup.yml
+            .github/workflows/checks-weekly.yml .github/workflows/template-cleanup.yml
           if git diff --cached --quiet; then exit 0; fi
           git -c user.name="github-actions[bot]" \
             -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "Make it yours: remove portfolio-gallery's own workflows"
           if git push; then
-            echo "::notice::Removed scope.yml, showcase-links.yml and template-cleanup.yml."
+            echo "::notice::Removed scope.yml, showcase-links.yml, checks-weekly.yml and template-cleanup.yml."
           else
-            echo "::notice::GitHub did not let this workflow's token change workflow files, so scope.yml, showcase-links.yml and template-cleanup.yml stay. Each runs nothing in a copy; delete them by hand if you like."
+            echo "::notice::GitHub did not let this workflow's token change workflow files, so scope.yml, showcase-links.yml, checks-weekly.yml and template-cleanup.yml stay. Each runs nothing in a copy; delete them by hand if you like."
           fi

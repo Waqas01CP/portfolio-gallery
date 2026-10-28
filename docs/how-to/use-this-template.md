@@ -82,8 +82,9 @@ these yourself, the first two above all:
    and its `copy-AGENTS.md` over `AGENTS.md`, your copy's own, which
    point you and any AI assistant to the right files; then delete
    `.github/template-cleanup/`, and the project's own workflows,
-   `.github/workflows/scope.yml`, `.github/workflows/showcase-links.yml`
-   and `.github/workflows/template-cleanup.yml`.
+   `.github/workflows/scope.yml`, `.github/workflows/showcase-links.yml`,
+   `.github/workflows/checks-weekly.yml` and
+   `.github/workflows/template-cleanup.yml`.
 
 Each path, with why it goes, is listed in
 `.github/template-cleanup/remove.txt`. Keep `LICENSE`: the MIT
