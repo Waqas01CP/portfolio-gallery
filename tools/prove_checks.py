@@ -521,6 +521,23 @@ def file_cases():
     yield ("control: a demo shown with its own sample person builds and checks", sample_demo,
            Passes("0 problem(s)"))
 
+    # A section with nothing to show is left out, menu entry and all
+    # (docs/reference/content.md): a site with no certificates builds and
+    # traces. Until 2026-10-28 the template asked about the missing section
+    # and the build failed.
+    def no_certificates(copy):
+        path = copy / "content/items.json"
+        items = json.loads(path.read_text(encoding="utf-8"))
+        path.write_text(json.dumps([i for i in items if i["lane"] != "certifications"], indent=2), encoding="utf-8")
+        cv = copy / "content/cv.md"
+        text = cv.read_text(encoding="utf-8")
+        start, end = text.index("## Certifications"), text.index("## Skills")
+        cv.write_text(text[:start] + text[end:], encoding="utf-8")
+        out = build_site(copy)
+        return ["tools/check_content.py", "--page", out / "index.html"]
+
+    yield "control: a site with no certificates builds and traces", no_certificates, Passes("PASS")
+
     def workflow(old, new):
         def plant(copy):
             edit(copy / ".github/workflows/deploy.yml", old, new)
