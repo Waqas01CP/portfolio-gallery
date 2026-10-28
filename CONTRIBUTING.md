@@ -71,7 +71,8 @@ They run on every pull request, and every one must pass before a review:
   hide content nor add text of its own); the page a screen reader meets
   at load is the page it meets later; every "In depth" panel works by
   keyboard; no words run together for a screen reader; links land where
-  they point; nothing moves when a visitor has asked for reduced motion.
+  they point; nothing moves when a visitor has asked for reduced motion;
+  no page scrolls sideways, on a phone 320 px wide or on a wide screen.
 
 Every check, and the case built to make it fail, is in
 [docs/reference/standing-checks.md](docs/reference/standing-checks.md).

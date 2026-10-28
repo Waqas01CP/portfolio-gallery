@@ -57,7 +57,8 @@ request 21; ADR-0018). The first contribution from outside, a showcase
 entry, merged in pull request 22, CODEOWNERS asking the owner's review.
 On the branch checks-for-changes, not yet pushed: the browser checks look
 only at the pages a change alters, every page by hand and each Monday
-(ADR-0019). Waiting: his push of it; five more designs for professions,
+(ADR-0019); on width-check, cut from it, a standing check that no page
+scrolls sideways (ADR-0009, Changes). Waiting: his push of it; five more designs for professions,
 approved 2026-10-28 and being built; step 5's policy, provable only on or
 after 2026-11-02; ADR-0012, held.
 
@@ -73,7 +74,6 @@ after 2026-11-02; ADR-0012, held.
 |---|---|---|---|---|
 | Lighthouse in CI | PENDING | held as proposed by the owner; speed measured locally | 2026-10-15 | ADR-0012 |
 | Five more designs for professions, each at least 60 to 75 percent distinct from every other design | PENDING | the owner's request of 2026-10-28, which raises the bar from three of five dimensions; the five proposed that day approved by him the same day ("only final look can tell"), each person's sections as their profession's portfolio has them; being built | 2026-10-28 | 2026-10-12-brief-1-build.md, Round 16 |
-| A standing check that no page scrolls sideways | PENDING | recommended in Report 14: Poster scrolled sideways at 360 px and no check measures width; it would bind contributors' designs too, so it waits on the chat and the owner | 2026-10-24 | 2026-10-12-brief-1-build.md, Round 14 |
 
 ## Built, not yet complete
 
@@ -82,6 +82,7 @@ DONE rows are in docs/reference/completed.md.
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
 | Checks on what a change alters: the browser checks of a pull request or push only on the pages whose built files differ from the base's; every page when the checks change, the base cannot be read or built, by hand, and each Monday | PARTIAL | [VERIFIED] the selection's defeat cases, a narrowed run's case and control, and a one-design change through the whole run (362 s against 3,676 s for every page); [BELIEVED] on GitHub until the branch merges: the base fetched on a push, the run's summary, the weekly workflow. Phase 2, a run of every page in parallel jobs, before about 19 designs | 2026-10-28 | 27db869; ADR-0019 |
+| No page scrolls sideways: a standing check on every design and the gallery page, at 320, 360 and 390 px, 1080 by 1920 and 1366 px, every section laid out, scripts on and off | PARTIAL | [VERIFIED] the twelve designs and the gallery page pass, 130 runs in 110 s; its defeat case (a 1400 px element) fails and its control (the same in a box that scrolls itself) passes; [BELIEVED] on GitHub's runner until its pull request runs | 2026-10-28 | ADR-0009, Changes; 2026-10-12-brief-1-build.md, Round 18 |
 | CODEOWNERS and the issue templates | PARTIAL | [VERIFIED] CODEOWNERS asked the owner's review the moment pull request 22, the first from outside, opened, and its author filled the pull request template's showcase section (GitHub's API); [BELIEVED] the issue templates, which no one has used yet | 2026-10-28 | b798834; pull request 22 |
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
 | The README's routes and prompt; the Showcase entry and Question forms | PARTIAL | [VERIFIED] the prompt check and its defeat cases; on main, GitHub's own page serves the prompt's block with its copy button's text and the three pictures through its image proxy (2026-10-23); the forms parsed; [BELIEVED] the four forms in the issue chooser, which needs a sign-in, until the owner looks | 2026-10-23 | 0ce2c71, pull request 15; ADR-0017 |
@@ -92,7 +93,7 @@ DONE rows are in docs/reference/completed.md.
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging checks-for-changes, after records-after-merges | The owner's push and merge | The owner | 2026-10-28 |
+| Merging checks-for-changes, then width-check | The owner's push and merge | The owner | 2026-10-28 |
 
 ## Known unverified
 

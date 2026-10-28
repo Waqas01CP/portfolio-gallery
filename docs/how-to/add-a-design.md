@@ -72,6 +72,8 @@ Things the checks will refuse, so you need not find out from them: SVG,
 any script, `@import`, a `url()` that is not `fonts/...` or `img/...` in
 your folder, and generated text (`content: "..."` with words in it). For a
 decorative glyph, give it empty alternative text: `content: "+" / "";`.
+And a page that scrolls sideways at any width from 320 px up: check yours
+on a narrow phone with every section open.
 
 ## 3. Build and look at it
 

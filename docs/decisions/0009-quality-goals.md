@@ -105,3 +105,4 @@ machine in CAPABILITIES.md.
 | Date | Change | Why |
 |---|---|---|
 | 2026-10-15 | **Accepted** by the owner, unchanged. With ADR-0011 accepted the same day, contrast is checked in CI by axe-core; Consequences' "until ADR-0011 and ADR-0012 are accepted, contrast and speed are checked locally" now holds for speed only, while ADR-0012 is proposed. | His answer 7 to the seat's report of 2026-10-13, checked with the portfolio architecture chat. |
+| 2026-10-28 | **No page scrolls sideways**, a standing check in tools/check_browser.py for every design: at 320, 360 and 390 px, at 1080 by 1920 and at 1366 px, every section laid out, scripts on and off. | Poster in Round 14 and Sentinel in Round 15 scrolled sideways on a phone, found only by eye; the seat recommended the check in Report 14, and the owner approved building it on 2026-10-28 UTC. |

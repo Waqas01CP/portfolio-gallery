@@ -3062,3 +3062,38 @@ final job still named checks, before about 19 designs.
   main, the run's summary, and checks-weekly.yml, which runs from main.
 - Nothing pushed: checks-for-changes waits on the owner, after
   records-after-merges.
+
+# Round 18, 2026-10-28 UTC: a standing check that no page scrolls sideways
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch width-check, cut from checks-for-changes.
+Mode: mutating. No brief: the owner's answer of 2026-10-28 UTC to Round
+16's question 3, "yes, you can build them if feasible", which covers the
+check recommended in Report 14 after Poster (Round 14) and Sentinel
+(Round 15) scrolled sideways on a phone, each found only by eye.
+
+## What was built
+
+- tools/check_browser.py, `width`: each page loaded once with scripts and
+  once without, every section laid out, then set to 320, 360 and 390 px,
+  1080 by 1920 and 1366 px; it fails when the document is wider than the
+  window, naming the deepest elements past the edge. A box that scrolls
+  inside itself passes. It runs on every design a change alters and on
+  the gallery page, as every browser check does since ADR-0019.
+- docs: standing-checks.md, design-contract.md (the rule and its usual
+  cures), add-a-design.md, CONTRIBUTING.md; ADR-0009, Changes.
+
+## Proofs
+
+- On the twelve designs and the gallery page, built from this tree: 130
+  runs, 0 failures, in 110 s.
+- Its defeat case, Plain's footer name set 1400 px wide, fails with "the
+  page scrolls"; its control, the same inside a footer that scrolls
+  itself, passes; each on a fresh copy, in 22 s and 19 s.
+- The checks themselves change in this branch, so its run on GitHub
+  checks every page.
+
+## Not done
+
+- Nothing pushed: width-check waits on the owner, after
+  checks-for-changes.

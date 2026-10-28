@@ -178,5 +178,10 @@ transitions.
   with swap, and none in 272 loads with optional (2026-10-12 and 13;
   ADR-0014).
 - **Nothing moves under reduced motion**, whatever `!important` says.
+- **No page scrolls sideways**, at any width from 320 px to 1366 px nor on
+  a desktop screen turned upright, 1080 by 1920, with every section open.
+  A long word, a wide title or a fixed width breaks it; `overflow-wrap:
+  anywhere` and `clamp()` for large type are the usual cures. A box that
+  scrolls inside itself, `overflow-x: auto`, is allowed.
 - One "Sections" menu at each width; anchors land at their target; no
   request leaves the site.

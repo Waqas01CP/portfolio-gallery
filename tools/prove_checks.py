@@ -1120,6 +1120,16 @@ def browser_cases(axe: Path | None):
                     "--skip-gallery-page"]
         return plant
 
+    # No page scrolls sideways (the owner's approval of 2026-10-28; Poster
+    # and Sentinel each did on a phone in Rounds 14 and 15, found by eye).
+    yield ("width: a design's element wider than the window", gallery(lambda c: edit(
+        c / "designs/plain/design.css", "/* Footer. */", ".foot-name { display: block; width: 1400px; }\n/* Footer. */"),
+        "width"), "the page scrolls")
+    yield ("control: width, the same element in a box that scrolls itself", gallery(lambda c: edit(
+        c / "designs/plain/design.css", "/* Footer. */",
+        ".foot { overflow-x: auto; } .foot-name { display: block; width: 1400px; }\n/* Footer. */"), "width"),
+        Passes("PASS"))
+
     yield "narrowed: a fault in the design checked", narrowed("plain"), "changes the page's words"
     yield ("control: narrowed, a fault in a design not checked is not looked at", narrowed("default"),
            Passes("designs not checked, as asked: plain"))
