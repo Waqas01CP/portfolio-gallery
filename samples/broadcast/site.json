@@ -1,0 +1,58 @@
+{
+  "name": "Drew Helloworld",
+  "headline": ["Developer advocate", "Talks and workshops", "Sample apps", "Developer community"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to developer relations roles",
+  "summary": "Developer advocate who teaches by building in public. Turns an API into a working sample app, a talk and a tutorial, and counts what developers build afterwards, not only who listened.",
+  "intro": "This is a sample portfolio. Drew Helloworld is an invented person, and every employer, school, event and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "hello-maps",
+      "from": "hello-maps/bullets/1",
+      "before": "Copied as a starting point by",
+      "figure": "2,400",
+      "text": "developers in 6 months"
+    },
+    {
+      "item": "hello-maps",
+      "from": "hello-maps/bullets/2",
+      "before": "Cut questions about first setup by",
+      "figure": "40%",
+      "text": "in the community forum"
+    },
+    {
+      "item": "ship-week",
+      "from": "ship-week/bullets/2",
+      "before": "Watched by",
+      "figure": "31,000",
+      "text": "people across 20 episodes"
+    },
+    {
+      "item": "developer-advocate",
+      "from": "developer-advocate/bullets/1",
+      "before": "Build sample apps for an example maps API used by",
+      "figure": "9,000",
+      "text": "developers"
+    }
+  ],
+  "feature": {
+    "item": "hello-maps",
+    "from": "hello-maps/bullets/3",
+    "label": "Shown live",
+    "figure": "14 talks",
+    "text": "at example meetups and conferences",
+    "note": "each with the code on screen."
+  },
+  "skills": [
+    {"label": "Teaching", "items": ["Talks", "Workshops", "Tutorials", "Live coding"]},
+    {"label": "Building", "items": ["TypeScript", "Python", "Next.js", "FastAPI"]},
+    {"label": "Community", "items": ["Forums", "Meetups", "Feedback loops"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:drew@example.com", "text": "drew@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Talks, posts and tutorials."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Sample apps and workshop kits."},
+    {"label": "Talks", "url": "https://example.com/talks", "text": "example.com/talks", "line": "Slides and recordings of every talk."},
+    {"label": "Newsletter", "url": "https://example.com/newsletter", "text": "example.com/newsletter", "line": "A monthly letter on what developers asked."}
+  ]
+}

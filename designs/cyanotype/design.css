@@ -1,0 +1,434 @@
+/* Cyanotype: a portfolio for embedded and robotics work, drawn as an
+   engineering sheet. White line on cyanotype blue grid paper, inside a
+   double frame. The figures sit as components on a circuit board drawn in
+   CSS, each with a numbered balloon; projects are detail views with a
+   hatched corner and their dates on a dimension line; the history is a
+   revision table, the skills a parts list, the contact routes an approval
+   stamp. On a wide screen the menu is the drawing's title block, held in
+   the bottom right corner; below that width, a title strip along the
+   bottom. One theme, blue.
+
+   One font file, Architects Daughter, an architect's hand lettering, for
+   titles and the name, preloaded and shown with font-display: optional
+   (ADR-0014); text in the system's sans. Dimension lines draw themselves
+   as they scroll into view where the browser can tie an animation to
+   scrolling, and stay drawn under reduced motion. It styles the engine's
+   fixed HTML (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Architects Daughter";
+  src: url("fonts/architects-daughter-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: optional;
+}
+
+:root {
+  --paper: #1B4D8A;     /* cyanotype blue */
+  --deep: #123A6B;      /* panels, the title block */
+  --ink: #FFFFFF;
+  --soft: #D6E6F8;      /* 7.0:1 on the paper */
+  --pencil: #FFE27A;    /* what matters: 9.6:1 on the paper */
+  --rule: rgba(255, 255, 255, 0.78);
+  --grid: rgba(255, 255, 255, 0.075);
+  --grid-major: rgba(255, 255, 255, 0.14);
+  --hand: "Architects Daughter", "Segoe Print", "Comic Sans MS", cursive;
+  --sans: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --block: 0px;          /* the title strip's height, below its width */
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-bottom: calc(var(--block) + 16px); }
+body {
+  margin: 0;
+  padding: 18px 18px calc(var(--block) + 18px);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -1px -1px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+}
+/* The sheet's double frame, with zone ticks along its top and bottom. */
+main {
+  display: block;
+  border: 2px solid var(--rule);
+  outline: 1px solid var(--rule);
+  outline-offset: 5px;
+  background-image:
+    repeating-linear-gradient(90deg, var(--rule) 0 2px, transparent 2px 120px),
+    repeating-linear-gradient(90deg, var(--rule) 0 2px, transparent 2px 120px);
+  background-size: 100% 10px, 100% 10px;
+  background-position: 59px top, 59px bottom;
+  background-repeat: no-repeat;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--pencil); }
+:focus-visible { outline: 2px solid var(--pencil); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+strong { font-weight: 700; color: var(--pencil); }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 52px); }
+.skip { padding: 10px 16px; background: var(--pencil); color: var(--deep); font-weight: 700; }
+.skip:focus { color: var(--deep); }
+.proj, .job, .degree, .cert { scroll-margin-top: 20px; }
+
+/* Labels: small monospace capitals. */
+.result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-dates,
+.degree-courses h4, .cert-view, .foot-credit, .facts, .strip-static {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .route-top, .avail-dot { display: none; }
+
+/* Buttons: outlined boxes, the first in pencil. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: var(--deep); color: var(--pencil); }
+.btn-acc { border-color: var(--pencil); background: var(--pencil); color: var(--deep); }
+.btn-acc:hover { background: var(--ink); border-color: var(--ink); color: var(--deep); }
+.btn-sm, .depth-toggle { min-height: 38px; padding: 0 14px; font-size: 14px; }
+.depth-toggle::after { content: "+" / ""; font-family: var(--mono); }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { padding: 1px 10px; border: 1px solid var(--rule); font-family: var(--mono); font-size: 13px; }
+
+/* The menu. Below 1200 px: a title strip fixed along the bottom, its
+   entries in a row that scrolls inside the strip. */
+.dnav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: var(--deep);
+  border-top: 2px solid var(--rule);
+}
+.dnav-list { list-style: none; margin: 0; padding: 0 8px; display: flex; overflow-x: auto; scrollbar-width: thin; counter-reset: zone; }
+.dnav-list li { flex: none; counter-increment: zone; }
+.dnav-list a { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; color: var(--soft); font-family: var(--hand); font-size: 17px; text-decoration: none; border-right: 1px solid rgba(255, 255, 255, 0.25); }
+.dnav-list a::before { content: counter(zone, upper-alpha) / ""; display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--rule); border-radius: 50%; font-family: var(--mono); font-size: 11px; }
+.dnav-list a:hover { color: var(--pencil); }
+.dnav-list a[aria-current] { color: var(--pencil); background: rgba(255, 255, 255, 0.06); }
+:root { --block: 50px; }
+
+/* From 1200 px: the title block, a ruled table in the corner. */
+@media (min-width: 1200px) {
+  :root { --block: 0px; }
+  .dnav {
+    left: auto;
+    right: 30px;
+    bottom: 30px;
+    width: 300px;
+    border: 2px solid var(--rule);
+    box-shadow: 0 0 0 4px var(--deep), 0 0 0 5px var(--rule);
+  }
+  .dnav-list { display: grid; grid-template-columns: 1fr 1fr; padding: 0; overflow: visible; }
+  .dnav-list a { min-height: 40px; border-right: 1px solid rgba(255, 255, 255, 0.3); border-bottom: 1px solid rgba(255, 255, 255, 0.3); font-size: 16px; }
+  .dnav-list li:nth-child(2n) a { border-right: 0; }
+  .wrap { max-width: none; margin: 0 360px 0 clamp(32px, 5vw, 80px); padding: 0; }
+  .foot { padding-right: 360px; }
+}
+
+/* The Intro: the name lettered over a board. */
+.intro { padding: clamp(36px, 5vw, 64px) 0 0; }
+.avail { display: inline-block; padding: 2px 10px; border: 1px solid var(--pencil); color: var(--pencil); font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; }
+.intro-name { margin-top: 18px; font-family: var(--hand); font-weight: 400; font-size: clamp(42px, 7vw, 88px); line-height: 1.02; overflow-wrap: anywhere; }
+.intro-name .serif { color: var(--pencil); }
+/* The name underlined by a dimension line, arrowheads at both ends. */
+.intro-name::after {
+  content: "" / "";
+  display: block;
+  height: 12px;
+  margin-top: 10px;
+  max-width: 560px;
+  background:
+    linear-gradient(var(--rule), var(--rule)) center / calc(100% - 20px) 1px no-repeat,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) left / 1px 100% no-repeat,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) right / 1px 100% no-repeat;
+}
+.headline { margin-top: 14px; font-size: 19px; color: var(--soft); }
+.sep { color: var(--pencil); }
+.intro-grid { display: grid; gap: 32px; margin-top: 30px; }
+.intro-main { min-width: 0; }
+/* The facts as numbered drawing notes. */
+.facts { list-style: none; margin: 0; padding: 0; counter-reset: note; color: var(--soft); }
+.facts li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr); counter-increment: note; }
+.facts li::before { content: counter(note) "." / ""; color: var(--pencil); }
+.arrow { display: none; }
+.lede { margin-top: 14px; max-width: 60ch; }
+.cta { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* The board: the figures as components on a circuit board, with mounting
+   holes in its corners and a dimension line along its top. */
+.results {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 34px 22px 26px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 26px 22px;
+  border: 2px solid var(--rule);
+  border-radius: 22px;
+  counter-reset: balloon;
+  background:
+    radial-gradient(circle at 18px 18px, transparent 6px, var(--rule) 6px 7px, transparent 7px),
+    radial-gradient(circle at calc(100% - 18px) 18px, transparent 6px, var(--rule) 6px 7px, transparent 7px),
+    radial-gradient(circle at 18px calc(100% - 18px), transparent 6px, var(--rule) 6px 7px, transparent 7px),
+    radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), transparent 6px, var(--rule) 6px 7px, transparent 7px),
+    rgba(18, 58, 107, 0.55);
+}
+.results::before {
+  content: "" / "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -20px;
+  height: 10px;
+  background:
+    linear-gradient(var(--rule), var(--rule)) center / 100% 1px no-repeat,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) left / 1px 100% no-repeat,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) right / 1px 100% no-repeat;
+}
+/* Each figure a chip package: pins down both sides, a balloon number. */
+.result {
+  position: relative;
+  counter-increment: balloon;
+  padding: 14px 16px 14px;
+  border: 1.5px solid var(--rule);
+  background:
+    repeating-linear-gradient(180deg, var(--rule) 0 3px, transparent 3px 11px) left 6px top 10px / 6px calc(100% - 20px) no-repeat,
+    repeating-linear-gradient(180deg, var(--rule) 0 3px, transparent 3px 11px) right 6px top 10px / 6px calc(100% - 20px) no-repeat;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+.result::before {
+  content: counter(balloon) / "";
+  position: absolute;
+  top: -15px;
+  right: -12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--pencil);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--pencil);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.result-label { color: var(--soft); }
+.result-fig { margin-top: 4px; display: flex; flex-direction: column; font-size: 14px; color: var(--soft); }
+.result-num, .result-word { font-family: var(--hand); font-size: 34px; line-height: 1.1; color: var(--ink); }
+.result-suffix { font-size: 0.6em; }
+
+/* The revision strip under the Intro. */
+.strip { margin-top: clamp(32px, 4vw, 48px); border-top: 2px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.strip-static { display: flex; flex-wrap: wrap; gap: 4px 28px; padding: 10px 0; color: var(--soft); }
+
+@media (min-width: 900px) {
+  .intro-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; gap: 48px; }
+  .results { margin-top: 10px; }
+}
+
+/* Sections: each a detail view, its title lettered over a double rule. */
+.sec { padding: clamp(52px, 6vw, 84px) 0 0; }
+.sec-last { padding-bottom: clamp(52px, 6vw, 84px); }
+.sec-head { margin-bottom: 26px; padding-bottom: 10px; border-bottom: 3px double var(--rule); }
+.sec-title { display: flex; align-items: center; gap: 14px; }
+.sec-n { order: -1; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--rule); border-radius: 50%; font-family: var(--mono); font-size: 14px; color: var(--pencil); }
+.sec-title h2 { font-family: var(--hand); font-weight: 400; font-size: clamp(32px, 4vw, 46px); line-height: 1.1; }
+
+/* Projects. */
+.feature { position: relative; margin-bottom: 28px; padding: 22px 24px; border: 2px dashed var(--pencil); display: grid; gap: 4px; }
+.feature-label { color: var(--pencil); }
+.feature-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; }
+.feature-num { font-family: var(--hand); font-size: clamp(54px, 7vw, 84px); line-height: 1; color: var(--pencil); }
+.feature-text { font-size: 21px; font-weight: 600; }
+.feature-pairs { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 24px; }
+.feature-pairs .num { font-weight: 700; color: var(--pencil); }
+.feature-note { color: var(--soft); }
+.proj-grid { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
+.proj {
+  position: relative;
+  padding: 26px 22px 22px;
+  border: 2px solid var(--rule);
+  background: rgba(18, 58, 107, 0.45);
+}
+/* The section-cut hatch in the corner. */
+.proj::after {
+  content: "" / "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+  height: 64px;
+  border-left: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(255, 255, 255, 0.35) 6px 7px);
+  pointer-events: none;
+}
+.proj-head { padding-right: 60px; }
+/* The dates on a dimension line, arrowheads at both ends. */
+.proj-dates { display: flex; align-items: center; gap: 10px; color: var(--pencil); }
+.proj-dates::before, .proj-dates::after { content: "" / ""; flex: 1 1 24px; min-width: 18px; height: 9px; background: linear-gradient(var(--pencil), var(--pencil)) center / 100% 1px no-repeat; }
+.proj-dates::before { border-left: 1px solid var(--pencil); }
+.proj-dates::after { border-right: 1px solid var(--pencil); }
+.proj h3 { margin-top: 10px; font-family: var(--hand); font-weight: 400; font-size: 27px; line-height: 1.15; }
+.proj.is-open h3 { color: var(--pencil); }
+.proj-sub { color: var(--soft); }
+.proj-summary { margin-top: 10px; }
+.proj-side { margin-top: 16px; display: grid; gap: 12px; }
+.proj-fact { font-weight: 600; }
+.proj-fact::before { content: "\2192  " / ""; white-space: pre; color: var(--pencil); }
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { grid-column: 1 / -1; padding: 22px 24px; border: 2px dashed var(--rule); background: var(--deep); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.depth-head h3 { font-family: var(--hand); font-weight: 400; font-size: 26px; }
+.depth-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 3em minmax(0, 1fr); padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.25); }
+.depth-n { font-family: var(--mono); font-size: 13px; color: var(--pencil); padding-top: 3px; }
+
+/* Timeline: a revision table, one row per entry. */
+.tl-lanes { margin-bottom: 16px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-filter { min-height: 38px; font-size: 14px; }
+.tl-filter .shape { width: 10px; height: 10px; border: 1.5px solid var(--ink); }
+.tl-filter.lane-work .shape { border-radius: 50%; }
+.tl-filter.lane-certifications .shape { transform: rotate(45deg); }
+.tl-filter[aria-pressed="false"] { border-color: rgba(255, 255, 255, 0.35); color: var(--soft); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 12px 0; font-weight: 600; }
+.tl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 2px solid var(--rule); }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 10px 16px; background: var(--deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.tl-entry { order: 2; border-top: 1px solid rgba(255, 255, 255, 0.3); }
+.tl-entry:first-child { border-top: 0; }
+.tl-band-label { display: flex; flex-wrap: wrap; gap: 0 12px; font-weight: 600; }
+.tl-card summary { list-style: none; display: grid; gap: 2px 16px; padding: 12px 16px; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--soft); font-family: var(--mono); font-size: 13px; }
+.tl-sign::before { content: "+" / ""; font-family: var(--mono); color: var(--pencil); }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-dates { color: var(--pencil); }
+.tl-title { font-size: 18px; font-weight: 700; }
+.tl-org { color: var(--soft); }
+.tl-card summary:hover .tl-title { color: var(--pencil); }
+.tl-pop { padding: 0 16px 14px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+@media (min-width: 760px) {
+  .tl-card summary { grid-template-columns: 11em minmax(0, 1fr); align-items: baseline; }
+  .tl-meta { grid-column: 1; grid-row: 1 / span 3; flex-direction: column; justify-content: start; }
+}
+
+/* Work: the same table, with a dates column. */
+.jobs { display: grid; border: 2px solid var(--rule); }
+.job { padding: 20px 20px; border-top: 1px solid rgba(255, 255, 255, 0.3); }
+.job:first-child { border-top: 0; }
+.job-dates { color: var(--pencil); }
+.job h3, .degree h3 { margin-top: 4px; font-family: var(--hand); font-weight: 400; font-size: 26px; line-height: 1.15; }
+.job-org, .degree-org { font-weight: 600; }
+.job-loc, .degree-cgpa { color: var(--soft); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 8px; padding-left: 22px; }
+.job-list li::before { content: "" / ""; position: absolute; left: 0; top: 0.65em; width: 12px; height: 1px; background: var(--pencil); box-shadow: 12px 0 0 -0px transparent; }
+@media (min-width: 760px) {
+  .job { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 0 16px; }
+  .job-head { display: contents; }
+  .job-top { grid-column: 1; grid-row: 1 / span 6; }
+  .job-head > :not(.job-top), .job-list { grid-column: 2; }
+}
+.degree { padding: 22px 24px; border: 2px solid var(--rule); box-shadow: 0 0 0 4px var(--paper), 0 0 0 5px var(--rule); }
+.degree-courses { margin-top: 14px; }
+.degree-courses h4 { margin-bottom: 8px; color: var(--soft); font-weight: 400; }
+
+/* Certifications: rows of the same table. */
+.certs { list-style: none; margin: 0; padding: 0; display: grid; border: 2px solid var(--rule); }
+.certs li + li { border-top: 1px solid rgba(255, 255, 255, 0.3); }
+.cert { display: grid; gap: 2px 18px; padding: 14px 18px; color: var(--ink); text-decoration: none; }
+.cert:hover { background: var(--deep); }
+.cert-top { color: var(--pencil); }
+.cert-title { font-size: 18px; font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cert-org { display: block; color: var(--soft); }
+.cert-view { color: var(--pencil); }
+@media (min-width: 760px) {
+  .cert { grid-template-columns: 11em minmax(0, 1fr) auto; align-items: baseline; }
+}
+
+/* Skills: the parts list, each group a numbered row. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; border: 2px solid var(--rule); counter-reset: part; }
+.skill { counter-increment: part; display: grid; grid-template-columns: 3em minmax(0, 1fr); gap: 6px 14px; padding: 14px 16px; border-top: 1px solid rgba(255, 255, 255, 0.3); }
+.skill:first-child { border-top: 0; }
+.skill::before { content: counter(part, decimal-leading-zero) / ""; grid-row: 1 / span 2; font-family: var(--mono); font-size: 14px; color: var(--pencil); padding-top: 4px; }
+.skill h3 { font-family: var(--hand); font-weight: 400; font-size: 22px; }
+.skill-n { display: none; }
+@media (min-width: 760px) {
+  .skill { grid-template-columns: 3em 12em minmax(0, 1fr); align-items: baseline; }
+  .skill::before { grid-row: auto; }
+}
+
+/* Contact: the approval stamp. */
+.routes { list-style: none; margin: 0; padding: 18px; display: grid; gap: 12px; border: 3px double var(--pencil); max-width: 640px; transform: rotate(-1.2deg); }
+.route { display: grid; gap: 2px 16px; padding: 12px 14px; border: 1px solid var(--rule); color: var(--ink); text-decoration: none; }
+.route:hover { background: var(--deep); }
+.route-label { font-family: var(--hand); font-size: 24px; }
+.route-line { color: var(--soft); }
+.route-addr { font-family: var(--mono); font-size: 14px; color: var(--pencil); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+
+/* Footer, inside the frame's margin. */
+.foot { padding: 28px clamp(16px, 4vw, 52px) 36px; display: grid; gap: 6px; }
+.foot-name { font-family: var(--hand); font-size: 26px; }
+.foot-loc, .foot-credit { color: var(--soft); }
+.foot-credit { margin-top: 8px; }
+
+/* Dimension lines draw themselves as they come into view, where the
+   browser ties animation to scrolling; base.css stops it under reduced
+   motion, and they are drawn either way. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .proj-dates::before, .proj-dates::after, .results::before {
+      animation: cy-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+    .proj-dates::before { transform-origin: right; }
+    .proj-dates::after { transform-origin: left; }
+  }
+}
+@keyframes cy-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }

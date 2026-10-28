@@ -1,0 +1,122 @@
+[
+  {
+    "id": "hello-maps",
+    "lane": "builds",
+    "title": "Hello Maps: a sample app for an example maps API",
+    "start": "2025-03",
+    "end": "present",
+    "source": "Projects / Hello Maps: a sample app for an example maps API",
+    "tier": 1,
+    "stack": ["TypeScript", "Next.js"],
+    "status": "The starting point in an example company's quickstart since May 2025.",
+    "layer2": "A small store finder that shows the API's three main calls, with a written walk-through.",
+    "layer1": "Copied as a starting point by 2,400 developers in 6 months.",
+    "detail": "The starting point in an example company's quickstart.",
+    "bullets": [
+      "Copied as a starting point by <strong>2,400</strong> developers in 6 months.",
+      "Cut questions about first setup by <strong>40%</strong> in the community forum.",
+      "Shown live in <strong>14 talks</strong> at example meetups and conferences, each with the code on screen."
+    ],
+    "proof": [
+      {"label": "Demo", "url": "https://example.com/hello-maps"},
+      {"label": "Code", "url": "https://example.com/hello-maps/code"}
+    ]
+  },
+  {
+    "id": "ship-week",
+    "lane": "builds",
+    "title": "Ship Week: a live-coding video series",
+    "start": "2024-09",
+    "end": "2025-02",
+    "source": "Projects / Ship Week: a live-coding video series",
+    "tier": 2,
+    "stack": ["Python", "FastAPI"],
+    "status": "Finished, 20 episodes.",
+    "layer1": "Built one small service each week on a live stream.",
+    "detail": "Built one small service each week on a live stream.",
+    "bullets": [
+      "Built one small service each week on a live stream, answering questions as they came.",
+      "Watched by <strong>31,000</strong> people across 20 episodes."
+    ],
+    "proof": [
+      {"label": "Videos", "url": "https://example.com/ship-week"}
+    ]
+  },
+  {
+    "id": "workshop-kit",
+    "lane": "builds",
+    "title": "Workshop Kit: a 90-minute API workshop",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Projects / Workshop Kit: a 90-minute API workshop",
+    "tier": 3,
+    "stack": ["Markdown", "Docker"],
+    "layer2": "A workshop any colleague can run,",
+    "layer1": "with a container that starts every attendee in the same place.",
+    "bullets": [
+      "A workshop any colleague can run, with a container that starts every attendee in the same place."
+    ],
+    "proof": [
+      {"label": "Guide", "url": "https://example.com/workshop-kit"}
+    ]
+  },
+  {
+    "id": "developer-advocate",
+    "lane": "work",
+    "title": "Developer Advocate",
+    "org": "Sample Maps Ltd",
+    "org_short": "Sample Maps",
+    "location": "Remote",
+    "start": "2025-02",
+    "end": "present",
+    "source": "Experience / Developer Advocate, Sample Maps Ltd",
+    "detail": "Speak, write and build sample apps for an example maps API.",
+    "bullets": [
+      "Speak, write and build sample apps for an example maps API used by 9,000 developers.",
+      "Bring the 5 most common questions from each event back to the product team every month."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "software-engineer",
+    "lane": "work",
+    "title": "Software Engineer",
+    "org": "Placeholder Software",
+    "location": "Example City",
+    "start": "2023-07",
+    "end": "2025-01",
+    "source": "Experience / Software Engineer, Placeholder Software",
+    "bullets": [
+      "Built the public API for an example scheduling product, and wrote its first reference."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "community-organiser",
+    "lane": "work",
+    "title": "Community Organiser",
+    "org": "Example Developers Meetup",
+    "location": "Example City",
+    "start": "2022-03",
+    "end": "2023-06",
+    "source": "Experience / Community Organiser, Example Developers Meetup",
+    "bullets": [
+      "Ran a monthly meetup of about 80 developers and found speakers for 15 evenings."
+    ],
+    "no_proof": "A volunteer role with no public record."
+  },
+  {
+    "id": "bsc-computer-science",
+    "lane": "band",
+    "title": "BSc Computer Science",
+    "org": "Example University",
+    "start": "2019-09",
+    "end": "2023-06",
+    "date_style": "full",
+    "source": "Education / BSc Computer Science, Example University",
+    "grade": "3.4 / 4.0 CGPA",
+    "coursework": ["Software Engineering", "Computer Networks", "Databases", "Public Speaking"],
+    "no_proof": "Checked with the university on request."
+  }
+]

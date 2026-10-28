@@ -1,0 +1,50 @@
+{
+  "name": "Avery Mockup",
+  "headline": ["Frontend developer", "Design systems", "Web performance"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to frontend and design engineering roles",
+  "summary": "Self-taught frontend developer who builds interfaces that feel fast on a cheap phone. Ships every component with its keyboard path and its numbers, and measures each one before calling it done.",
+  "intro": "This is a sample portfolio. Avery Mockup is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "tide-ui",
+      "from": "tide-ui/bullets/1",
+      "before": "Cut the median page weight by",
+      "figure": "38%",
+      "text": "by removing a CSS framework"
+    },
+    {
+      "item": "tide-ui",
+      "from": "tide-ui/bullets/2",
+      "before": "Brought largest paint from 4.1 to",
+      "figure": "1.6 seconds",
+      "text": "on a mid-range phone"
+    },
+    {
+      "item": "motion-lab",
+      "from": "motion-lab/bullets/2",
+      "before": "Each demo stays under",
+      "figure": "16 milliseconds",
+      "text": "a frame on a mid-range phone"
+    }
+  ],
+  "feature": {
+    "item": "tide-ui",
+    "from": "tide-ui/bullets/3",
+    "label": "axe-core",
+    "figure": "0",
+    "text": "violations on all 40 components",
+    "note": "checked on every pull request."
+  },
+  "skills": [
+    {"label": "Build", "items": ["TypeScript", "React", "Astro"]},
+    {"label": "Style", "items": ["CSS", "Design tokens", "Motion"]},
+    {"label": "Check", "items": ["axe-core", "Lighthouse", "Playwright"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:avery@example.com", "text": "avery@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Write-ups of what I build and measure."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Components and experiments."},
+    {"label": "Demos", "url": "https://example.com/demos", "text": "example.com/demos", "line": "Live demos to try in a browser."}
+  ]
+}

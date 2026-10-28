@@ -73,7 +73,8 @@ SHOWCASE_PATH_RE = re.compile(
 # The project's own designs, each credited to the owner (ADR-0013,
 # Changes, 2026-10-24). A design dropped from designs/ leaves this list too.
 MAINTAINED = {"default", "plain", "bento", "broadsheet", "console", "poster", "signal",
-              "assert", "latent", "pipeline", "pocket", "sentinel"}
+              "assert", "latent", "pipeline", "pocket", "sentinel",
+              "broadcast", "cyanotype", "frost", "handbook", "savepoint"}
 MAINTAINER_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 AS_CONTRIBUTOR = "[scope: as contributor]"
 FILE_LIMIT = 40

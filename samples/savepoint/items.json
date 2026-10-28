@@ -1,0 +1,113 @@
+[
+  {
+    "id": "lantern-path",
+    "lane": "builds",
+    "title": "Lantern Path: a puzzle game about light",
+    "start": "2025-02",
+    "end": "present",
+    "source": "Projects / Lantern Path: a puzzle game about light",
+    "tier": 1,
+    "stack": ["C#", "Unity"],
+    "status": "Released on an example store in August 2025.",
+    "layer2": "A puzzle game in which every level is solved by bending one beam of light.",
+    "layer1": "Played by 18,000 people in its first 3 months.",
+    "detail": "Released on an example store.",
+    "bullets": [
+      "Played by <strong>18,000</strong> people in its first 3 months.",
+      "Rated <strong>4.6 out of 5</strong> by 900 players on an example store.",
+      "Holds 60 frames a second on a five-year-old phone."
+    ],
+    "proof": [
+      {"label": "Play", "url": "https://example.com/lantern-path"},
+      {"label": "Code", "url": "https://example.com/lantern-path/code"}
+    ]
+  },
+  {
+    "id": "tiny-orbit",
+    "lane": "builds",
+    "title": "Tiny Orbit: a game jam entry about gravity",
+    "start": "2024-04",
+    "end": "2024-05",
+    "date_style": "full",
+    "source": "Projects / Tiny Orbit: a game jam entry about gravity",
+    "tier": 2,
+    "stack": ["Godot", "GDScript"],
+    "status": "Finished.",
+    "layer1": "Built in 48 hours for an example game jam.",
+    "detail": "Built in 48 hours for an example game jam.",
+    "bullets": [
+      "Built in 48 hours for an example game jam, then polished over a month.",
+      "Placed <strong>3rd of 210</strong> entries for fun."
+    ],
+    "proof": [
+      {"label": "Play", "url": "https://example.com/tiny-orbit"}
+    ]
+  },
+  {
+    "id": "level-kit",
+    "lane": "builds",
+    "title": "Level Kit: a level editor for a puzzle game",
+    "start": "2024-09",
+    "end": "2025-01",
+    "source": "Projects / Level Kit: a level editor for a puzzle game",
+    "tier": 3,
+    "stack": ["C#", "Unity"],
+    "layer2": "An in-game editor that lets designers build and test a level",
+    "layer1": "without a programmer.",
+    "bullets": [
+      "An in-game editor that lets designers build and test a level without a programmer."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/level-kit"}
+    ]
+  },
+  {
+    "id": "sand-garden",
+    "lane": "builds",
+    "title": "Sand Garden: a falling-sand toy",
+    "start": "2024-01",
+    "end": "2024-03",
+    "date_style": "full",
+    "source": "Projects / Sand Garden: a falling-sand toy",
+    "tier": 3,
+    "stack": ["C++", "SDL"],
+    "layer2": "A falling-sand toy that simulates 200,000 grains",
+    "layer1": "at 60 frames a second.",
+    "bullets": [
+      "A falling-sand toy that simulates 200,000 grains at 60 frames a second."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/sand-garden"}
+    ]
+  },
+  {
+    "id": "junior-gameplay-programmer",
+    "lane": "work",
+    "title": "Junior Gameplay Programmer",
+    "org": "Sample Games Studio",
+    "org_short": "Sample Games",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / Junior Gameplay Programmer, Sample Games Studio",
+    "detail": "Program enemy behaviour for an example studio's action game.",
+    "bullets": [
+      "Program enemy behaviour for an example studio's action game, from first sketch to release.",
+      "Cut a level's load time from 9 to 3 seconds by streaming its sounds."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "bsc-computer-games-programming",
+    "lane": "band",
+    "title": "BSc Computer Games Programming",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BSc Computer Games Programming, Example University",
+    "grade": "3.5 / 4.0 CGPA",
+    "coursework": ["Game Engine Architecture", "Computer Graphics", "Artificial Intelligence for Games", "Physics Simulation"],
+    "no_proof": "Checked with the university on request."
+  }
+]
