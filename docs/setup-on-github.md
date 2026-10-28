@@ -516,6 +516,19 @@ activity there ("Events that trigger workflows", read 2026-10-19). After
 a quiet spell, open **Actions**, **Showcase links**, and enable it again;
 **Run workflow** checks at once.
 
+## The weekly check of every page
+
+A pull request's checks look only at the pages it alters (ADR-0019).
+`.github/workflows/checks-weekly.yml` checks every page of the default
+branch each Monday at 04:41 UTC, so a fault that reaches an unchanged page
+from outside, such as a newer Chrome on GitHub's runner, shows within a
+week. It holds no permissions and blocks nothing. When it fails, GitHub
+notifies the user who last changed its cron line, which is you: open the
+run, and fix the design it names by a pull request of your own. To check
+every page at any time: **Actions**, **Checks** or **Checks, every
+page**, **Run workflow**. Like the showcase check, GitHub disables its
+schedule after 60 days without activity; enable it the same way.
+
 ## What the tests prove, and what they do not
 
 - Test 1 proves the scope check runs from the default branch and refuses a

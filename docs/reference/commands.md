@@ -59,7 +59,7 @@ python tools/check_showcase.py --fetch-url URL [--login LOGIN]   one address's r
 python tools/check_built.py [_site] [--previews] built files, without a browser
 python tools/check_prompt.py [README]            the prompts for an AI, the README's and a copy's, and AGENTS.md, against the repository
 python tools/check_content.py [--cv FILE] [--page FILE] [--content DIR]   the content trace
-python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES]
+python tools/check_browser.py [_site] [--quick] [--axe FILE] [--only NAMES] [--designs NAMES] [--skip-gallery-page]
 python tools/screenshots.py [_site]              the gallery's previews, showcase copies and own picture
 python tools/ci.py pictures --gallery _site      those pictures made and checked
 python tools/scope_check.py --files LIST.tsv [--author LOGIN]   a pull request's scope, locally
@@ -122,7 +122,8 @@ to check_browser.py, ci.py checks or prove_checks.py.
 The workflows call these, and they run the same locally:
 
 ```
-python tools/ci.py checks [--quick] [--axe FILE]
+python tools/ci.py checks [--quick] [--axe FILE] [--since REF]
+python tools/ci.py changes --since REF
 python tools/ci.py build --mode site|gallery [--out DIR]
 python tools/ci.py assemble --site DIR --shots DIR
 python tools/ci.py pages --mode site|gallery
@@ -135,6 +136,12 @@ conditions, designs, two builds each of the site and the gallery compared
 byte for byte, the built files, the content trace and the browser checks,
 axe among them when given `--axe`, as the checks workflow always gives
 it. It stops at the first failure with that tool's exit code.
+
+With `--since REF`, the browser checks look only at the pages the change
+since REF alters, and the rest runs in full (ADR-0019); without it, every
+page, as a run started by hand on GitHub. `changes --since REF` prints
+what such a run would check and why, and runs no check: try
+`python tools/ci.py changes --since main` on a branch.
 
 ## Gates
 

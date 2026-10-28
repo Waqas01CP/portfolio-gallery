@@ -117,7 +117,9 @@ catch most problems first.
    request.
 
 Two checks run: **scope**, at once, and **checks**, once the maintainer
-approves a first-time contributor's run. If one fails, open it from the
+approves a first-time contributor's run. **checks** looks at your design's
+page in a browser and at no other design's, so it takes minutes, not an
+hour. If one fails, open it from the
 pull request's **Checks** tab: the failing step names every problem. Push
 a fix to the same branch and both run again.
 

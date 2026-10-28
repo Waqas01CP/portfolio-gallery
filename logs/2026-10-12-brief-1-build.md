@@ -2937,3 +2937,128 @@ from 3,020 s for twelve; the 90-minute limit falls at about 21 designs.
 - His own items, deferred by him: Test 1 on or after 2026-11-02, the four
   issue forms in the chooser, ADR-0012.
 - Nothing pushed: records-after-merges waits on the owner.
+
+# Round 17, 2026-10-28 UTC: checks on what a change alters
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: 87e9a6b on records-after-merges, which the owner
+was merging; work on the branch checks-for-changes, cut from it. HEAD at
+end: the commit that adds this section. Mode: mutating. No brief: the
+owner's instructions in this conversation.
+
+## What was asked
+
+The owner, 2026-10-28 UTC, after Round 16's report that seventeen designs
+would take Checks about 71 minutes: the change-only checks "has to start
+now before you do anything else and consider this no.1 priority". "a
+sound implementation plan on how you will do this work without breaking
+anything or inconveniencing anyone as it is logical that only what is
+changed is checked and what remains the same is passed. this will keep
+the time only to what needs to be checked because this gallery will grow
+and i do not want it to like check runs for days. so make sure that
+while you work on this, no other issues are raised or current working is
+broken." Also: the pull request text for records-after-merges first, so
+he could merge while the seat worked; the five proposed designs approved
+("only final look can tell 100% how good they are"); each person's
+sections and counts may differ "as long as that is how their profession
+portfolios are", nothing a profession's portfolio should have left out;
+the standing width check and these checks may be built "if feasible".
+
+## The plan, as stated to him before the work
+
+Phase 1, this round: the job keeps its name, checks, which the ruleset
+requires, and always reports, so no path filter; only the browser checks
+narrow; "changed" decided by building the gallery from the base too and
+comparing built files, not by file names; every page on any doubt (the
+checks' own code, the base unreadable or unbuildable, a run by hand, the
+weekly run, a local run without --since); the base a pull request's merge
+parent or a push's previous main; a weekly run of every page as the net
+for changes from outside, such as a newer Chrome; the run's summary
+listing what was checked; defeat cases for every rule; ADR-0019. Phase 2,
+later and separate: runs of every page split across parallel jobs, a
+final job still named checks, before about 19 designs.
+
+## Errors this seat made
+
+1. **The harness's cleanup and git's read-only files.** The new cases make
+   the copy a git repository; on Windows, git's object files are read-only
+   and shutil.rmtree refused them, so the first run stopped after the
+   first new case. The harness now restores write permission before
+   deleting (writable in tools/prove_checks.py).
+2. **A case built wrong.** "A base that does not build" first broke
+   content/config.json's design, which the gallery build does not read;
+   the base built and the case failed. It now breaks a design's
+   design.json, which the gallery build does read, and passes.
+3. **File names split on spaces.** The changed files were first split on
+   whitespace, so a screenshot's name with spaces came apart, and a name
+   git quotes would not have matched. Found in review before the commit;
+   the names are NUL-separated now.
+4. **remove.txt cannot list a workflow.** The weekly workflow was first
+   added to the copy's removal list, which refuses workflow files; it is
+   removed by the cleanup workflow's own step, beside scope.yml and
+   showcase-links.yml.
+5. **Two commands mistyped**: `git cherry-pick -q`, which git does not
+   take, and the keep-awake helper given a relative interpreter path,
+   which Windows could not start; both rerun correctly.
+
+## What was built
+
+- tools/ci.py: `select` builds the gallery from the base by the base's own
+  build.py and compares built files; a design's demo is checked when its
+  folder differs or is new, the gallery page when anything outside
+  designs/ differs or the showcase changed, every page when static/
+  differs, when a file in CHECKING changed (build.py, requirements.txt,
+  tools/ci.py, tools/check_browser.py, tools/cdp.py, checks.yml), or when
+  the base is missing, unreadable or does not build. `checks --since REF`
+  passes the selection to the browser checks and writes it to the run's
+  summary; `changes --since REF` prints it alone.
+- tools/check_browser.py: `--designs` and `--skip-gallery-page`; a design
+  the gallery lacks is a usage error.
+- checks.yml: the base (a pull request's merge parent; a push's previous
+  main, fetched), `--since`, and Run workflow for every page.
+  checks-weekly.yml: every page each Monday at 04:41 UTC, anonymous clone,
+  no permissions, only in this repository; the copy's cleanup removes it.
+  tools/check_workflows.py holds the two workflows' axe-core pins equal.
+- ADR-0019; standing-checks.md, commands.md, setup-on-github.md,
+  add-a-design.md, use-this-template.md and the README's line on the
+  accessibility checks.
+- Found while proving it, on main too: pull request 22's real showcase
+  entry, a 3360x2100 screenshot of 3.1 MB, broke two older defeat cases.
+  "pictures: a maker that publishes the screenshot itself" met that
+  entry's size failure before the planted one's, so its expected words
+  were missing; "packing: a showcase picture without its reserved size"
+  hung in the wait for pictures to decode and ended in a TimeoutError
+  after 60 s, not a failure naming its cause. Reproduced on a clone of
+  56077aa, main, without this branch; passed with that entry removed. The
+  cases that plant their own entries now empty the copy's showcase first
+  (own_showcase), and the packing check gives up waiting after 20 s and
+  reports the picture as not loaded.
+
+## Proofs
+
+- The file harness on the working tree before the commit: 152 defeat
+  cases, 30 planted controls, 0 unproven, in 538 s; among them the ten
+  selection cases, the two usage cases and the two axe-pin cases.
+- Every defeat case with the browser and axe on a fresh clone of 27db869,
+  kept awake: 176 defeat cases and 35 planted controls, 2 unproven, the
+  two above, in 4,792 s; the narrowed case failed on the fault in the
+  design it checks, and its control passed.
+- After the fix, the served-copy and packing families rerun, each on a
+  fresh copy: the twelve cases of the served-copy and packing families, five controls and seven defeat cases, each as expected, in 878 s, the two that failed among them; committed as 1e9137c.
+- End to end, in a scratch clone: one design's stylesheet changed, `ci.py
+  checks --since HEAD~1 --axe`: exit 0 in 362 s, the browser checks 286 s
+  of it on Bento alone, against 3,676 s for every page of twelve designs
+  (2026-10-25). Pull request 22 replayed on the new tools: no design, the
+  gallery page checked, in 8 s of selection. A change to content/: the
+  seven designs shown with it, none of the five with their own person.
+- tools/check_workflows.py, check_template_cleanup.py and check_prompt.py:
+  0 problems each; gates A, B and C on the commit.
+
+## Not done
+
+- Phase 2: a run of every page split across parallel jobs, a final job
+  still named checks; needed before about 19 designs.
+- On GitHub only, until this branch merges: the base fetched on a push to
+  main, the run's summary, and checks-weekly.yml, which runs from main.
+- Nothing pushed: checks-for-changes waits on the owner, after
+  records-after-merges.

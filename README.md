@@ -24,8 +24,8 @@ What every site gets, whatever the design:
   engines and by AI tools that read only the first response.
 - **Accessibility checked, not assumed**: the accessibility tree a screen
   reader meets at load, keyboard use through every panel, words a screen
-  reader would run together, and anchors, on every design, on every pull
-  request.
+  reader would run together, and anchors, on every design a pull request
+  changes, and on every design each week.
 - **Nothing that phones home**: no cookies, no tracking, no analytics, and
   a Content-Security-Policy that refuses anything from another site.
 - **Claims you can stand behind**: an optional check that every sentence on
