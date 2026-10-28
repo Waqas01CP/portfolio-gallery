@@ -627,10 +627,15 @@ PACKING = """(() => {
                aw: img ? Number(img.getAttribute('width')) : 0, ah: img ? Number(img.getAttribute('height')) : 0 };
     }) };
 })()"""
-LOAD_ALL = """Promise.all([...document.querySelectorAll('[data-pack] img')].map((img) => {
-  img.loading = 'eager';
-  return img.decode().then(() => true, () => false);
-})).then((done) => done.every(Boolean))"""
+# Every showcase picture loaded and decoded, or false after 20 s: a picture
+# that never decodes is reported as not loaded, never left to hang the run.
+LOAD_ALL = """Promise.race([
+  Promise.all([...document.querySelectorAll('[data-pack] img')].map((img) => {
+    img.loading = 'eager';
+    return img.decode().then(() => true, () => false);
+  })).then((done) => done.every(Boolean)),
+  new Promise((resolve) => setTimeout(() => resolve(false), 20000)),
+])"""
 FOCUSED_CARD = """(() => { const a = document.activeElement;
   const li = a && a.closest('[data-pack] > li');
   return { card: li ? [...li.parentNode.children].indexOf(li) : -1, footer: !!(a && a.closest('footer')) };

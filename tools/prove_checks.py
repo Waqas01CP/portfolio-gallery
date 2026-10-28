@@ -167,6 +167,15 @@ MAC_NAME = "Screenshot 2026-10-20 at 11.30.12\u202fAM.png"
 GOOD_ENTRY = {"name": "Test Person", "url": "https://example.com/", "description": "A sample entry."}
 
 
+def own_showcase(copy: Path) -> None:
+    """The copy's showcase emptied of the real entries, for a case that
+    plants its own: what contributors add must not change what it tests
+    (pull request 22's 3360x2100 screenshot reached two cases first)."""
+    for folder in (copy / "showcase").glob("*"):
+        if folder.is_dir():
+            shutil.rmtree(folder)
+
+
 def plant_entry(copy: Path, login: str = "tester", entry: dict | None = None,
                 files: dict[str, bytes] | None = None) -> Path:
     folder = copy / "showcase" / login
@@ -1136,6 +1145,7 @@ def browser_cases(axe: Path | None):
     # the screenshot itself, is refused.
     def served(old=None, new=None, name="screenshot.png", where="tools/screenshots.py", exif=None):
         def plant(copy):
+            own_showcase(copy)
             plant_entry(copy, files={name: png(
                 1920, 1080, (b"eXIf", exif or tiff(0x0112, 0x011A)), xmp(MAC_XMP))})
             if old is not None:
@@ -1174,6 +1184,7 @@ def browser_cases(axe: Path | None):
 
     def packed(*edits):
         def plant(copy):
+            own_showcase(copy)
             for i, (w, h) in enumerate(MIX):
                 plant_entry(copy, f"person-{i + 1}", {**GOOD_ENTRY, "url": f"https://example.com/{i}",
                                                      "description": "A sample entry. " * (i % 4)},
