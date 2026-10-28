@@ -56,6 +56,12 @@ docs/reference/standing-checks.md with the case built to defeat it.
               outside the picture each close it and put focus back on the
               card's link. With scripts off, nothing opens: Enter on the
               card opens the picture itself, as a plain link.
+  width       No page scrolls sideways, every section laid out, scripts on
+              and off, at 320, 360 and 390 px, at 1080 by 1920 (a desktop
+              screen turned upright) and at 1366 px: the document is never
+              wider than the window. A failure names the deepest elements
+              that pass the window's edge. A box that scrolls inside itself
+              is the design's choice and passes.
   axe         With --axe FILE, axe-core's default rules at 360 and 1366 px,
               light, device dark and switched dark, panels closed and open.
               The checks workflow fetches axe.min.js by exact version and
@@ -587,6 +593,51 @@ def check_words(demos, origins, report) -> None:
                                 f"is the page with no design)")
 
 
+# The widths a page must fit without scrolling sideways: the narrowest phone
+# in common use, two phones, a desktop screen turned upright, and a laptop.
+FIT_WIDTHS = ((320, 640), (360, 780), (390, 844), (1080, 1920), (1366, 900))
+WIDER = """(() => {
+  const view = document.documentElement.clientWidth;
+  const over = document.documentElement.scrollWidth - view;
+  if (over <= 0) return { over: 0, culprits: [] };
+  const name = (el) => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+    (el.classList.length ? '.' + [...el.classList].slice(0, 2).join('.') : '');
+  // The deepest elements past the window's edge: the ones to fix, not
+  // every ancestor they widen.
+  const past = [...document.body.querySelectorAll('*')].filter((el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.right > view + 1;
+  });
+  const deepest = past.filter((el) => !past.some((o) => o !== el && el.contains(o)));
+  return { over, culprits: deepest.slice(0, 3).map((el) =>
+    `${name(el)} ${Math.round(el.getBoundingClientRect().right - view)}px past the edge`) };
+})()"""
+
+
+def check_width(pages, origin, report, quick) -> None:
+    """Each page loaded once with scripts and once without, every section
+    laid out, then set to each width in turn."""
+    widths = FIT_WIDTHS[:1] if quick else FIT_WIDTHS
+    with Chrome() as chrome:
+        for path in pages:
+            for scripts in (True, False):
+                page = open_page(chrome, origin, path, *widths[0], scripts=scripts)
+                if scripts:
+                    wait_started(page)
+                lay_out_all(page)
+                for width, height in widths:
+                    report.ran("width")
+                    page.send("Emulation.setDeviceMetricsOverride",
+                              {"width": width, "height": height, "deviceScaleFactor": 1, "mobile": False})
+                    time.sleep(0.4)
+                    state = page.evaluate(WIDER)
+                    if state["over"] > 0:
+                        report.fail("width", path, f"{width}px, scripts {'on' if scripts else 'off'}: the page "
+                                    f"scrolls {state['over']}px sideways: "
+                                    f"{'; '.join(state['culprits']) or 'no element found past the edge'}")
+                page.close()
+
+
 def check_motion(pages, origin, report) -> None:
     with Chrome() as chrome:
         for path in pages:
@@ -944,7 +995,7 @@ def main(argv: list[str]) -> int:
     sites = demos if gallery else ["index.html"]
     pages = sites + (["index.html"] if page else [])
     chosen = set(args.only.split(",")) if args.only else {
-        "tree", "keyboard", "joins", "anchors", "words", "motion", "packing", "overlay", "axe"}
+        "tree", "keyboard", "joins", "anchors", "words", "motion", "width", "packing", "overlay", "axe"}
     loads = 1 if args.quick else args.loads
     started = time.monotonic()
     work = Path(tempfile.mkdtemp(prefix="pg-check-"))
@@ -968,6 +1019,8 @@ def main(argv: list[str]) -> int:
                 check_words(demos, origins, report)
             if "motion" in chosen:
                 check_motion(pages, origins["built"], report)
+            if "width" in chosen:
+                check_width(pages, origins["built"], report, args.quick)
             if "packing" in chosen and page:
                 check_packing(origins["built"], report)
             if "overlay" in chosen and page:

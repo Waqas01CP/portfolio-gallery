@@ -149,7 +149,7 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 | A contributor's site is never rendered by the project | tools/check_showcase.py fetches responses only, bounded in time, size and redirects, refusing private addresses; the weekly workflow holds no permissions (tools/check_workflows.py refuses any) |
 | Every word in the first response, readable without scripts | The fixed HTML; the words check compares every design with no design, scripts off |
 | Checks that grow with the change, not the gallery | A pull request's browser checks look only at the pages whose built files differ from its base's; every page when the checks change, when in doubt, by hand and each Monday (ADR-0019) |
-| Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
+| Accessibility, for every design | The standing checks: the tree at load, keyboard, joins, anchors, words, motion, no page scrolling sideways from 320 px to 1366 px and at 1080 by 1920, and axe-core's rules, contrast among them (docs/reference/standing-checks.md) |
 | A check can fail | tools/prove_checks.py runs each on its defeat case: 152 file cases and 24 browser cases, with 12 controls and 35 planted controls (2026-10-28) |
 | Claims trace to the user's CV | tools/check_content.py, page to CV and CV to page |
 | Deterministic output | Two builds compared byte for byte in CI |
