@@ -2798,3 +2798,142 @@ fresh clone of 3f65c4f unless named.
 - A standing check that no page scrolls sideways (Round 14), still for the
   chat and the owner.
 - Test 1 once more, on or after 2026-11-02.
+
+# Round 16, 2026-10-28 UTC: a status check after the merges; five more designs proposed
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: fdfdf6a on profession-designs; the local main
+fast-forwarded to origin's 56077aa; work on the branch
+records-after-merges, cut from it. HEAD at end: the commit that adds this
+section. Mode: mutating, records only. No brief: the owner's instructions
+in this conversation.
+
+## What was asked
+
+- 2026-10-25 UTC, on Round 15's report that the Checks limit rose from 45
+  to 90 minutes: "it should not be the case, since the prior designs were
+  not touched then they should not be checked again and only under the
+  case when something in those design changes." To be remembered, not
+  built. Both merges, he said, were done.
+- 2026-10-28 UTC: run a check, since things may have changed; a status
+  report; what is pending, since the project seems complete to him.
+- Then: leave for now the pending items that are his own and need no
+  seat; do what can be completed. Round 15's five are "somewhat better
+  and reasonable" than Round 14's, which "looked basic", but still
+  resemble each other by "30-45%": "how the boxes are placed and what is
+  written and the other placements". Propose five more, "60-75%
+  distinct", "state of the art", and taking nothing from existing
+  websites, so that no one can raise a claim.
+
+## Errors this seat made
+
+1. **A path the Windows Python could not read.** A download went to Git
+   Bash's /tmp, which Windows Python does not see; repeated into the
+   scratchpad.
+2. **A guessed address.** The first check of the live demos asked for
+   demo/<design>/ and got twelve 404s; the gallery links
+   designs/<design>/index.html, which answered 200 for all twelve.
+3. **A long heredoc in Git Bash.** The shell could not parse it and ran
+   nothing; the text went through a scratch file instead.
+
+## What was found
+
+- Read from GitHub's public API, unauthenticated (no gh on this machine):
+  pull request 20 merged 2026-10-24 22:28Z and 21 on 2026-10-25 14:39Z,
+  each merge's tree its branch head's (3ec3c74, fdfdf6a). Scope and
+  Checks passed on both pull requests and on main; Checks 1,918 and
+  1,888 s with seven designs, 3,157 and 3,020 s with twelve, inside 90
+  minutes; Deploy 89 to 94 s.
+- Pull request 22, the first from outside: Choudhary-Khuzaim's showcase
+  entry, entry.json and a 3.1 MB screenshot, opened 17:19Z on 2026-10-25;
+  CODEOWNERS requested the owner's review at once; the pull request
+  template's showcase section filled; approved 17:42Z, merged 18:15Z
+  (56077aa, main's tree with the entry's two files). Scope passed seven
+  times, Checks 3,041 s and on main 3,062 s, Deploy 94 s. The weekly
+  showcase check passed on 2026-10-26.
+- The live gallery: twelve template cards, each naming its person; two
+  showcase cards; all twelve demos answer 200 with their own design.css,
+  the five sample demos with their own layout.css. The runner's previews
+  of Broadsheet, Console and Signal, on Linux's faces, read as on Windows.
+- On 56077aa here: check_workflows, check_template_cleanup, check_design
+  (12), check_showcase and its --fetch-all (both sites 200, each linking
+  to its author's profile), check_prompt, check_content, the gallery build
+  and check_built (13 pages): 0 problems each; MAP.md current.
+- The seat's processes: none running. The Python processes on the
+  machine were another project's session's.
+
+## What was done
+
+- The records: STATE's verified line, headline, Publishing and Blocked
+  rows; the two design rows and the two merges to completed.md, with
+  pull request 22; the CODEOWNERS row; the runner-preview line out of
+  Known unverified; two rows waiting on the owner (five more designs, and
+  checks only for the designs a change touches); CAPABILITIES' runner
+  times for twelve designs; this section.
+- The eight local branches merged into main and gone from GitHub were
+  deleted with git branch -d, which refuses an unmerged branch.
+
+## The likeness, measured
+
+A scratch script, not committed: for each design's demo, at 1366x768,
+390x844 and 1080x1920, on the first screen, the Projects screen and the
+Work screen, the box of each engine block in view (the menu, name,
+headline, facts, summary, buttons, figures, strip, section titles, the
+first three projects, the first two jobs) marked on a grid of about 85 px
+cells; two designs' likeness is the mean Jaccard overlap of the same
+blocks' cells, a block in view in one only counting 0, averaged over the
+nine screen-viewports. Run once over the twelve live demos, 105 s:
+
+- Round 15's five: 33% alike on average, 18% to 55%; Round 14's six: 31%,
+  20% to 46%; all 66 pairs: 29%, 10% to 58%.
+- Most alike: Bento and Sentinel 58%, Pipeline and Sentinel 55%,
+  Broadsheet and Pipeline 54%, Bento and Pipeline 51%.
+
+It matches the owner's own 30 to 45% for Round 15. Round 15's judged rule,
+three of five dimensions with layout always among them, passed every pair;
+the rule was too coarse to see what he sees.
+
+Two more causes, read from the content and the designs: all six sample
+people share one shape (3 projects, 2 jobs, 1 degree, 2 certificates, 3
+figures, 3 contact routes, 3 skill groups, a feature figure, a three-part
+headline), so every page has the same menu and the same count of boxes;
+and all eleven designs after Default set the engine's four motion switches
+(knot, tilt, strip, scroll) to 0.
+
+## The proposal
+
+Gitignored, for the owner to judge: briefs/round16-proposal/index.html,
+wireframes at the three sizes. The bar: by the script, no pair above 35%
+alike and each new design's mean at most 25%; judged, at least 8 of 12
+aspects different from every other design. Five designs, each with its own
+sample person of a different content shape:
+
+- Cyanotype, for embedded and robotics engineers (Rowan Fixture): an
+  engineering drawing sheet on blue grid paper, the menu as a title block
+  at the bottom right, figures as callout balloons around a board outline.
+- Handbook, for technical writers (Quinn Lorem): a cloth-bound book, a
+  cover first screen, thumb-index tabs as the menu, chapters with margin
+  notes; light and dark.
+- Frost, for frontend developers (Avery Mockup, no degree): frosted glass
+  over a moving aurora, a floating capsule menu, a kinetic name, project
+  cards that stack as a deck; light and dark.
+- Savepoint, for game developers (Robin Tileset): a pause screen, a hotbar
+  menu, a player card, a level-select grid, an inventory of skills.
+- Broadcast, for developer advocates (Drew Helloworld): a programme
+  monitor with a lower third, a moving ticker with pause, segment bumpers,
+  an episode guide, work as end credits.
+
+No website is a reference; decoration is drawn in CSS; fonts OFL with no
+Reserved Font Name; names avoid tech products' names. Estimated cost:
+seventeen designs would take Checks about 71 minutes on GitHub, scaled
+from 3,020 s for twelve; the 90-minute limit falls at about 21 designs.
+
+## Not done
+
+- The five designs: not built until the owner chooses.
+- Checks only for the designs a change touches, and the standing check
+  that no page scrolls sideways: waiting on his word; both change what
+  every pull request runs.
+- His own items, deferred by him: Test 1 on or after 2026-11-02, the four
+  issue forms in the chooser, ADR-0012.
+- Nothing pushed: records-after-merges waits on the owner.
