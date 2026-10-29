@@ -281,6 +281,48 @@ def build_site(copy: Path, *mode: str) -> Path:
     return out
 
 
+# A stand-in for Chrome, for the cases of its start: it never opens the
+# debugging port or, with PG_FAKE_MODE=stuck-once, only at its first start,
+# and then runs the real Chrome in its place.
+FAKE_CHROME = """import os, subprocess, sys, time
+from pathlib import Path
+mark = Path(os.environ["PG_FAKE_MARK"])
+if os.environ["PG_FAKE_MODE"] == "stuck-once" and mark.exists():
+    sys.exit(subprocess.call([os.environ["PG_REAL_CHROME"], *sys.argv[1:]]))
+mark.touch()
+time.sleep(600)
+"""
+
+START_CHROME = """import os, sys
+from pathlib import Path
+sys.path.insert(0, "tools")
+import cdp
+mode, mark = sys.argv[1], os.path.abspath("_started")
+os.environ["PG_FAKE_MODE"], os.environ["PG_FAKE_MARK"] = mode, mark
+os.environ["PG_REAL_CHROME"] = cdp.find_chrome() if mode == "stuck-once" else ""
+os.environ["PG_CHROME"] = str(Path(sys.argv[2]).resolve())
+cdp.START_SECONDS = 2
+with cdp.Chrome() as chrome:
+    print("started after a stuck start:" if os.path.exists(mark) else "started:", chrome.version())
+"""
+
+
+def chrome_start(mode: str):
+    def plant(copy: Path):
+        (copy / "_fake_chrome.py").write_text(FAKE_CHROME, encoding="utf-8")
+        if os.name == "nt":
+            wrapper = copy / "_fake_chrome.cmd"
+            wrapper.write_text(f'@"{PY}" "%~dp0_fake_chrome.py" %*\n', encoding="utf-8")
+        else:
+            wrapper = copy / "_fake_chrome"
+            wrapper.write_text(f'#!/bin/sh\nexec "{PY}" "$(dirname "$0")/_fake_chrome.py" "$@"\n',
+                               encoding="utf-8")
+            wrapper.chmod(0o755)
+        (copy / "_start_chrome.py").write_text(START_CHROME, encoding="utf-8")
+        return ["_start_chrome.py", mode, wrapper.name]
+    return plant
+
+
 # Each case: (label, plant(copy) -> command args, expected text in output).
 # A case whose expected value is Passes must pass instead: a control with a
 # planted input.
@@ -1170,6 +1212,10 @@ def file_cases():
         return ["tools/check_browser.py", build_site(copy), "--designs", "plain"]
 
     yield "browser: designs named for a site, not a gallery", narrowed_site, "apply to a built gallery only"
+    # A start that never opens the port is tried once more, then fails
+    # naming both; the start that recovers is a browser case.
+    yield ("browser: Chrome that never opens its debugging port", chrome_start("stuck"),
+           ("starting Chrome once more", "within 2 s, at both of two starts"))
 
 
 def axe_file(argv: list[str]) -> Path | None:
@@ -1206,6 +1252,9 @@ def browser_cases(axe: Path | None):
             out = build_site(copy, "--gallery")
             return ["tools/check_browser.py", out, "--only", only, "--quick"]
         return plant
+
+    yield ("start: Chrome stuck at its first start opens at the second", chrome_start("stuck-once"),
+           Passes("started after a stuck start: Chrome/"))
 
     # A panel hidden by the script without aria-hidden was not exposed at
     # load on this engine and sample page in Chrome 154 (2026-10-12), though

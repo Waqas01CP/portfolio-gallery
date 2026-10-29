@@ -34,7 +34,9 @@ permissions:
   contents: read
 
 # A new push to a pull request stops the run for its old commit, which no
-# one will merge. On main every run finishes: each merge is checked.
+# one will merge. On main no run is stopped once started, but GitHub lets
+# only one more wait behind it: a newer merge's run takes the waiting one's
+# place, and checks all that merge held besides its own.
 concurrency:
   group: checks-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

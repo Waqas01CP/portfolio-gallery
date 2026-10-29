@@ -3356,3 +3356,62 @@ but not read whole; read whole this round and brought current.
   branch's own pull request, which changes the checks, so it checks every
   page, side by side.
 - Nothing pushed: parallel-checks waits on the owner, after checks-tuned.
+
+# Round 22, 2026-10-29 UTC: Chrome's start, after Phase 2's first run on GitHub
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch chrome-start, from main at 40c9610. Mode:
+mutating. No brief: the owner's report of pull request 28's run with its
+failing job's log, his merge after a rerun, and his approval of the work
+that follows (the profession tags, Lighthouse), each its own round.
+
+## What GitHub showed
+
+- Pull request 28, Phase 2's first run, checked every page, as a change
+  to the checks should: plan, files, seventeen design jobs and the gallery
+  page side by side, 5 min 8 s from 15:46:28 to 15:51:36 UTC, against
+  76 min for pull request 27's run on one runner (GitHub's API). Sixteen
+  design jobs passed in about 4.5 minutes each; savepoint's failed 32 s
+  into its browser step, and the verdict failed with it, as built.
+- The log, which needs a sign-in, as the owner read it: "the browser
+  failed: Chrome did not open its debugging port within 30 s". The same
+  job run here passed, 0 failures in 315 s; his rerun on GitHub passed in
+  4 min 30 s, and he merged.
+- Main's run for that merge waited behind pull request 27's, still on one
+  runner. The workflow's comment and ADR-0019's row of the audit said
+  every run on main finishes; GitHub keeps one run waiting, and a newer
+  merge's takes its place. Corrected in both.
+
+## What was built
+
+- tools/cdp.py: a start has START_SECONDS, 60, to open the debugging
+  port; a start that fails is stopped, its profile removed, and Chrome
+  started once more with a fresh one; failing twice names both.
+- tools/prove_checks.py: a stand-in Chrome; a defeat case, one that never
+  opens its port, fails naming both starts; a browser control, stuck at
+  its first start and then the real Chrome, opens at the second.
+- checks.yml's comment on runs on main; ADR-0010 and ADR-0019, Changes;
+  CAPABILITIES; STATE.
+
+## Errors this seat made
+
+1. **Eighteen starts weighed as one.** The 30 s had held for one Chrome a
+   run; Phase 2 made it eighteen at once on fresh runners, and the
+   rehearsal, one job at a time on this machine, could not show it.
+2. **"On main every run finishes"**, written without reading how GitHub
+   queues a group's runs.
+3. The scratch runner of single cases read a case naming two texts as
+   one; mended.
+
+## Proofs
+
+- The two new cases against main's tools/cdp.py, in a worktree: both
+  fail, the stuck start in 32 s with "within 30 s", the time and words of
+  the job on GitHub. On the branch both hold, in 6 s and 9 s.
+- tools/prove_checks.py on the branch: 164 file defeat cases fail as built and 37 planted file controls pass, in 655 s; the new browser control, Chrome's start, run alone, passes.
+
+## Not done
+
+- Nothing pushed: chrome-start waits on the owner.
+- A narrowed run on GitHub, a pull request changing some designs only,
+  and the weekly run shared out, not yet seen there.
