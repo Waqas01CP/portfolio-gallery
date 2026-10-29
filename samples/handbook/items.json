@@ -1,0 +1,141 @@
+[
+  {
+    "id": "start-here",
+    "lane": "builds",
+    "title": "Start Here: a getting-started guide for a payments API",
+    "start": "2025-01",
+    "end": "present",
+    "source": "Projects / Start Here: a getting-started guide for a payments API",
+    "tier": 1,
+    "stack": ["Markdown", "OpenAPI", "Vale"],
+    "status": "Live on an example company's developer site since April 2025.",
+    "layer2": "One path from a new account to a first test payment, every step run on a clean machine.",
+    "layer1": "Cut the time to a first test payment from 2 days to 40 minutes.",
+    "detail": "Live on an example company's developer site.",
+    "bullets": [
+      "Cut the time to a first test payment from 2 days to <strong>40 minutes</strong> for the median new user.",
+      "Cut support tickets about setup by <strong>55%</strong> in the first quarter.",
+      "Runs every code sample in the guide on each change, so none goes stale."
+    ],
+    "proof": [
+      {"label": "Guide", "url": "https://example.com/start-here"},
+      {"label": "Write-up", "url": "https://example.com/start-here/notes"}
+    ]
+  },
+  {
+    "id": "style-sheet",
+    "lane": "builds",
+    "title": "Style Sheet: a writing guide for 12 engineering teams",
+    "start": "2024-06",
+    "end": "2024-12",
+    "date_style": "full",
+    "source": "Projects / Style Sheet: a writing guide for 12 engineering teams",
+    "tier": 2,
+    "stack": ["Vale", "Markdown"],
+    "status": "Finished.",
+    "layer1": "Wrote the house rules 12 example teams now follow.",
+    "detail": "Wrote the house rules.",
+    "bullets": [
+      "Wrote the house rules 12 example teams now follow, and a linter that checks them on every pull request.",
+      "Settled on one word for each of 140 terms that had two or three."
+    ],
+    "proof": [
+      {"label": "Guide", "url": "https://example.com/style-sheet"}
+    ]
+  },
+  {
+    "id": "technical-writer",
+    "lane": "work",
+    "title": "Technical Writer",
+    "org": "Sample Payments Ltd",
+    "org_short": "Sample Payments",
+    "location": "Example City",
+    "start": "2024-09",
+    "end": "present",
+    "source": "Experience / Technical Writer, Sample Payments Ltd",
+    "detail": "Write the API reference and guides for an example payments platform.",
+    "bullets": [
+      "Write the API reference and guides for an example payments platform used by 300 shops.",
+      "Set up a review in which an engineer and a new user test each guide before it ships."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "documentation-intern",
+    "lane": "work",
+    "title": "Documentation Intern",
+    "org": "Placeholder Software",
+    "location": "Remote",
+    "start": "2023-06",
+    "end": "2023-08",
+    "date_style": "full",
+    "source": "Experience / Documentation Intern, Placeholder Software",
+    "bullets": [
+      "Rewrote the install guide for an example command-line tool, from 14 steps to 5."
+    ],
+    "no_proof": "Client work under an agreement that keeps it private."
+  },
+  {
+    "id": "support-agent",
+    "lane": "work",
+    "title": "Support Agent",
+    "org": "Example Hosting Co",
+    "location": "Example City",
+    "start": "2022-01",
+    "end": "2023-05",
+    "source": "Experience / Support Agent, Example Hosting Co",
+    "bullets": [
+      "Answered about 60 customer questions a day, and kept a list of those the documentation should have answered."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "ba-english-computer-science",
+    "lane": "band",
+    "title": "BA English and Computer Science",
+    "org": "Example University",
+    "start": "2019-09",
+    "end": "2023-06",
+    "date_style": "full",
+    "source": "Education / BA English and Computer Science, Example University",
+    "grade": "3.8 / 4.0 CGPA",
+    "coursework": ["Technical Communication", "Programming Fundamentals", "Linguistics", "Human-Computer Interaction"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-api-documentation",
+    "lane": "certifications",
+    "title": "Example Certificate in API Documentation",
+    "org": "Example Academy",
+    "start": "2024-11",
+    "end": "2024-11",
+    "source": "Certifications / Example Certificate in API Documentation",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/api-documentation"}
+    ]
+  },
+  {
+    "id": "cert-technical-writing",
+    "lane": "certifications",
+    "title": "Example Certificate in Technical Writing",
+    "org": "Example Academy",
+    "start": "2024-03",
+    "end": "2024-03",
+    "source": "Certifications / Example Certificate in Technical Writing",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/technical-writing"}
+    ]
+  },
+  {
+    "id": "cert-plain-language",
+    "lane": "certifications",
+    "title": "Example Certificate in Plain Language",
+    "org": "Example Institute",
+    "start": "2023-06",
+    "end": "2023-06",
+    "source": "Certifications / Example Certificate in Plain Language",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/plain-language"}
+    ]
+  }
+]

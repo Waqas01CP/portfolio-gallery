@@ -1037,7 +1037,9 @@ def load_content(folder: Path, as_of: str) -> dict:
         "as_of": as_of,
         "site": site,
         "sections": sections,
-        "section": {s["id"]: s for s in sections},
+        # Every section by name, None when it has nothing to show, so a
+        # template can ask about one that is left out.
+        "section": {sid: None for sid, _ in SECTIONS} | {s["id"]: s for s in sections},
         "projects": by_lane["builds"],
         "work": by_lane["work"],
         "degree": by_lane["band"][0] if by_lane["band"] else None,

@@ -1,0 +1,117 @@
+[
+  {
+    "id": "field-node",
+    "lane": "builds",
+    "title": "Field Node: a soil sensor that runs on one battery",
+    "start": "2025-03",
+    "end": "present",
+    "source": "Projects / Field Node: a soil sensor that runs on one battery",
+    "tier": 1,
+    "stack": ["C", "Zephyr", "LoRa"],
+    "status": "Running in 60 example farm fields since June 2025.",
+    "layer2": "A sensor board that wakes once an hour, sends one reading and sleeps.",
+    "layer1": "Cut sleep current from 48 to 6 microamps.",
+    "detail": "Running in 60 example farm fields.",
+    "bullets": [
+      "Cut sleep current from 48 to <strong>6 microamps</strong> by switching off every unused peripheral.",
+      "Stretched battery life from 5 months to <strong>3 years</strong> on one AA cell, estimated from bench measurements.",
+      "Lost <strong>0.4%</strong> of readings over 9 months across 60 nodes.",
+      "Sends each reading in <strong>40 milliseconds</strong> of radio time."
+    ],
+    "proof": [
+      {"label": "Write-up", "url": "https://example.com/field-node"},
+      {"label": "Code", "url": "https://example.com/field-node/code"}
+    ]
+  },
+  {
+    "id": "line-follower",
+    "lane": "builds",
+    "title": "Line Follower: a robot kit for a school club",
+    "start": "2024-09",
+    "end": "2025-02",
+    "source": "Projects / Line Follower: a robot kit for a school club",
+    "tier": 2,
+    "stack": ["C++", "STM32"],
+    "status": "Finished.",
+    "layer1": "Designed a two-wheeled robot kit that 30 students built.",
+    "detail": "Designed a two-wheeled robot kit.",
+    "bullets": [
+      "Designed a two-wheeled robot kit that 30 students built in an example school's club.",
+      "Tuned its steering loop to hold the line at <strong>0.8 metres a second</strong>."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/line-follower"}
+    ]
+  },
+  {
+    "id": "firmware-engineer",
+    "lane": "work",
+    "title": "Firmware Engineer",
+    "org": "Sample Robotics Ltd",
+    "org_short": "Sample Robotics",
+    "location": "Example City",
+    "start": "2025-07",
+    "end": "present",
+    "source": "Experience / Firmware Engineer, Sample Robotics Ltd",
+    "detail": "Write the motor-control firmware for 25 warehouse robots.",
+    "bullets": [
+      "Write the motor-control firmware for 25 warehouse robots at an example company.",
+      "Found a timer fault that stopped a robot about once a week, and fixed it in the bootloader."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "hardware-test-intern",
+    "lane": "work",
+    "title": "Hardware Test Intern",
+    "org": "Placeholder Devices",
+    "location": "Example Town",
+    "start": "2024-06",
+    "end": "2024-08",
+    "date_style": "full",
+    "source": "Experience / Hardware Test Intern, Placeholder Devices",
+    "bullets": [
+      "Built a test jig that checks 200 example boards an hour for shorts and wrong parts."
+    ],
+    "no_proof": "Client work under an agreement that keeps it private."
+  },
+  {
+    "id": "teaching-assistant",
+    "lane": "work",
+    "title": "Teaching Assistant",
+    "org": "Example University",
+    "location": "Example City",
+    "start": "2023-09",
+    "end": "2024-05",
+    "source": "Experience / Teaching Assistant, Example University",
+    "bullets": [
+      "Ran weekly microcontroller labs for 40 second-year students."
+    ],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "beng-electronic-engineering",
+    "lane": "band",
+    "title": "BEng Electronic Engineering",
+    "org": "Example University",
+    "start": "2021-09",
+    "end": "2025-06",
+    "date_style": "full",
+    "source": "Education / BEng Electronic Engineering, Example University",
+    "grade": "3.7 / 4.0 CGPA",
+    "coursework": ["Embedded Systems", "Control Theory", "Digital Signal Processing", "Real-Time Operating Systems"],
+    "no_proof": "Checked with the university on request."
+  },
+  {
+    "id": "cert-functional-safety",
+    "lane": "certifications",
+    "title": "Example Certificate in Functional Safety",
+    "org": "Example Academy",
+    "start": "2025-03",
+    "end": "2025-03",
+    "source": "Certifications / Example Certificate in Functional Safety",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/functional-safety"}
+    ]
+  }
+]

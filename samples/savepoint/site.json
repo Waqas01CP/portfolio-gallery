@@ -1,0 +1,34 @@
+{
+  "name": "Robin Tileset",
+  "headline": ["Game developer", "Gameplay and tools programming"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to gameplay programming roles",
+  "summary": "Game developer who prototypes fast and finishes what ships. Builds small games end to end, and tunes each one against playtest notes rather than taste.",
+  "intro": "This is a sample portfolio. Robin Tileset is an invented person, and every employer, school, game and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "lantern-path",
+      "from": "lantern-path/bullets/1",
+      "before": "Played by",
+      "figure": "18,000",
+      "text": "people in its first 3 months"
+    },
+    {
+      "item": "lantern-path",
+      "from": "lantern-path/bullets/2",
+      "before": "Rated",
+      "figure": "4.6 out of 5",
+      "text": "by 900 players"
+    }
+  ],
+  "skills": [
+    {"label": "Engines", "items": ["Unity", "Godot"]},
+    {"label": "Languages", "items": ["C#", "C++", "GDScript"]},
+    {"label": "Craft", "items": ["Gameplay", "Level design", "Tools"]},
+    {"label": "Workflow", "items": ["Git", "Perforce", "Playtesting"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:robin@example.com", "text": "robin@example.com", "line": "The quickest way to reach me."},
+    {"label": "Games", "url": "https://example.com/games", "text": "example.com/games", "line": "Every game, free to play in a browser."}
+  ]
+}

@@ -127,7 +127,9 @@ a design that does not exist, one naming another design, and a folder that
 is not a whole content folder; the checks build each sample person's own
 site and trace it to their CV, as yours is. Every sample person is
 invented and obviously so, every link goes to example.com, and a copy of
-the template removes samples/.
+the template removes samples/. Each has the sections and amounts their
+profession's portfolio would: one may have no degree, no certificates or
+no headline figures, and the build leaves those sections out.
 
 ## Limits
 

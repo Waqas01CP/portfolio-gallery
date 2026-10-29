@@ -1,0 +1,368 @@
+/* Handbook: a portfolio for technical writers, as a cloth-bound book. The
+   first screen is the cover, olive linen with a stamped panel and the
+   name in gilt; after it the pages, cream, one column with a wide margin
+   where dates and facts sit as margin notes. Sections open as chapters,
+   the timeline reads as a contents page with dot leaders, the skills as
+   an index, the contact routes as a colophon. On a wide screen the menu
+   is a set of coloured thumb-index tabs down the right edge; below that
+   width, a ribbon bookmark along the bottom. Light, and a night-reading
+   dark.
+
+   One font file, Literata's variable weights and optical sizes,
+   preloaded and shown with font-display: optional (ADR-0014). Almost no
+   motion. It styles the engine's fixed HTML
+   (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Literata";
+  src: url("fonts/literata-latin-opsz-normal.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: optional;
+}
+
+:root {
+  --cloth: #4E5B31;
+  --cloth-deep: #3B4624;
+  --gilt: #E2C77F;      /* on the cloth, 5.6:1 */
+  --cover-ink: #F5EEDA;
+  --paper: #FBF7EE;
+  --leaf: #F3ECDC;      /* panels on the page */
+  --ink: #2A2522;
+  --muted: #5F574D;     /* 6.6:1 on the paper */
+  --ox: #7B2430;        /* oxblood, 9.2:1 on the paper */
+  --rule: #D8CDB8;      /* rules, never text */
+  --tab1: #7B2430; --tab2: #8C6418; --tab3: #3E5A6B; --tab4: #5A4A7A;
+  --tab5: #2F5D46; --tab6: #8A3F2E; --tab7: #4E5B31; --tab8: #6B3B5A;
+  --book: "Literata", Georgia, "Times New Roman", serif;
+  --bar: 0px;
+  --pg-knot: 0;
+  --pg-tilt: 0;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: light;
+}
+/* Night reading: the dark theme, by the device or by the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cloth: #2F3820; --cloth-deep: #232A17; --gilt: #E2C77F; --cover-ink: #EFE6CF;
+    --paper: #1C1A16; --leaf: #26231D; --ink: #ECE3CF; --muted: #BDB29C; --ox: #EBA0A8; --rule: #3E3930;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --cloth: #2F3820; --cloth-deep: #232A17; --gilt: #E2C77F; --cover-ink: #EFE6CF;
+  --paper: #1C1A16; --leaf: #26231D; --ink: #ECE3CF; --muted: #BDB29C; --ox: #EBA0A8; --rule: #3E3930;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-bottom: calc(var(--bar) + 16px); }
+body {
+  margin: 0;
+  padding-bottom: var(--bar);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--book);
+  font-size: 18px;
+  line-height: 1.68;
+  font-optical-sizing: auto;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  hyphens: auto;
+}
+h1, h2, h3, h4, p { margin: 0; }
+p, li { text-wrap: pretty; }
+a { color: var(--ox); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--ox); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+strong { font-weight: 700; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 56px); }
+.skip { padding: 10px 16px; background: var(--ox); color: var(--paper); font-weight: 700; }
+.skip:focus { color: var(--paper); }
+.proj, .job, .degree, .cert { scroll-margin-top: 24px; }
+
+/* Small capitals for labels: the glyphs change, the words do not. */
+.result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-dates,
+.degree-courses h4, .cert-view, .foot-credit, .strip-static, .avail {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+}
+
+.knot, .feature-glow, .depth-glow, .degree-glow, .glare, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign, .arrow,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .route-top, .avail-dot, .skill-n { display: none; }
+
+/* Buttons: quiet, ruled, like a book's own furniture. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ox);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: var(--leaf); }
+.btn-sm, .depth-toggle { min-height: 38px; padding: 0 14px; font-size: 15px; }
+.depth-toggle::after { content: "+" / ""; }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 0; }
+.chips li { font-style: italic; color: var(--muted); }
+.chips li:not(:last-child)::after { content: "\00B7" / ""; margin: 0 0.5em; font-style: normal; }
+
+/* The menu, below 1240 px: a ribbon bookmark along the bottom. */
+:root { --bar: 52px; }
+.dnav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  background: var(--tab1);
+  box-shadow: 0 -2px 0 var(--gilt);
+}
+.dnav-list { list-style: none; margin: 0; padding: 0 10px; display: flex; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.dnav-list li { flex: none; }
+.dnav-list a { display: flex; align-items: center; min-height: 52px; padding: 0 12px; color: #FFF3E6; font-size: 16px; text-decoration: none; }
+.dnav-list a[aria-current] { box-shadow: inset 0 -3px 0 var(--gilt); }
+.dnav-list a:hover { background: rgba(255, 255, 255, 0.1); }
+.dnav :focus-visible { outline-color: var(--gilt); outline-offset: -3px; }
+.theme-switch { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 14px; border: 0; background: transparent; color: #FFF3E6; cursor: pointer; }
+.theme-switch .track { width: 30px; height: 16px; border-radius: 9px; border: 1px solid #FFF3E6; position: relative; }
+.theme-switch .knob { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: #FFF3E6; }
+.theme-switch[aria-checked="true"] .knob { left: 16px; }
+
+/* From 1240 px: thumb-index tabs, each its own colour, cut into the right
+   edge; the section in view stands out further. */
+@media (min-width: 1240px) {
+  :root { --bar: 0px; }
+  .dnav {
+    left: auto;
+    right: 0;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    align-items: stretch;
+    background: transparent;
+    box-shadow: none;
+  }
+  .dnav-list { flex-direction: column; gap: 4px; padding: 0; overflow: visible; }
+  .dnav-list a {
+    justify-content: flex-start;
+    width: 148px;
+    min-height: 36px;
+    margin-left: 22px;
+    padding: 0 14px;
+    border-radius: 6px 0 0 6px;
+    font-size: 15px;
+    box-shadow: -2px 2px 0 rgba(0, 0, 0, 0.15);
+    transition: margin-left 0.2s ease;
+  }
+  .dnav-list li:nth-child(1) a { background: var(--tab1); }
+  .dnav-list li:nth-child(2) a { background: var(--tab2); }
+  .dnav-list li:nth-child(3) a { background: var(--tab3); }
+  .dnav-list li:nth-child(4) a { background: var(--tab4); }
+  .dnav-list li:nth-child(5) a { background: var(--tab5); }
+  .dnav-list li:nth-child(6) a { background: var(--tab6); }
+  .dnav-list li:nth-child(7) a { background: var(--tab7); }
+  .dnav-list li:nth-child(8) a { background: var(--tab8); }
+  .dnav-list a:hover, .dnav-list a:focus-visible, .dnav-list a[aria-current] { margin-left: 0; box-shadow: -4px 3px 0 rgba(0, 0, 0, 0.2), inset 4px 0 0 var(--gilt); }
+  .theme-switch { order: -1; align-self: flex-end; width: 126px; min-height: 36px; margin-bottom: 8px; border-radius: 6px 0 0 6px; background: var(--ink); color: var(--paper); }
+  .theme-switch .track { border-color: var(--paper); }
+  .theme-switch .knob { background: var(--paper); }
+}
+
+/* The cover: olive linen, a stamped panel, the name in gilt. */
+.intro {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(40px, 7vw, 88px) 0 clamp(24px, 4vw, 40px);
+  background-color: var(--cloth);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 80% at 50% 30%, rgba(255, 255, 255, 0.08), transparent 70%);
+  color: var(--cover-ink);
+}
+/* The ribbon that marks the page, hanging from the top. */
+.intro-glow { position: absolute; top: 0; right: clamp(28px, 18vw, 260px); width: 28px; height: clamp(120px, 22vh, 220px); background: var(--tab1); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); }
+.intro > .wrap {
+  position: relative;
+  width: min(100% - 32px, 620px);
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 56px) clamp(20px, 4vw, 48px);
+  border: 1px solid var(--gilt);
+  box-shadow: inset 0 0 0 6px var(--cloth-deep), inset 0 0 0 7px var(--gilt), 0 18px 40px rgba(0, 0, 0, 0.25);
+  background: var(--cloth-deep);
+  text-align: center;
+}
+.intro a { color: var(--gilt); }
+.intro :focus-visible { outline-color: var(--gilt); }
+.avail { display: inline-block; color: var(--gilt); }
+.intro-name { margin-top: 8px; font-size: clamp(38px, 6.4vw, 70px); font-weight: 600; line-height: 1.05; letter-spacing: 0.02em; color: var(--gilt); font-variant-caps: small-caps; overflow-wrap: anywhere; }
+.intro-name .serif { font-weight: 400; font-style: normal; }
+.headline { margin-top: 14px; font-size: 19px; font-style: italic; color: var(--cover-ink); }
+.sep { color: var(--gilt); }
+/* Gilt rules above and below the blurb. */
+.intro-grid { display: grid; gap: 24px; margin-top: 26px; padding: 22px 0 0; border-top: 1px solid var(--gilt); }
+.intro-main { min-width: 0; }
+.facts { list-style: none; margin: 0; padding: 0; font-size: 15px; color: var(--cover-ink); font-variant-caps: all-small-caps; letter-spacing: 0.05em; font-variant-numeric: lining-nums; }
+.lede { margin-top: 12px; font-size: 17px; text-align: left; hyphens: auto; }
+.cta { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.intro .btn { color: var(--gilt); }
+.intro .btn:hover { background: rgba(255, 255, 255, 0.08); }
+.intro .btn-acc { background: var(--gilt); border-color: var(--gilt); color: var(--cloth-deep); }
+.intro .btn-acc:hover { background: var(--cover-ink); border-color: var(--cover-ink); }
+/* The figures: oldstyle numerals in a row, under the blurb. */
+.results { list-style: none; margin: 0; padding: 20px 0 0; border-top: 1px solid var(--gilt); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px 28px; }
+.result { text-align: center; }
+.result-label { color: var(--gilt); }
+.result-fig { display: flex; flex-direction: column; font-size: 15px; font-style: italic; }
+.result-num, .result-word { font-size: 46px; font-style: normal; font-weight: 500; line-height: 1.05; color: var(--cover-ink); font-variant-numeric: oldstyle-nums; }
+.result-suffix { font-size: 0.5em; }
+/* The publisher's line at the cover's foot. */
+.strip { margin-top: 26px; text-align: center; }
+.strip-static { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 26px; color: var(--gilt); }
+
+/* The pages: one column, a wide margin for notes from 900 px. */
+.page { padding-top: 8px; }
+.sec { padding: clamp(64px, 8vw, 104px) 0 0; }
+.sec-last { padding-bottom: clamp(64px, 8vw, 104px); }
+/* A chapter opener: the numeral, a rule, the title in small capitals. */
+.sec-head { margin-bottom: 34px; text-align: center; }
+.sec-title { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sec-n { order: -1; font-size: 64px; font-weight: 300; line-height: 1; color: var(--ox); font-variant-numeric: oldstyle-nums; }
+.sec-title h2 { font-size: clamp(28px, 3.2vw, 36px); font-weight: 500; letter-spacing: 0.08em; font-variant-caps: small-caps; }
+.sec-title::after { content: "\2766" / ""; margin-top: 8px; color: var(--ox); font-size: 18px; }
+
+/* Projects: chapters of text with margin notes. */
+.feature { margin: 0 auto 34px; max-width: 640px; padding: 20px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-align: center; display: grid; gap: 4px; }
+.feature-label { color: var(--muted); }
+.feature-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 12px; }
+.feature-num { font-size: clamp(56px, 7vw, 84px); font-weight: 400; line-height: 1; color: var(--ox); }
+.feature-text { font-size: 21px; font-style: italic; }
+.feature-pairs { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 24px; }
+.feature-pairs .num { font-weight: 700; color: var(--ox); }
+.feature-note { color: var(--muted); font-style: italic; }
+.proj-grid { display: grid; gap: 40px; }
+.proj { padding-top: 34px; border-top: 1px solid var(--rule); }
+.proj:first-child { padding-top: 0; border-top: 0; }
+.proj-dates { color: var(--ox); }
+.proj h3 { margin-top: 4px; font-size: clamp(24px, 2.6vw, 30px); font-weight: 600; line-height: 1.2; }
+.proj.is-open h3 { color: var(--ox); }
+.proj-sub { font-style: italic; color: var(--muted); }
+.proj-summary { margin-top: 12px; }
+.proj-lead .proj-summary::first-letter { initial-letter: 3; margin-right: 0.12em; font-weight: 600; color: var(--ox); }
+.proj-side { margin-top: 16px; display: grid; gap: 10px; font-size: 16px; }
+.proj-fact { font-style: italic; }
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { padding: 22px 26px; background: var(--leaf); border-left: 3px solid var(--ox); }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.depth-head h3 { font-size: 22px; font-weight: 600; }
+.depth-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 2.6em minmax(0, 1fr); padding: 8px 0; }
+.depth-n { color: var(--ox); font-variant-numeric: oldstyle-nums; }
+@media (min-width: 900px) {
+  /* The text column, and the margin beside it for dates and facts. */
+  .proj-body { display: grid; grid-template-columns: minmax(0, 1fr) 15em; gap: 0 40px; }
+  .proj-head { display: contents; }
+  .proj-dates { grid-column: 2; grid-row: 1; align-self: end; padding-left: 14px; border-left: 1px solid var(--ox); }
+  .proj h3, .proj-sub, .proj-summary { grid-column: 1; }
+  .proj h3 { grid-row: 1; }
+  .proj-side { grid-column: 2; grid-row: 2 / span 3; align-self: start; margin-top: 12px; padding-left: 14px; border-left: 1px solid var(--rule); }
+  .depth { margin-right: calc(15em + 40px); }
+}
+
+/* Timeline: a contents page, each entry joined to its dates by dots. */
+.tl-lanes { margin-bottom: 18px; }
+.tl-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.tl-filter { min-height: 38px; font-size: 15px; }
+.tl-filter .shape { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.tl-filter[aria-pressed="false"] { color: var(--muted); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 12px 0; font-weight: 600; text-align: center; }
+.tl-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; display: flex; flex-direction: column; }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; margin: 14px 0; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); text-align: center; font-style: italic; }
+.tl-entry { order: 2; }
+.tl-band-label { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 12px; }
+.tl-card summary { list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; padding: 8px 0; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-title { order: 1; font-weight: 600; }
+.tl-card summary::after { content: "" / ""; order: 2; flex: 1 1 40px; min-width: 24px; height: 0.4em; background: radial-gradient(circle, var(--muted) 1px, transparent 1.5px) left center / 8px 4px repeat-x; }
+.tl-meta { order: 3; display: flex; gap: 8px; color: var(--muted); }
+.tl-org { order: 4; flex-basis: 100%; font-style: italic; color: var(--muted); font-size: 16px; }
+.tl-sign::before { content: "+" / ""; color: var(--ox); }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-dates { color: var(--ox); }
+.tl-card summary:hover .tl-title { color: var(--ox); }
+.tl-pop { padding: 0 0 12px 1.4em; font-size: 16px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+
+/* Work and Education: chapters, the dates in the margin. */
+.jobs { display: grid; gap: 34px; }
+.job-dates { color: var(--ox); }
+.job h3, .degree h3 { margin-top: 4px; font-size: 25px; font-weight: 600; line-height: 1.2; }
+.job-org, .degree-org { font-style: italic; }
+.job-loc, .degree-cgpa { color: var(--muted); font-size: 16px; }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { margin-top: 8px; padding-left: 1.4em; text-indent: -1.4em; }
+.job-list li::before { content: "\2013\00A0" / ""; color: var(--ox); }
+.degree-courses { margin-top: 14px; }
+.degree-courses h4 { margin-bottom: 6px; color: var(--muted); font-weight: 400; }
+@media (min-width: 900px) {
+  .job, .degree { display: grid; grid-template-columns: minmax(0, 1fr) 15em; gap: 0 40px; }
+  .job-head, .degree-head { display: contents; }
+  .job-top, .degree .job-top { grid-column: 2; grid-row: 1 / span 4; align-self: start; padding-left: 14px; border-left: 1px solid var(--ox); }
+  .job-head > :not(.job-top), .job-list, .degree-head > :not(.job-top), .degree-courses { grid-column: 1; }
+}
+
+/* Certifications: an appendix, each with its dot leader to the date. */
+.certs { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; display: grid; gap: 6px; }
+.cert { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; padding: 8px 0; color: var(--ink); text-decoration: none; }
+.cert-name { order: 1; }
+.cert::after { content: "" / ""; order: 2; flex: 1 1 40px; min-width: 24px; height: 0.4em; background: radial-gradient(circle, var(--muted) 1px, transparent 1.5px) left center / 8px 4px repeat-x; }
+.cert-top { order: 3; color: var(--ox); }
+.cert-view { order: 4; flex-basis: 100%; color: var(--ox); }
+.cert-title { font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cert-org { display: block; font-style: italic; color: var(--muted); font-size: 16px; }
+.cert:hover .cert-title { color: var(--ox); }
+
+/* Skills: the index, in two columns. */
+.skills { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; columns: 2 18em; column-gap: 48px; column-rule: 1px solid var(--rule); }
+.skill { break-inside: avoid; margin-bottom: 18px; }
+.skill h3 { font-size: 19px; font-weight: 600; letter-spacing: 0.06em; font-variant-caps: small-caps; }
+
+/* Contact: the colophon. */
+.routes { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; display: grid; gap: 18px; text-align: center; }
+.routes::before { content: "\2766" / ""; display: block; color: var(--ox); font-size: 26px; }
+.route { display: grid; gap: 2px; color: var(--ink); text-decoration: none; }
+.route-label { font-size: 22px; font-variant-caps: small-caps; letter-spacing: 0.06em; }
+.route-line { font-style: italic; color: var(--muted); }
+.route-addr { color: var(--ox); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.route:hover .route-label { color: var(--ox); }
+
+/* Footer: the last leaf. */
+.foot { padding: 32px clamp(18px, 5vw, 56px) 44px; border-top: 1px solid var(--rule); display: grid; gap: 4px; text-align: center; }
+.foot-name { font-size: 22px; font-variant-caps: small-caps; letter-spacing: 0.06em; }
+.foot-loc, .foot-credit { color: var(--muted); }
+.foot-credit { margin-top: 8px; }

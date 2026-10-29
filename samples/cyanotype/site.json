@@ -1,0 +1,55 @@
+{
+  "name": "Rowan Fixture",
+  "headline": ["Embedded systems engineer", "Firmware for sensors and robots"],
+  "location": "Example City, Exampleland",
+  "availability": "Open to embedded and robotics roles",
+  "summary": "Embedded engineer who writes firmware for small boards that must run for years on one battery. Measures power on the bench before trusting any estimate, and every number on this page comes from those measurements.",
+  "intro": "This is a sample portfolio. Rowan Fixture is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "field-node",
+      "from": "field-node/bullets/1",
+      "before": "Cut sleep current from",
+      "figure": "48 to 6 microamps",
+      "text": "by switching off every unused peripheral"
+    },
+    {
+      "item": "field-node",
+      "from": "field-node/bullets/3",
+      "before": "Lost",
+      "figure": "0.4%",
+      "text": "of readings over 9 months"
+    },
+    {
+      "item": "field-node",
+      "from": "field-node/bullets/4",
+      "before": "Sends each reading in",
+      "figure": "40 milliseconds",
+      "text": "of radio time"
+    },
+    {
+      "item": "line-follower",
+      "from": "line-follower/bullets/2",
+      "before": "Tuned its steering loop to hold the line at",
+      "figure": "0.8",
+      "text": "metres a second"
+    }
+  ],
+  "feature": {
+    "item": "field-node",
+    "from": "field-node/bullets/2",
+    "label": "Battery life",
+    "figure": "3 years",
+    "text": "on one AA cell",
+    "note": "estimated from bench measurements."
+  },
+  "skills": [
+    {"label": "Firmware", "items": ["C", "C++", "Zephyr", "FreeRTOS"]},
+    {"label": "Bench", "items": ["Oscilloscope", "Logic analyser", "KiCad"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:rowan@example.com", "text": "rowan@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Bench notes and measurements."},
+    {"label": "Code", "url": "https://example.com/code", "text": "example.com/code", "line": "Firmware and board files."}
+  ]
+}

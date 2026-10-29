@@ -1,0 +1,130 @@
+[
+  {
+    "id": "tide-ui",
+    "lane": "builds",
+    "title": "Tide UI: a component library for an example bank",
+    "start": "2025-04",
+    "end": "present",
+    "source": "Projects / Tide UI: a component library for an example bank",
+    "tier": 1,
+    "stack": ["TypeScript", "React", "CSS"],
+    "status": "Used by 6 example product teams since July 2025.",
+    "layer2": "Forty components, each with its keyboard path written down and tested.",
+    "layer1": "Cut the median page weight by 38%.",
+    "detail": "Used by 6 example product teams.",
+    "bullets": [
+      "Cut the median page weight of the bank's screens by <strong>38%</strong> by removing a CSS framework.",
+      "Brought largest paint from 4.1 to <strong>1.6 seconds</strong> on a mid-range phone.",
+      "Passes axe-core with <strong>0 violations</strong> on all 40 components, checked on every pull request."
+    ],
+    "proof": [
+      {"label": "Docs", "url": "https://example.com/tide-ui"},
+      {"label": "Code", "url": "https://example.com/tide-ui/code"}
+    ]
+  },
+  {
+    "id": "motion-lab",
+    "lane": "builds",
+    "title": "Motion Lab: scroll-driven animation demos",
+    "start": "2024-11",
+    "end": "2025-03",
+    "source": "Projects / Motion Lab: scroll-driven animation demos",
+    "tier": 2,
+    "stack": ["CSS", "HTML"],
+    "status": "Finished.",
+    "layer1": "Twelve demos built with CSS alone.",
+    "detail": "Twelve demos built with CSS alone.",
+    "bullets": [
+      "Twelve demos built with CSS alone, each still under reduced motion.",
+      "Each demo stays under <strong>16 milliseconds</strong> a frame on a mid-range phone."
+    ],
+    "proof": [
+      {"label": "Demos", "url": "https://example.com/motion-lab"}
+    ]
+  },
+  {
+    "id": "colour-check",
+    "lane": "builds",
+    "title": "Colour Check: a contrast checker for design tokens",
+    "start": "2024-07",
+    "end": "2024-10",
+    "date_style": "full",
+    "source": "Projects / Colour Check: a contrast checker for design tokens",
+    "tier": 3,
+    "stack": ["TypeScript"],
+    "layer2": "Checks every pair of colour tokens in a design file",
+    "layer1": "against the contrast rules.",
+    "bullets": [
+      "Checks every pair of colour tokens in a design file against the contrast rules."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/colour-check"}
+    ]
+  },
+  {
+    "id": "form-kit",
+    "lane": "builds",
+    "title": "Form Kit: accessible form fields",
+    "start": "2024-03",
+    "end": "2024-06",
+    "date_style": "full",
+    "source": "Projects / Form Kit: accessible form fields",
+    "tier": 3,
+    "stack": ["HTML", "CSS"],
+    "layer2": "Form fields whose errors a screen reader reads",
+    "layer1": "at the right moment.",
+    "bullets": [
+      "Form fields whose errors a screen reader reads at the right moment."
+    ],
+    "proof": [
+      {"label": "Code", "url": "https://example.com/form-kit"}
+    ]
+  },
+  {
+    "id": "small-shop",
+    "lane": "builds",
+    "title": "Small Shop: a storefront for an example bakery",
+    "start": "2023-10",
+    "end": "2024-02",
+    "source": "Projects / Small Shop: a storefront for an example bakery",
+    "tier": 3,
+    "stack": ["Astro", "CSS"],
+    "layer2": "A storefront that loads in under a second",
+    "layer1": "on a slow connection.",
+    "bullets": [
+      "A storefront that loads in under a second on a slow connection."
+    ],
+    "proof": [
+      {"label": "Site", "url": "https://example.com/small-shop"}
+    ]
+  },
+  {
+    "id": "frontend-developer",
+    "lane": "work",
+    "title": "Frontend Developer",
+    "org": "Sample Bank plc",
+    "org_short": "Sample Bank",
+    "location": "Example City",
+    "start": "2025-04",
+    "end": "present",
+    "source": "Experience / Frontend Developer, Sample Bank plc",
+    "detail": "Build the component library for an example bank's web app.",
+    "bullets": [
+      "Build the component library for an example bank's web app, used by 6 product teams.",
+      "Run a monthly check of every screen on a mid-range phone and with a screen reader."
+    ],
+    "no_proof": "Internal work for an employer has no public link."
+  },
+  {
+    "id": "cert-web-accessibility",
+    "lane": "certifications",
+    "title": "Example Certificate in Web Accessibility",
+    "org": "Example Institute",
+    "start": "2024-05",
+    "end": "2024-05",
+    "source": "Certifications / Example Certificate in Web Accessibility",
+    "proof": [
+      {"label": "Credential", "url": "https://example.com/certificates/web-accessibility"}
+    ]
+  }
+]

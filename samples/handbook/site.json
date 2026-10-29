@@ -1,0 +1,31 @@
+{
+  "name": "Quinn Lorem",
+  "headline": ["Technical writer for developer tools"],
+  "location": "Example City, Exampleland",
+  "summary": "Technical writer who turns working code into documents people can follow the first time. Tests every step on a clean machine before it ships, and counts the questions readers stop asking.",
+  "intro": "This is a sample portfolio. Quinn Lorem is an invented person, and every employer, school and link on this page is fictional.",
+  "highlights": [
+    {
+      "item": "start-here",
+      "from": "start-here/bullets/1",
+      "before": "Cut the time to a first test payment to",
+      "figure": "40 minutes",
+      "text": "for the median new user"
+    },
+    {
+      "item": "start-here",
+      "from": "start-here/bullets/2",
+      "before": "Cut support tickets about setup by",
+      "figure": "55%",
+      "text": "in the first quarter"
+    }
+  ],
+  "skills": [
+    {"label": "Writing", "items": ["API references", "Tutorials", "Release notes", "Style guides"]},
+    {"label": "Tools", "items": ["Markdown", "OpenAPI", "Vale", "Git"]}
+  ],
+  "contact": [
+    {"label": "Email", "cta": "Email me", "url": "mailto:quinn@example.com", "text": "quinn@example.com", "line": "The quickest way to reach me."},
+    {"label": "Website", "url": "https://example.com/", "text": "example.com", "line": "Writing samples and guides."}
+  ]
+}

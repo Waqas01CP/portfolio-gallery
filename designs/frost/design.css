@@ -1,0 +1,379 @@
+/* Frost: a portfolio for frontend and creative developers. Frosted glass
+   panels float over a slow aurora of ice-cyan and blue light. The menu is
+   a glass capsule floating at the top, which tightens once the page
+   scrolls; the name, centred and as wide as the screen, tightens its width
+   as the page scrolls; the headline is a row of glass pills; the figures are glass
+   tiles that drift at their own speeds; the projects are a deck of glass
+   cards that stack as they scroll by, each tilting toward the pointer
+   with the engine's glare. Light and dark.
+
+   One font file, Bricolage Grotesque's variable weights, widths and
+   optical sizes, preloaded and shown with font-display: optional
+   (ADR-0014). Its motion uses the newest CSS where the browser has it:
+   scroll-driven animations, an animated custom property for the aurora,
+   container query units for the name, corner-shape for the cards'
+   corners. Without them, and always under reduced motion, the page is
+   still and complete. It styles the engine's fixed HTML
+   (docs/reference/design-contract.md). */
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("fonts/bricolage-grotesque-latin-standard-normal.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-style: normal;
+  font-display: optional;
+}
+
+@property --hue {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+:root {
+  --sky: #F2F6FB;
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-edge: rgba(255, 255, 255, 0.95);
+  --ink: #0A1428;
+  --muted: #3D4B63;     /* 7.9:1 on the sky */
+  --ice: #0A6E80;       /* links and marks in light: 5.4:1 on the sky */
+  --blue: #2F49E0;
+  --a1: rgba(34, 211, 238, 0.45);
+  --a2: rgba(59, 91, 255, 0.40);
+  --a3: rgba(124, 242, 208, 0.30);
+  --ring: linear-gradient(120deg, #22D3EE, #3B5BFF, #7CF2D0, #22D3EE);
+  --shadow: 0 16px 40px rgba(10, 20, 40, 0.12);
+  --bar: 72px;          /* the capsule's band, which the page starts below */
+  --font: "Bricolage Grotesque", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --pg-knot: 0;
+  --pg-tilt: 1;
+  --pg-strip: 0;
+  --pg-scroll: 0;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky: #070B18; --glass: rgba(255, 255, 255, 0.07); --glass-edge: rgba(255, 255, 255, 0.22);
+    --ink: #EEF4FF; --muted: #A9B6CE; --ice: #67E8F9; --blue: #9DB0FF;
+    --a1: rgba(34, 211, 238, 0.38); --a2: rgba(59, 91, 255, 0.45); --a3: rgba(124, 242, 208, 0.20);
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky: #070B18; --glass: rgba(255, 255, 255, 0.07); --glass-edge: rgba(255, 255, 255, 0.22);
+  --ink: #EEF4FF; --muted: #A9B6CE; --ice: #67E8F9; --blue: #9DB0FF;
+  --a1: rgba(34, 211, 238, 0.38); --a2: rgba(59, 91, 255, 0.45); --a3: rgba(124, 242, 208, 0.20);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+/* Every target lands below the capsule. */
+[id] { scroll-margin-top: var(--bar); }
+body {
+  margin: 0;
+  padding-top: var(--bar);
+  background: var(--sky);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.6;
+}
+/* The aurora: three lights fixed behind everything, their hues turning
+   slowly where an animated custom property is supported. */
+body::before {
+  content: "" / "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(48% 42% at 16% 22%, var(--a1), transparent 70%),
+    radial-gradient(52% 48% at 84% 18%, var(--a2), transparent 72%),
+    radial-gradient(60% 50% at 60% 96%, var(--a3), transparent 70%);
+  filter: hue-rotate(var(--hue));
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--ice); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+strong { font-weight: 700; }
+.i { flex: none; vertical-align: -0.12em; margin: 0 0.2em; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
+.skip { padding: 10px 16px; background: var(--ink); color: var(--sky); font-weight: 700; border-radius: 999px; }
+.skip:focus { color: var(--sky); }
+
+/* Glass: a translucent panel with a bright edge and a soft shadow. */
+.result, .proj, .depth, .job, .degree, .cert, .skill, .route, .feature, .tl-card, .tl-band, .dnav {
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-radius: 22px;
+}
+@supports (corner-shape: squircle) {
+  .result, .proj, .depth, .job, .degree, .cert, .skill, .route, .feature { corner-shape: squircle; border-radius: 40px; }
+}
+
+.result-label, .feature-label, .proj-dates, .job-dates, .cert-top, .tl-dates,
+.degree-courses h4, .cert-view, .foot-credit {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-stretch: 85%;
+  color: var(--muted);
+}
+
+.knot, .intro-glow, .feature-glow, .depth-glow, .degree-glow, .cert-flood,
+.fade-word, .rail, .mbar, .dot, .sq, .tile, .route-icon, .sign, .arrow,
+.tl-axis, .tl-mspine, .tl-yr, .tl-mark, .tl-head, .tl-scale, .tl-band-bg, .tl-band-end,
+.cert-sq, .strip-pause, .route-top, .skill-n { display: none; }
+/* The engine's glare, on the cards that tilt. */
+.glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(40% 50% at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.35), transparent 70%); opacity: 0; transition: opacity 0.3s; }
+[data-tilt]:hover .glare { opacity: 1; }
+[data-tilt] { position: relative; }
+
+/* Buttons: pills with a gradient ring. */
+.btn, .depth-toggle, .tl-filter, .tl-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(var(--sky), var(--sky)) padding-box, var(--ring) border-box;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover, .depth-toggle:hover, .tl-filter:hover { background: linear-gradient(var(--glass), var(--glass)) padding-box, var(--ring) border-box; }
+.btn-acc { background: linear-gradient(var(--ink), var(--ink)) padding-box, var(--ring) border-box; color: var(--sky); }
+.btn-acc:hover { background: linear-gradient(var(--blue), var(--blue)) padding-box, var(--ring) border-box; color: #FFFFFF; }
+.btn-sm, .depth-toggle { min-height: 40px; padding: 0 16px; font-size: 14px; }
+.depth-toggle::after { content: "+" / ""; }
+.depth-toggle[aria-expanded="true"]::after { content: "\2212" / ""; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { padding: 3px 12px; border-radius: 999px; border: 1px solid var(--glass-edge); background: var(--glass); font-size: 13px; font-weight: 600; }
+
+/* The capsule menu, in the band the page starts below. */
+.dnav {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  max-width: calc(100% - 24px);
+  padding: 4px;
+  border-radius: 999px;
+}
+.dnav-list { list-style: none; margin: 0; padding: 0; display: flex; overflow-x: auto; scrollbar-width: none; }
+.dnav-list li { flex: none; }
+.dnav-list a { display: flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; color: var(--ink); font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.dnav-list a:hover { background: var(--glass); }
+.dnav-list a[aria-current] { background: var(--ink); color: var(--sky); }
+.theme-switch { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; font-size: 14px; font-weight: 600; }
+.theme-switch .track { width: 30px; height: 16px; border-radius: 9px; border: 1.5px solid currentColor; position: relative; }
+.theme-switch .knob { position: absolute; top: 2px; left: 2px; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.theme-switch[aria-checked="true"] .knob { left: 16px; }
+
+/* The Intro: centred, the name as wide as the screen allows, the
+   headline in a glass pill, drifting tiles. */
+.intro { position: relative; padding: clamp(24px, 4vw, 48px) 0 clamp(36px, 5vw, 64px); container-type: inline-size; }
+.intro > .wrap { display: flex; flex-direction: column; align-items: center; }
+.intro-grid { align-self: stretch; }
+.avail { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--glass-edge); background: var(--glass); font-size: 14px; font-weight: 600; }
+.avail-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+.intro-name {
+  margin-top: 18px;
+  font-size: clamp(52px, 16cqi, 240px);
+  font-weight: 800;
+  font-stretch: 100%;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+  text-align: center;
+  max-width: 100%;
+}
+.intro-name span { display: block; }
+.intro-name .serif {
+  background: var(--ring);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 300;
+}
+/* The headline in one glass pill, its separators drawn as gradient dots;
+   their words stay for screen readers. */
+.headline { margin-top: 22px; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 0; padding: 8px 18px; border-radius: 22px; border: 1px solid var(--glass-edge); background: var(--glass); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); font-size: 16px; font-weight: 650; }
+.headline .sep { display: inline-flex; align-items: center; font-size: 0; }
+.headline .sep::before { content: "" / ""; width: 7px; height: 7px; margin: 0 12px; border-radius: 50%; background: var(--ring); }
+.intro-grid { display: grid; gap: 28px; margin-top: 30px; }
+.intro-main { min-width: 0; }
+.facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 15px; color: var(--muted); }
+.lede { margin-top: 14px; font-size: 18px; max-width: 58ch; }
+.cta { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.results { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 14px; }
+.result { padding: 18px 18px 20px; }
+.result-fig { margin-top: 6px; display: flex; flex-direction: column; font-size: 14px; color: var(--muted); }
+.result-num, .result-word { font-size: 42px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--ink); }
+.result-suffix { font-size: 0.45em; letter-spacing: 0; }
+.strip { margin: clamp(28px, 4vw, 44px) auto 0; max-width: 1120px; padding: 0 clamp(16px, 4vw, 48px); }
+.strip-static { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; color: var(--muted); }
+@media (min-width: 960px) {
+  .intro-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; gap: 48px; }
+  /* The tiles at three heights, as if floating. */
+  .result:nth-child(3n + 2) { transform: translateY(26px); }
+  .result:nth-child(3n + 3) { transform: translateY(-14px); }
+}
+
+/* Sections. */
+.sec { padding: clamp(64px, 8vw, 112px) 0 0; }
+.sec-last { padding-bottom: clamp(64px, 8vw, 112px); }
+.sec-head { margin-bottom: 32px; }
+.sec-title { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.sec-n { order: -1; font-size: 15px; font-weight: 700; color: var(--ice); font-variant-numeric: tabular-nums; }
+.sec-title h2 { font-size: clamp(38px, 6vw, 76px); font-weight: 800; font-stretch: 80%; line-height: 0.95; letter-spacing: -0.035em; }
+
+/* Projects: a deck of glass cards. */
+.feature { position: relative; margin-bottom: 26px; padding: 28px 30px; display: grid; gap: 6px; overflow: hidden; }
+.feature-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; }
+.feature-num { font-size: clamp(72px, 11vw, 140px); font-weight: 800; line-height: 0.9; letter-spacing: -0.05em; background: var(--ring); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.feature-text { font-size: 24px; font-weight: 700; }
+.feature-pairs { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 24px; }
+.feature-pairs .num { font-weight: 800; }
+.feature-note { color: var(--muted); }
+.proj-grid { display: grid; gap: 22px; }
+.proj { padding: clamp(22px, 3vw, 34px); }
+.proj-dates { display: block; }
+.proj h3 { margin-top: 8px; font-size: clamp(26px, 3.2vw, 40px); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
+.proj-lead h3 { font-size: clamp(30px, 4.4vw, 54px); }
+.proj.is-open h3 { color: var(--blue); }
+.proj-sub { color: var(--muted); font-weight: 600; }
+.proj-summary { margin-top: 12px; max-width: 62ch; }
+.proj-side { margin-top: 18px; display: grid; gap: 12px; }
+.proj-fact { font-weight: 700; }
+.proj-actions, .depth-actions, .job-links { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.depth { padding: 24px 26px; }
+.depth-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.depth-head h3 { font-size: 24px; font-weight: 800; }
+.depth-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.depth-list li { display: grid; grid-template-columns: 3em minmax(0, 1fr); padding: 10px 0; border-top: 1px solid var(--glass-edge); }
+.depth-n { font-weight: 800; color: var(--ice); }
+/* The deck: with the script and its panels closed, on a screen tall
+   enough, each card holds below the capsule as the next slides over it. */
+@media (min-width: 720px) and (min-height: 700px) {
+  .js .proj { position: sticky; top: calc(var(--bar) + 8px + var(--i, 0) * 14px); }
+  .js .proj:nth-of-type(2) { --i: 1; }
+  .js .proj:nth-of-type(3) { --i: 2; }
+  .js .proj:nth-of-type(4) { --i: 3; }
+  .js .proj:nth-of-type(n + 5) { --i: 4; }
+  /* A link to a card lands where the card holds. */
+  .js .proj[id] { scroll-margin-top: calc(var(--bar) + 8px + var(--i, 0) * 14px); }
+  .js .proj.is-open { position: relative; top: auto; }
+  .js .proj-grid:has(.proj.is-open) .proj { position: relative; top: auto; }
+}
+
+/* Timeline: glass cards on a glowing line. */
+.tl-lanes { margin-bottom: 16px; }
+.tl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.tl-filter { min-height: 40px; font-size: 14px; }
+.tl-filter .shape { width: 10px; height: 10px; border-radius: 50%; background: var(--ice); }
+.tl-filter.lane-work .shape { background: var(--blue); }
+.tl-filter.lane-certifications .shape { background: #10B981; }
+.tl-filter[aria-pressed="false"] { color: var(--muted); }
+.tl-filter[aria-pressed="false"] .tl-filter-label { text-decoration: line-through; }
+.tl-empty { margin: 12px 0; font-weight: 700; }
+.tl-list { list-style: none; margin: 0; padding: 0 0 0 26px; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.tl-list::before { content: "" / ""; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 3px; border-radius: 3px; background: var(--ring); box-shadow: 0 0 14px rgba(34, 211, 238, 0.6); }
+.tl-entry.after-band { order: 0; }
+.tl-band { order: 1; padding: 12px 18px; }
+.tl-entry { order: 2; }
+.tl-band-label { display: flex; flex-wrap: wrap; gap: 0 12px; font-weight: 700; }
+.tl-card summary { list-style: none; display: grid; gap: 2px; padding: 14px 18px; cursor: pointer; }
+.tl-card summary::-webkit-details-marker { display: none; }
+.tl-meta { display: flex; justify-content: space-between; gap: 8px; }
+.tl-sign::before { content: "+" / ""; color: var(--ice); }
+.tl-card[open] .tl-sign::before { content: "\2212" / ""; }
+.tl-title { font-size: 18px; font-weight: 800; }
+.tl-org { color: var(--muted); }
+.tl-pop { padding: 0 18px 14px; }
+.js .tl-close { display: none; }
+.tl-detail { margin-bottom: 4px; }
+.tl-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+
+/* Work, Education, Certifications. */
+.jobs { display: grid; gap: 16px; }
+@media (min-width: 960px) {
+  .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+.job, .degree { padding: 22px 26px; }
+.job h3, .degree h3 { margin-top: 6px; font-size: 26px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.job-org, .degree-org { font-weight: 700; color: var(--blue); }
+.job-loc, .degree-cgpa { color: var(--muted); }
+.job-links { margin-top: 10px; }
+.job-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.job-list li { position: relative; margin-top: 8px; padding-left: 20px; }
+.job-list li::before { content: "" / ""; position: absolute; left: 2px; top: 0.6em; width: 8px; height: 8px; border-radius: 50%; background: var(--ring); }
+.degree-courses { margin-top: 14px; }
+.degree-courses h4 { margin-bottom: 8px; }
+.certs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.cert { display: grid; gap: 4px; padding: 18px 20px; color: var(--ink); text-decoration: none; height: 100%; }
+.cert-title { font-size: 18px; font-weight: 800; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cert-org { display: block; color: var(--muted); }
+.cert-view { color: var(--ice); }
+
+/* Skills: a field of glass chips. */
+.skills { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; }
+.skill { padding: 18px 20px; }
+.skill h3 { margin-bottom: 10px; font-size: 18px; font-weight: 800; }
+.skill .chips li { font-size: 15px; padding: 6px 14px; }
+
+/* Contact: large ringed links. */
+.routes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.route { position: relative; display: grid; gap: 4px; padding: 22px 22px; color: var(--ink); text-decoration: none; height: 100%; }
+.route::after { content: "" / ""; position: absolute; inset: -1px; border-radius: inherit; padding: 2px; background: var(--ring); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+.route:hover::after, .route:focus-visible::after { opacity: 1; }
+.route-label { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.route-line { color: var(--muted); }
+.route-addr { font-size: 15px; font-weight: 600; color: var(--ice); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+
+/* Footer. */
+.foot { padding: 32px clamp(16px, 4vw, 48px) 48px; display: grid; gap: 6px; max-width: 1120px; margin: 0 auto; }
+.foot-name { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.foot-loc { color: var(--muted); }
+.foot-credit { margin-top: 8px; }
+
+/* Motion, only where the browser supports it and nobody asked for less.
+   base.css stops every animation under reduced motion as well. */
+@media (prefers-reduced-motion: no-preference) {
+  /* The aurora turns once through its hues as the page opens. */
+  body::before { animation: fr-hue 40s ease-in-out 1; }
+  @supports (animation-timeline: scroll()) {
+    /* The name tightens its width and weight as the page scrolls. */
+    .intro-name { animation: fr-tighten linear both; animation-timeline: scroll(root); animation-range: 0 60vh; }
+    /* The tiles drift at their own speeds. */
+    .result { animation: fr-drift linear both; animation-timeline: scroll(root); animation-range: 0 80vh; }
+    .result:nth-child(2) { --drift: -40px; }
+    .result:nth-child(3) { --drift: -24px; }
+    /* Sections and cards rise into view. */
+    .sec-head, .tl-entry, .job, .skill, .route { animation: fr-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+    /* The capsule tightens once the page leaves its top. */
+    .dnav { animation: fr-capsule linear both; animation-timeline: scroll(root); animation-range: 0 140px; }
+  }
+}
+@keyframes fr-hue { to { --hue: 360deg; } }
+@keyframes fr-tighten { to { font-stretch: 75%; letter-spacing: -0.02em; } }
+@keyframes fr-drift { to { translate: 0 var(--drift, -60px); } }
+@keyframes fr-capsule { to { padding: 2px; box-shadow: 0 8px 24px rgba(10, 20, 40, 0.18); } }
+@keyframes fr-rise { from { opacity: 0; translate: 0 24px; } to { opacity: 1; translate: 0 0; } }

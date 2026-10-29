@@ -125,3 +125,7 @@ sample person builds and passes check_built.py (a planted control).
 - Revisit if a profession needs a section the content model lacks.
 
 ## Changes
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-28 | **Each sample person has the sections and amounts of their profession's portfolio**, not one shape for all: a self-taught developer with no degree, a game developer with no certificates, a writer with one headline part, from two contact routes to five. The build leaves out a section with nothing to show, as content.md says; until cd7bd89 it failed instead. | The owner's answer of 2026-10-28 UTC: "it is fine as long as that is how their profession portfolios are"; all six sample people before shared one shape, which made every page's boxes the same (the session log, Round 16). |

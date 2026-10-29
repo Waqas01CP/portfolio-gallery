@@ -3097,3 +3097,88 @@ check recommended in Report 14 after Poster (Round 14) and Sentinel
 
 - Nothing pushed: width-check waits on the owner, after
   checks-for-changes.
+
+# Round 19, 2026-10-28 UTC: five more designs for professions
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch more-professions, cut from width-check.
+Mode: mutating. No brief: the owner's approval of 2026-10-28 UTC of the
+five proposed in Round 16: "i approve as they are reasonable but only
+final look can tell 100% how good they are", and on each person's
+sections and amounts: "it is fine as long as that is how their profession
+portfolios are. i do not want it to be like that they have some details
+or section that should be there but it is not."
+
+## What was built
+
+- Five designs, each one stylesheet and one OFL font, credited to
+  Waqas01CP and maintained: Cyanotype (embedded and robotics: a drawing
+  sheet on blue grid paper, the figures as components on a drawn board,
+  the menu as a title block in the corner), Handbook (technical writers:
+  a cloth-bound cover, chapters with margin notes, a contents page with
+  dot leaders, thumb-index tabs; light and dark), Frost (frontend: glass
+  over a moving aurora, a capsule menu, a name that tightens as the page
+  scrolls, project cards that stack as a deck; light and dark), Savepoint
+  (game developers: a player card, achievements, a level-select grid, an
+  inventory, a hotbar menu) and Broadcast (developer advocates: a
+  programme monitor with a lower third, a scoreboard, a moving ticker
+  with pause, segment bumpers, work as end credits).
+- Five sample people, each with their profession's shape: Rowan Fixture
+  (2 projects, 3 jobs, 4 figures, 1 certificate), Quinn Lorem (1 headline
+  part, no availability line, 2 figures, 3 certificates, 2 routes), Avery
+  Mockup (5 projects, 1 job, no degree, 1 certificate, 4 routes), Robin
+  Tileset (4 projects, 1 job, no certificates, 2 routes, 4 skill groups),
+  Drew Helloworld (3 projects, 3 jobs, 4 figures, 5 routes, 4 headline
+  parts). Each traced to their own CV: 0 blocks untraced.
+- The engine: a site with a section left out builds (cd7bd89); a control
+  builds and traces a site with no certificates, and fails without it.
+- Fonts from @fontsource 5.3.0 on jsdelivr, each with its licence text,
+  none naming a Reserved Font Name.
+
+## Errors this seat made
+
+1. **Headline parts are not elements.** Frost and Savepoint first styled
+   each headline part as a pill or tag; the engine writes the parts as
+   text between separators, so nothing matched. Both now style the
+   separators, drawn as dots, their words kept for screen readers.
+2. **A pixel face for figures.** Savepoint first set dates and figures
+   in Pixelify Sans, whose 5 reads as an 8 or an S: "2025" looked like
+   "2028". Dates, figures and slot numbers are now in a plain monospace.
+3. **Four long figures in a 16:9 frame.** Broadcast first set the figures
+   inside the monitor; they spilled out and pushed the name below it. They
+   are a scoreboard under the monitor now.
+4. **Cut order.** Two highlights were first written out of their bullet's
+   word order, and one with no words after its figure; the build refused
+   them, and the bullets were reworded in the CV and items alike.
+5. **Backslashes through the shell.** An edit script passed through a
+   heredoc lost its CSS escapes and changed nothing; it ran from a file.
+
+## Proofs
+
+- check_design: 17 designs, 0 problems; the gallery of 17 designs and
+  its built files, 0 problems; each new sample person's site built and
+  traced, PASS.
+- every browser check with axe on the five designs and the gallery page: the first run's only failures were the run's own missing showcase pictures and Broadcast's education dates in yellow on white, both fixed and rerun; Frost and Broadcast again after their last changes, 0 failures in 754 s.
+- no page scrolls sideways: the twelve designs and the gallery page, 130 runs, and the five new ones, 60 runs, then Frost and Broadcast again, 30.
+- the file harness on this branch: 152 defeat cases, 31 planted controls, 0 unproven, in 701 s.
+
+## The likeness, measured
+
+The Round 16 script, box placement on the first, Projects and Work
+screens at 1366 by 768, 390 by 844 and 1080 by 1920:
+
+- each new design at most 34% alike to any other of the seventeen, and 13% to 21% on average, against the bar of 35% and 25%
+- Broadcast: 18.4% on average, most alike to Frost at 34.1%
+- Cyanotype: 21.5% on average, most alike to Savepoint at 29.6%
+- Frost: 19.5% on average, most alike to Broadcast at 34.1%
+- Handbook: 13.4% on average, most alike to Cyanotype at 25.2%
+- Savepoint: 15.2% on average, most alike to Cyanotype at 29.6%
+- the five among themselves: 19.4% on average, 34.1% at most; Round 15's five by the same measure: 32.6% and 55.4%
+- first measured, Broadcast was 39.8% alike to Default and Frost 36.2%, over the bar: both had a full-width name or feature and jobs where Default has them, and Broadcast's phone menu sat where Default's does. Frost's composition was centred, its jobs set two to a row; Broadcast kept its channel bar at the top on a phone, its credits in a column and its feature at its own width; measured again
+
+## Not done
+
+- The owner's judgment of the final look, from the screenshots in
+  briefs/round19-shots (gitignored).
+- Nothing pushed: more-professions waits on the owner, after
+  checks-for-changes and width-check.
