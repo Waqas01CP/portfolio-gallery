@@ -6,13 +6,13 @@ status: current
 
 # STATE
 
-**Verified against main at 52bd61a and the branch checks-tuned after it,
-2026-10-29 UTC, by the Brief 1 implementing session's twentieth round,
-the audit the owner asked for**: GitHub's own record of the six runs of
-pull requests 24 to 26 and their merges; each run's selection replayed
-on the same commits; pull request 26 replayed under the tuned rule,
-every check with axe; the file harness on the branch
-(logs/2026-10-12-brief-1-build.md, Round 20). This is the only line in
+**Verified against main at 40c9610 and the branch chrome-start after it,
+2026-10-29 UTC, by the Brief 1 implementing session's twenty-second
+round, after Phase 2's first run on GitHub**: GitHub's own record of pull
+request 28's run; its failing job's log as the owner read it; that job
+rerun here; the cases of Chrome's start against main's tools/cdp.py and
+the branch's; the file harness on the branch
+(logs/2026-10-12-brief-1-build.md, Round 22). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -54,16 +54,14 @@ standard (pull request 20), and five for professions, each shown with its
 own invented person, Sentinel, Latent, Pocket, Assert and Pipeline (pull
 request 21; ADR-0018). The first contribution from outside, a showcase
 entry, merged in pull request 22, CODEOWNERS asking the owner's review.
-Since pull requests 24 to 26: the browser checks look only at the pages
-a change alters, every page by hand and each Monday (ADR-0019); a
-standing check that no page scrolls sideways; seventeen designs, ten of
-them for professions. On the branch checks-tuned, not yet pushed, the
-audit's fixes: build.py no longer checks every page, a failing selection
-checks every page instead of stopping the run, a new push to a pull
-request cancels its old run; on parallel-checks, cut from it, Phase 2:
-the checks shared out across jobs that run side by side on GitHub, a job
-per design to check, the required job giving the verdict. Waiting: his
-merge of checks-tuned, then his push of parallel-checks; step 5's policy, provable only on or
+Since pull requests 24 to 28: the browser checks look only at the pages
+a change alters, every page by hand and each Monday (ADR-0019), shared
+out across jobs that run side by side on GitHub, a check of every page
+about 5 minutes against 76 on one runner; a standing check that no page
+scrolls sideways; seventeen designs, ten of them for professions. On the
+branch chrome-start, not yet pushed: Chrome's start given 60 s and a
+second try, after one job of eighteen on GitHub waited past 30 s.
+Waiting: his push of chrome-start; step 5's policy, provable only on or
 after 2026-11-02; ADR-0012, held.
 
 ## Publishing
@@ -84,7 +82,7 @@ DONE rows are in docs/reference/completed.md.
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
-| Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; under checks-tuned's rule, pull request 26 replayed checks its five designs and the gallery page, 1,982 s against 75.4 minutes on GitHub for every page; [BELIEVED] a narrowed run on GitHub, not yet seen there. Phase 2, the jobs side by side, built on parallel-checks: its jobs rehearsed here in order, plan 11 s, files 113 s, one design's job 306 s, the gallery page's 212 s, the verdict passing; [BELIEVED] on GitHub until its first run there | 2026-10-29 | 27db869; ADR-0019, Changes |
+| Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; Phase 2 on GitHub, pull request 28's run checking every page side by side in 5 min 8 s against 76 min for pull request 27's on one runner, one design's job failing at Chrome's start and the verdict with it, as built, then green on a rerun; [BELIEVED] a narrowed run on GitHub, and the weekly run shared out, not yet seen there | 2026-10-29 | 27db869, 40c9610; ADR-0019, Changes |
 | CODEOWNERS and the issue templates | PARTIAL | [VERIFIED] CODEOWNERS asked the owner's review the moment pull request 22, the first from outside, opened, and its author filled the pull request template's showcase section (GitHub's API); [BELIEVED] the issue templates, which no one has used yet | 2026-10-28 | b798834; pull request 22 |
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
 | The README's routes and prompt; the Showcase entry and Question forms | PARTIAL | [VERIFIED] the prompt check and its defeat cases; on main, GitHub's own page serves the prompt's block with its copy button's text and the three pictures through its image proxy (2026-10-23); the forms parsed; [BELIEVED] the four forms in the issue chooser, which needs a sign-in, until the owner looks | 2026-10-23 | 0ce2c71, pull request 15; ADR-0017 |
@@ -95,7 +93,7 @@ DONE rows are in docs/reference/completed.md.
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging checks-tuned, then parallel-checks | The owner's push and merge | The owner | 2026-10-29 |
+| Merging chrome-start | The owner's push and merge | The owner | 2026-10-29 |
 
 ## Known unverified
 

@@ -57,6 +57,11 @@ CANDIDATES = {
     "Linux": ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser"],
 }
 
+# How long one start may take to open Chrome's debugging port. A start that
+# runs out is stopped and made once more, with a fresh profile: on GitHub,
+# one of eighteen jobs starting at once waited past 30 s (2026-10-29).
+START_SECONDS = 60
+
 
 def find_chrome() -> str:
     override = os.environ.get("PG_CHROME")
@@ -165,9 +170,7 @@ class Chrome:
 
     def __init__(self, accessibility: bool = False, flags: tuple[str, ...] = ()) -> None:
         self.binary = find_chrome()
-        self.profile = tempfile.mkdtemp(prefix="pg-chrome-")
-        args = [self.binary, "--headless=new", "--remote-debugging-port=0",
-                f"--user-data-dir={self.profile}", "--no-first-run",
+        args = [self.binary, "--headless=new", "--remote-debugging-port=0", "--no-first-run",
                 "--no-default-browser-check", "--disable-extensions",
                 "--disable-background-networking", "--disable-sync",
                 "--disable-component-update", "--disable-default-apps",
@@ -183,10 +186,21 @@ class Chrome:
         # there only, in jobs that hold no write token (ADR-0010).
         if os.environ.get("PG_CHROME_NO_SANDBOX") == "1":
             args.append("--no-sandbox")
-        args.append("about:blank")
-        self.process = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.next_id = 0
         self.events: collections.deque = collections.deque()
+        try:
+            self._start(args)
+        except CDPError as error:
+            print(f"cdp: {error}; starting Chrome once more", file=sys.stderr)
+            try:
+                self._start(args)
+            except CDPError as again:
+                raise CDPError(f"{again}, at both of two starts") from None
+
+    def _start(self, args: list[str]) -> None:
+        self.profile = tempfile.mkdtemp(prefix="pg-chrome-")
+        self.process = subprocess.Popen([*args, f"--user-data-dir={self.profile}", "about:blank"],
+                                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
             port, path = self._debugging_port(Path(self.profile) / "DevToolsActivePort")
             self.ws = WebSocket(f"ws://127.0.0.1:{port}{path}")
@@ -198,7 +212,7 @@ class Chrome:
             raise
 
     def _debugging_port(self, port_file: Path) -> list[str]:
-        deadline = time.monotonic() + 30
+        deadline = time.monotonic() + START_SECONDS
         while True:
             try:
                 fields = port_file.read_text().split() if port_file.is_file() else []
@@ -211,7 +225,7 @@ class Chrome:
             if self.process.poll() is not None:
                 raise CDPError(f"Chrome exited at start with code {self.process.returncode}")
             if time.monotonic() > deadline:
-                raise CDPError("Chrome did not open its debugging port within 30 s")
+                raise CDPError(f"Chrome did not open its debugging port within {START_SECONDS} s")
             time.sleep(0.05)
 
     def version(self) -> str:
