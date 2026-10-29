@@ -8,7 +8,7 @@ status: current
 
 A portfolio site you can publish with GitHub Pages without installing
 anything, and a gallery of designs for it. Write your content once, pick a
-design with one setting, and GitHub builds and publishes your site.
+design with one setting, and GitHub builds and publishes your site. one word
 
 **See every design: https://waqas01cp.github.io/portfolio-gallery/**
 
