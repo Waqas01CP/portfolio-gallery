@@ -3550,3 +3550,66 @@ goal; it put three options to him. His choice the same day, after the seat put T
 - The numbers on GitHub's runner: its pull request's run, which checks
   every page, since the checks change.
 - The like button, approved: the next round.
+
+# Round 25, 2026-10-29 UTC: a like button on each template and site
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch likes, cut from lighthouse. Mode: mutating.
+No brief. He asked whether a like button with every like counted was a
+good idea, easy, or one to discuss first; this seat put four ways to
+him, with the scope floor's lines each crossed. The owner's choice of 2026-10-29 UTC, of the options this seat put to him: "for like button: the simple option A is accepted ... i just need a like button for each template and site. which is essentially both. and i can turn on discussion."
+
+## What was built
+
+- tools/likes.py, standard library only: GitHub's GraphQL API with the
+  deploy's token; the category Likes; a post made for any template or site
+  without one, its item in a marker in the body and its name only in the
+  title; each post's thumbs up counted, only the workflow's own posts and
+  the owner's, the first made if two; likes.json. Any trouble a warning,
+  likes.json empty, exit 0; one post that cannot be made leaves the rest
+  counted.
+- deploy.yml: the job likes, gallery only, `contents: read` and
+  `discussions: write`; build after it whatever its result, reading
+  likes.json when there is one; shots' condition made explicit, since
+  build may now be skipped.
+- build.py --likes FILE, the gallery only: every entry checked, or the
+  build stops; each card's like line, its post and count, or the category
+  and none. tools/ci.py build --likes.
+- The gallery's cards and stylesheet: "Like on GitHub", the link naming
+  its item to a screen reader; a contributor's card's like link carries
+  rel="ugc nofollow", as check_built requires of every link in it.
+- ADR-0021; the setup guide's step 13; the two contributor guides;
+  standing-checks.md; CAPABILITIES; STATE.
+
+## Errors this seat made
+
+1. **The like link in a contributor's card first lacked rel="ugc
+   nofollow"**; check_built refused it at once; fixed.
+2. **check_prompt read by its last line, not its exit code.** A copy's
+   README names Deploy's jobs, and likes was not among them; the last
+   line, about another file, said 0 problems. The harness's control
+   caught it. The sentence now names likes and shots as skipped in a
+   copy, check_prompt's pattern with it; the user guide and setup step 8
+   count the jobs again; an older case that edits Deploy's build job
+   moved to its new first line.
+
+## Proofs
+
+- Ten cases alone: a stranger's look-alike post, numbered first with 50,
+  not counted, the workflow's post with 2 counted; the owner's post
+  counted; a missing post made; Discussions off, no category, no token,
+  each a warning and exit 0; the build refusing a count linking
+  elsewhere, a count not a whole number, and counts for a site; a file as
+  likes.py writes it building. With the author rule removed in a copy,
+  the stranger's 50 is counted and the case fails.
+- The gallery built with counts: nineteen like lines, two with counts;
+  check_built, 0 problems; check_workflows, check_template_cleanup,
+  check_prompt and check_design, 0 problems.
+- checked in Chrome with axe as its job on GitHub checks it, after the pictures, with two counts given: 0 failures in 152 s.
+- tools/prove_checks.py on the branch: 178 file defeat cases fail as built and 49 planted file controls pass, in 766 s; the speed cases, unchanged since Round 24, not rerun.
+
+## Not done
+
+- Nothing pushed: likes waits on the owner, after lighthouse.
+- The first run against GitHub's API: after his step 13, by a merge or
+  Deploy run by hand.

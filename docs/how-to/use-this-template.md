@@ -146,9 +146,10 @@ build, then assemble, then deploy, with "pages" beside them asking GitHub
 whether Pages is on. When all four are green, your site is live at the
 address from step 1, and the run's "deploy" job links to it. If "deploy"
 shows as skipped and the run's summary says "Turn on GitHub Pages to
-publish your site", Pages is still off: step 3. A fifth job, "shots",
-shows as skipped too (a grey circle with a line through it): it takes the
-gallery's previews and runs only in this project's own repository.
+publish your site", Pages is still off: step 3. Two more jobs, "likes"
+and "shots", show as skipped too (a grey circle with a line through it):
+they count the gallery's likes and take its previews, and run only in
+this project's own repository.
 
 If the build fails, open the run and the failed step: it names every
 problem, such as an item missing a field, a `layer1` that is not a cut, or

@@ -202,6 +202,33 @@ class Pages(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # A fake GitHub GraphQL API, for the like counts' cases (ADR-0021):
+    # /api/likes-<state>/graphql. Its posts: a stranger's look-alike for
+    # Plain, numbered first, with 50; the workflow's own for Plain with 2;
+    # the owner's for Default with 4.
+    def do_POST(self):
+        parts = self.path.split("/")
+        if len(parts) != 4 or parts[1] != "api" or not parts[2].startswith("likes-") or parts[3] != "graphql":
+            return self.answer(404)
+        state = parts[2][len("likes-"):]
+        query = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}").get("query", "")
+
+        def post(number, author, key, thumbs):
+            return {"number": number, "url": f"https://github.com/tester/gallery/discussions/{number}",
+                    "body": f"Like it.\n\n<!-- portfolio-gallery likes: {key} -->", "author": {"login": author},
+                    "reactionGroups": [{"content": "THUMBS_UP", "reactors": {"totalCount": thumbs}}]}
+        if "createDiscussion" in query:
+            data = {"createDiscussion": {"discussion": {
+                "number": 99, "url": "https://github.com/tester/gallery/discussions/99"}}}
+        elif "hasDiscussionsEnabled" in query:
+            data = {"repository": {"id": "R", "hasDiscussionsEnabled": state != "off", "discussionCategories": {
+                "nodes": [] if state == "nocategory" else [{"id": "C", "name": "Likes"}]}}}
+        else:
+            data = {"repository": {"discussions": {"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": [
+                post(3, "mallory", "designs/plain", 50), post(7, "github-actions", "designs/plain", 2),
+                post(9, "tester", "designs/default", 4)]}}}
+        self.answer(200, json.dumps({"data": data}).encode(), "application/json")
+
     def do_GET(self):
         port = self.server.server_address[1]
         path = self.path
@@ -624,8 +651,7 @@ def file_cases():
         '    if status == 404 and mode == "gallery":', '    if status == 404 and mode == "none":'),
         "gives 'notice' for gallery mode, the API answering 404, where it must give 'fail'")
     yield ("workflows: a build waiting on Pages, so a copy's broken build would pass", workflow(
-        "  build:\n    runs-on: ubuntu-24.04\n",
-        "  build:\n    needs: pages\n    if: needs.pages.outputs.on == 'true'\n    runs-on: ubuntu-24.04\n"),
+        "  build:\n    needs: likes\n", "  build:\n    needs: [likes, pages]\n"),
         "job 'build' (line")
     yield ("workflows: a failed build let through by continue-on-error", workflow(
         "      - name: Build and check\n", "      - name: Build and check\n        continue-on-error: true\n"),
@@ -778,6 +804,44 @@ def file_cases():
 
     yield ("build: a design's profession with no label", build_unknown_profession,
            "professions must list ids from src/professions.json")
+
+    # The like counts (ADR-0021): tools/likes.py against the fake API,
+    # then the build's reading of its file.
+    def likes_run(state, token="yes"):
+        def plant(copy):
+            (copy / "_run_likes.py").write_text('import os, sys\nsys.path.insert(0, "tools")\nos.environ.pop("GITHUB_TOKEN", None)\nif sys.argv[1] != "none":\n    os.environ.update({"GITHUB_TOKEN": "t", "GITHUB_REPOSITORY": "tester/gallery", "GITHUB_REPOSITORY_OWNER": "tester"})\nimport likes\nsys.exit(likes.main(sys.argv[2:]))\n', encoding="utf-8")
+            return ["_run_likes.py", token, "--out", copy / "_likes.json",
+                    "--api", local_site(f"/api/likes-{state}")]
+        return plant
+
+    yield ("likes: a look-alike post by anyone else is not counted", likes_run("counted"),
+           Passes("likes: designs/plain: 2 like(s), post 7"))
+    yield ("likes: the owner's own post counts", likes_run("counted"),
+           Passes("likes: designs/default: 4 like(s), post 9"))
+    yield ("likes: a template with no post gets one", likes_run("counted"),
+           Passes("likes: created the post for designs/assert, post 99"))
+    yield ("likes: Discussions off, a warning and no count", likes_run("off"),
+           Passes("::warning::likes: Discussions are off in this repository"))
+    yield ("likes: no Likes category, a warning and no count", likes_run("nocategory"),
+           Passes("no discussion category named Likes"))
+    yield ("likes: no token, a warning and no count", likes_run("counted", "none"),
+           Passes("no GITHUB_TOKEN or GITHUB_REPOSITORY"))
+
+    def counts(value, *mode):
+        def plant(copy):
+            (copy / "_likes.json").write_text(json.dumps(value), encoding="utf-8")
+            return ["build.py", *(mode or ("--gallery",)), "--likes", copy / "_likes.json", "--out", copy / "_out"]
+        return plant
+
+    good = "https://github.com/Waqas01CP/portfolio-gallery/discussions/7"
+    yield ("build: a like count linking outside the repository's Discussions",
+           counts({"designs/plain": {"url": "https://example.com/discussions/7", "likes": 3}}),
+           "must be a post in https://github.com/Waqas01CP/portfolio-gallery/discussions/")
+    yield ("build: a like count that is not a whole number", counts({"designs/plain": {"url": good, "likes": 2.5}}),
+           "and a whole number of likes")
+    yield ("build: like counts for a site, not the gallery", counts({}, "--design", "plain"),
+           "--likes applies to the gallery only")
+    yield "build: like counts as tools/likes.py writes them", counts({"designs/plain": {"url": good, "likes": 3}}), Passes()
 
     # Its responses, from a local server; --test-local lets the check reach
     # it over http, and nothing else changes.

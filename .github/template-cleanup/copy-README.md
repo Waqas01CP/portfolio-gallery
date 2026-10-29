@@ -106,8 +106,8 @@ C. PUBLISH
    Then Actions, Deploy in the left list, Run workflow, and the green Run
    workflow button; or commit any change.
 2. Each commit to main starts a Deploy run in the Actions tab, with the jobs build,
-   pages, assemble and deploy. A fifth, shots, is skipped in their repository;
-   that is normal.
+   pages, assemble and deploy. Two more, likes and shots, are skipped in their
+   repository; that is normal.
 3. When the run is green the site is live: https://<username>.github.io/ for a
    repository named <username>.github.io, otherwise
    https://<username>.github.io/<repository>/. The deploy job links to it.

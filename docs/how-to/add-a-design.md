@@ -67,6 +67,10 @@ for `https://`, a 200 answer and a domain not parked
 for the professions your design is made for, such as `["games"]`, shown
 on its gallery card. Leave it out if the design suits anyone (ADR-0020).
 
+Once merged, your design's card gets a like button: a post in the
+repository's Discussions, made for it at the next publish, where a
+thumbs up counts (ADR-0021).
+
 `preload` lists the fonts that set text on the first screen, so they load
 with the page. `assets` lists every font and image, each once; an image
 you made yourself is `"licence": "MIT", "source": "own work"`. Allowed

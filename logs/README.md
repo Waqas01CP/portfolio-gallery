@@ -44,6 +44,7 @@ subdirectories and leave this index at the top pointing into them.
 
 | Date (UTC) | Log file | Session | What was done | Outcome |
 |---|---|---|---|---|
+| 2026-10-29 | 2026-10-12-brief-1-build.md | The owner's choice, Round 25: a like button on each template and site | A post per item in Discussions, category Likes, made and counted by the deploy; only the workflow's and the owner's posts count; the counts written into the cards (ADR-0021) | On the branch likes, not pushed |
 | 2026-10-29 | 2026-10-12-brief-1-build.md | The owner's go-ahead and choice, Round 24: Lighthouse in CI | ADR-0012 accepted with option A: LCP and CLS fail, TBT reported, failing over 600 ms; five runs on each page a change alters; actions held to full SHAs and npm to npm ci --ignore-scripts; the gallery page's own files check it alone | On the branch lighthouse, not pushed |
 | 2026-10-29 | 2026-10-12-brief-1-build.md | The owner's approval, Round 23: profession tags | Designs and showcase entries name up to three professions from src/professions.json, shown on each card; ten designs and both entries tagged; nine cases (ADR-0020) | On the branch profession-tags, not pushed |
 | 2026-10-29 | 2026-10-12-brief-1-build.md | The owner's report, Round 22: Phase 2's first run on GitHub | Every page in 5 min 8 s against 76; one job of eighteen failed at Chrome's start; a start now gets 60 s and a second try; the comment on runs on main corrected | On the branch chrome-start, not pushed |

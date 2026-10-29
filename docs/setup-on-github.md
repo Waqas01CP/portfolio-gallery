@@ -183,8 +183,9 @@ have it, builds its owner's site instead.
 1. **Actions** tab, then **Deploy** in the left list.
 2. **Run workflow**, branch `main`, **Run workflow**.
 
-You should see five jobs: build, pages, shots, assemble, deploy, all green
-within about 5 minutes. If pages failed saying GitHub Pages is off, step 6
+You should see six jobs: likes, build, pages, shots, assemble, deploy, all
+green within about 5 minutes; likes warns, until step 13, that Discussions
+are off. If pages failed saying GitHub Pages is off, step 6
 did not take: in the gallery an off Pages fails, since the gallery would
 be down. Open the run and look at each job's icon, not the run's:
 GitHub counts a skipped job as passed, so a run can be green while a job
@@ -289,6 +290,29 @@ under the first box.
 
 **Send back:** that the first box is ticked, and whether you ticked the
 second. Not the address.
+
+### Step 13. Discussions, and the category the like buttons use
+
+GitHub Docs, "Enabling or disabling GitHub Discussions for a repository"
+and "Managing categories for discussions". Each template and showcase
+site on the gallery has a like button: a post in the category Likes,
+whose thumbs up the deploy counts (ADR-0021).
+
+1. **Settings**, **General**, under **Features** tick **Discussions**.
+2. Open the new **Discussions** tab, then the pencil beside
+   **Categories**, then **New category**.
+3. **Category name**: `Likes`, exactly. **Description**: `One post per
+   template and showcase site: a thumbs up on a post is a like.`
+   **Discussion format**: **Open-ended discussion**. **Create**.
+4. **Actions**, **Deploy**, **Run workflow** on main.
+
+You should see the job **likes** pass, its log ending "19 item(s)
+written", one line "created the post" for each template and site; under
+**Discussions**, **Likes**, those posts, written by github-actions. Each
+card's **Like on GitHub** opens its post. A thumbs up shows as "1 like"
+on the card after the next publish: a merge, or Deploy run by hand.
+
+**Send back:** the likes job's result and its last ten lines.
 
 ## Part D: prove each workflow
 

@@ -161,6 +161,8 @@ img { display: block; max-width: 100%; height: auto; }
 .g-use { font-size: 14px; color: var(--muted); }
 .g-inuse, .g-host { font-size: 15px; color: var(--muted); }
 .g-host { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+.g-like { font-size: 15px; }
+.g-likes { color: var(--muted); }
 .g-demo { margin-top: auto; padding-top: 8px; }
 .g-btn {
   display: inline-flex;
