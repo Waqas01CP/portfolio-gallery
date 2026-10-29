@@ -30,6 +30,7 @@ Pick a name: lowercase letters, digits and single hyphens, such as
   "author": "Your Name",
   "author_url": "https://github.com/your-username",
   "description": "One line: what it looks like and who it is for.",
+  "professions": ["frontend"],
   "dark": true,
   "preload": ["fonts/your-font.woff2"],
   "assets": [
@@ -61,6 +62,10 @@ with this design, shown as "In use" on its gallery card. Like a showcase
 entry, it is fetched on the pull request and every week, never rendered,
 for `https://`, a 200 answer and a domain not parked
 (docs/how-to/add-to-the-showcase.md).
+
+`professions` is optional: one to three ids from `src/professions.json`
+for the professions your design is made for, such as `["games"]`, shown
+on its gallery card. Leave it out if the design suits anyone (ADR-0020).
 
 `preload` lists the fonts that set text on the first screen, so they load
 with the page. `assets` lists every font and image, each once; an image

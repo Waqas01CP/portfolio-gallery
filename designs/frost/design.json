@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": true,
   "description": "For frontend and creative developers: frosted glass over a slow aurora, the name centred and as wide as the screen, tightening as the page scrolls, a floating capsule menu, and project cards that stack as a deck. Light and dark.",
+  "professions": ["frontend"],
   "preload": [
     "fonts/bricolage-grotesque-latin-standard-normal.woff2"
   ],

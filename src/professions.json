@@ -1,0 +1,16 @@
+{
+  "software": "Software engineering",
+  "frontend": "Frontend and creative development",
+  "backend": "Backend and APIs",
+  "mobile": "Mobile",
+  "devops": "DevOps and cloud",
+  "security": "Security",
+  "ml": "Machine learning and AI",
+  "data": "Data",
+  "embedded": "Embedded and robotics",
+  "games": "Game development",
+  "qa": "QA and testing",
+  "devrel": "Developer relations",
+  "writing": "Technical writing",
+  "design": "Product and UX design"
+}

@@ -58,6 +58,8 @@ SAMPLES = ROOT / "samples"
 TEMPLATES = ROOT / "src" / "templates"
 STATIC_SRC = ROOT / "src" / "static"
 DESIGNS = ROOT / "designs"
+# Profession ids and their labels on the gallery's cards (ADR-0020).
+PROFESSIONS = ROOT / "src" / "professions.json"
 SHOWCASE = ROOT / "showcase"
 REQUIREMENTS = ROOT / "requirements.txt"
 DEFAULT_OUT = ROOT / "_site"
@@ -898,7 +900,20 @@ def load_design(name: str) -> dict:
     return {"slug": name, "name": meta["name"], "author": meta["author"],
             "author_url": meta["author_url"], "description": meta["description"],
             "dark": meta["dark"], "preload": preload, "files": files, "in_use": in_use,
-            "in_use_host": urlsplit(in_use).hostname if in_use else None}
+            "in_use_host": urlsplit(in_use).hostname if in_use else None,
+            "professions": profession_labels(meta.get("professions"), f"designs/{name}/design.json")}
+
+
+def profession_labels(value, where: str) -> list[str]:
+    """A card's labels for the professions its design suits or its author
+    names (ADR-0020). The full rule is tools/check_design.py's; the build
+    refuses only an id it has no label for."""
+    if value is None:
+        return []
+    known = json.loads(PROFESSIONS.read_text(encoding="utf-8"))
+    if not (isinstance(value, list) and all(isinstance(p, str) and p in known for p in value)):
+        raise BuildError(f"{where}: professions must list ids from src/professions.json")
+    return [known[p] for p in value]
 
 
 # The showcase.
@@ -941,6 +956,7 @@ def load_showcase() -> list[dict]:
         entries.append({"login": folder.name, "name": entry["name"], "url": entry["url"],
                         "host": urlsplit(entry["url"]).hostname,
                         "description": description if _text(description) else None,
+                        "professions": profession_labels(entry.get("professions"), f"{where}/entry.json"),
                         "screenshot": f"{where}/{shots[0]}", "shown": (width, height), "shapes": shapes,
                         "card": f"{where}/{SHOWCASE_CARD}", "full": f"{where}/{SHOWCASE_FULL}",
                         "card_size": shapes[SHOWCASE_CARD]["size"], "full_size": shapes[SHOWCASE_FULL]["size"]})

@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For DevOps and cloud work: a navy status header with uptime bars, then the sections as numbered stages down a pipeline's rail. Light only.",
+  "professions": ["devops"],
   "preload": [
     "fonts/barlow-semi-condensed-latin-600-normal.woff2"
   ],

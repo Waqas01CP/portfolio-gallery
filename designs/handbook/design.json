@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": true,
   "description": "For technical writers: a cloth-bound book, the cover first, then cream pages with notes in the margin, chapters, a contents page and an index, and thumb-index tabs down the edge as the menu. Light and a night-reading dark.",
+  "professions": ["writing"],
   "preload": [
     "fonts/literata-latin-opsz-normal.woff2"
   ],

@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For embedded and robotics work: an engineering drawing in white line on blue grid paper, the figures as components on a drawn circuit board, the menu as the sheet's title block in the corner. One blue theme.",
+  "professions": ["embedded"],
   "preload": [
     "fonts/architects-daughter-latin-400-normal.woff2"
   ],

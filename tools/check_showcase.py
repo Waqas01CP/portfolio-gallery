@@ -73,6 +73,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
+# The professions an entry may name: the design check's list and rule,
+# which stays in a copy of the template when this file goes (ADR-0020).
+from check_design import PROFESSIONS, PROFESSIONS_MOST, professions_ok
+
 ROOT = Path(__file__).resolve().parent.parent
 SHOWCASE = ROOT / "showcase"
 DESIGNS = ROOT / "designs"
@@ -92,7 +96,7 @@ NAME_LIMIT, URL_LIMIT, DESCRIPTION_LIMIT = 80, 300, 120
 IMAGE_NAME_RE = re.compile(r"[^/\\.\x00-\x1f\x7f][^/\\\x00-\x1f\x7f]{0,115}\.(?:png|jpe?g|webp)", re.IGNORECASE)
 KINDS = {".png": "png", ".jpg": "jpeg", ".jpeg": "jpeg", ".webp": "webp"}
 LOGIN_RE = re.compile(r"^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$")
-ENTRY_FIELDS = {"name", "url", "description"}
+ENTRY_FIELDS = {"name", "url", "description", "professions"}
 
 TIMEOUT = 10
 MAX_REDIRECTS = 5
@@ -348,7 +352,7 @@ def load_entry(folder: Path, problems: list[str]) -> dict | None:
         problems.append(f"{where}: not valid JSON: {error}")
         return None
     if not isinstance(entry, dict):
-        problems.append(f"{where}: must be an object with name, url and an optional description")
+        problems.append(f"{where}: must be an object with name, url, and an optional description and professions")
         return None
     unknown = sorted(set(entry) - ENTRY_FIELDS)
     if unknown:
@@ -364,6 +368,9 @@ def load_entry(folder: Path, problems: list[str]) -> dict | None:
                                         and "\n" not in description):
         problems.append(f"{where}: description, if given, is one line of at most "
                         f"{DESCRIPTION_LIMIT} characters")
+    if "professions" in entry and not professions_ok(entry["professions"]):
+        problems.append(f"{where}: professions, if given, lists one to {PROFESSIONS_MOST} of these ids, "
+                        f"each once: {', '.join(PROFESSIONS)} (src/professions.json)")
     return entry
 
 

@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For machine learning work: a split screen, a dark field of soft colour held on the left with the name and figures, the sections scrolling on a white sheet beside it. Light only.",
+  "professions": ["ml"],
   "preload": [
     "fonts/space-grotesk-latin-wght-normal.woff2"
   ],

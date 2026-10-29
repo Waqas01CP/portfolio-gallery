@@ -758,6 +758,26 @@ def file_cases():
     yield "showcase: a file loose in showcase/", loose, "showcase/ holds only folders"
     yield ("design: an in_use address that is not https", design(meta={"in_use": "http://example.com/"}),
            "in_use, if given, must be the https:// address")
+    # Profession tags (ADR-0020): ids from src/professions.json, one to
+    # three, each once, in design.json and in an entry.
+    yield "design: a profession not on the list", design(meta={"professions": ["astronaut"]}), "professions, if given, must list one to 3"
+    yield "design: professions as text, not a list", design(meta={"professions": "games"}), "professions, if given, must list one to 3"
+    yield ("design: four professions", design(meta={"professions": ["games", "qa", "ml", "data"]}),
+           "professions, if given, must list one to 3")
+    yield "design: a profession twice", design(meta={"professions": ["games", "games"]}), "professions, if given, must list one to 3"
+    yield "design: an empty list of professions", design(meta={"professions": []}), "professions, if given, must list one to 3"
+    yield "design: professions from the list", design(meta={"professions": ["games", "qa"]}), Passes()
+    yield ("showcase: an entry's profession not on the list",
+           showcase(entry={**GOOD_ENTRY, "professions": ["astronaut"]}), "professions, if given, lists one to 3")
+    yield ("showcase: an entry's profession from the list",
+           showcase(entry={**GOOD_ENTRY, "professions": ["mobile"]}), Passes())
+
+    def build_unknown_profession(copy):
+        edit(copy / "designs/plain/design.json", '  "dark": ', '  "professions": ["astronaut"],\n  "dark": ')
+        return ["build.py", "--gallery", "--out", copy / "_out"]
+
+    yield ("build: a design's profession with no label", build_unknown_profession,
+           "professions must list ids from src/professions.json")
 
     # Its responses, from a local server; --test-local lets the check reach
     # it over http, and nothing else changes.
