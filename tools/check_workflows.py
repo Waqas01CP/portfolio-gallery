@@ -26,9 +26,12 @@ at the top and none in its jobs. A scheduled run starts with nobody's
 review, so it may write nothing (ADR-0016, the owner's answer Q2 of
 2026-10-19).
 
-Every workflow that fetches axe-core must pin the same version and
-SHA-512 (AXE_VERSION, AXE_SHA512): the weekly run of every page and the
-checks of each change judge pages by the same rules (ADR-0019).
+Every job that fetches axe-core, in every workflow, must pin the same
+version and SHA-512 (AXE_VERSION, AXE_SHA512): the weekly run of every
+page and the checks of each change judge pages by the same rules
+(ADR-0019). A verdict job, which runs `tools/ci.py verdict` after a
+failure on purpose so as to fail itself, may name the results it needs in
+its steps rather than its if:, and must name every one.
 
 A workflow that publishes with actions/deploy-pages must ask first
 whether GitHub Pages is on (the owner's decision of 2026-10-23; ADR-0015,
@@ -84,6 +87,7 @@ PAGES_TABLE = (
 )
 
 KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)\s*:(?:\s+(.*))?$")
+VERDICT = "tools/ci.py verdict"
 STATUS = re.compile(r"\b(always|cancelled|failure)\s*\(\s*\)")
 RESULT = re.compile(r"""needs\s*(?:\.\s*([A-Za-z0-9_-]+)|\[\s*['"]([A-Za-z0-9_-]+)['"]\s*\])\s*\.\s*result""")
 
@@ -154,6 +158,7 @@ def read_jobs(text: str) -> dict[str, dict]:
         while i < len(rows) and rows[i][1] > job_indent:
             body.append(rows[i])
             i += 1
+        job["body"] = "\n".join(content for _, _, content in body)
         read_job(body, job)
     return jobs
 
@@ -340,19 +345,29 @@ def check_file(path: Path) -> list[str]:
             continue
         if functions & {"always", "cancelled"}:
             named = {a or b for a, b in RESULT.findall(condition)}
+            # A verdict job runs after a failure on purpose, to fail itself:
+            # it may name the results in its steps, where tools/ci.py verdict
+            # reads them, and must name every one.
+            verdict = VERDICT in job.get("body", "")
+            if verdict:
+                named |= {a or b for a, b in RESULT.findall(job["body"])}
             missing = [n for n in job["needs"] if n not in named]
             if missing:
                 problems.append(f"{where}: its if: does not name "
                                 f"{', '.join(f'needs.{n}.result' for n in missing)}, so it would run "
-                                f"after that job failed")
+                                f"after that job failed"
+                                + ("; a verdict job must pass every result to the verdict" if verdict else ""))
     return problems
 
 
-def axe_pin(text: str) -> tuple[str | None, str | None]:
-    """The axe-core version and SHA-512 a workflow fetches, if it does."""
-    version = re.search(r'^\s*AXE_VERSION:\s*"?([^"\s]+)"?\s*$', text, re.M)
-    sha = re.search(r"^\s*AXE_SHA512:\s*([0-9a-f]+)\s*$", text, re.M)
-    return (version.group(1) if version else None, sha.group(1) if sha else None)
+def axe_pins(text: str) -> set[tuple[str | None, str | None]]:
+    """Every axe-core version and SHA-512 a workflow fetches, in each of its
+    jobs that fetch it."""
+    versions = re.findall(r'^\s*AXE_VERSION:\s*"?([^"\s]+)"?\s*$', text, re.M)
+    shas = re.findall(r"^\s*AXE_SHA512:\s*([0-9a-f]+)\s*$", text, re.M)
+    if len(versions) != len(shas):
+        return {(v, None) for v in versions} | {(None, h) for h in shas}
+    return set(zip(versions, shas))
 
 
 def main(argv: list[str]) -> int:
@@ -372,12 +387,12 @@ def main(argv: list[str]) -> int:
         problems += found
         shown = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
         print(f"{'FAIL' if found else 'ok  '} {shown}")
-        pin = axe_pin(path.read_text(encoding="utf-8"))
-        if pin != (None, None):
-            pins[shown] = pin
-    if len(set(pins.values())) > 1:
+        for pin in axe_pins(path.read_text(encoding="utf-8")):
+            pins.setdefault(pin, []).append(shown)
+    if len(pins) > 1:
         problems.append("the workflows fetch different axe-core: " + "; ".join(
-            f"{shown} {version} {(sha or 'no SHA-512')[:12]}" for shown, (version, sha) in sorted(pins.items())))
+            f"{', '.join(sorted(set(where)))} {version} {(sha or 'no SHA-512')[:12]}"
+            for (version, sha), where in sorted(pins.items(), key=lambda kv: str(kv[0]))))
     for problem in problems:
         print(f"  {problem}")
     print(f"\n{len(files)} workflow(s), {len(problems)} problem(s)")

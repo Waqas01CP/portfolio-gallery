@@ -983,6 +983,69 @@ def file_cases():
             return ["tools/check_workflows.py"]
         return plant
 
+    # The checks shared out across jobs (ADR-0019, Changes, 2026-10-29): the
+    # required job gives the verdict, after any failure, from every result.
+    def checks_yml(old, new):
+        def plant(copy):
+            edit(copy / ".github/workflows/checks.yml", old, new)
+            return ["tools/check_workflows.py"]
+        return plant
+
+    yield ("workflows: the verdict job not passing one result to the verdict", checks_yml(
+        "          RESULT_PAGE: ${{ needs.gallery-page.result }}\n", ""),
+        "a verdict job must pass every result to the verdict")
+    yield ("workflows: the required job without its if:, so skipped after a failure", checks_yml(
+        "    needs: [plan, files, browser, gallery-page]\n    if: ${{ !cancelled() }}\n",
+        "    needs: [plan, files, browser, gallery-page]\n"), "has no if: of its own")
+    yield ("workflows: one job of a workflow fetching another axe-core", checks_yml(
+        '          AXE_VERSION: "4.14.0"\n          AXE_SHA512: f564d9c448ec67b6f5dd31fc24f99b576cfc0876e5f34ff6866dd73c41b826035d40b2bcd480515e64b11df3003a44aa41e4714ffd1dc0d0f3d863a6df3ce971\n        run: |\n          curl --fail --silent --show-error --proto \'=https\' --tlsv1.2 \\\n            --output "$RUNNER_TEMP/axe-core.tgz" \\\n            "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"\n          echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict\n          tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js\n      # The showcase',
+        '          AXE_VERSION: "4.13.0"\n          AXE_SHA512: f564d9c448ec67b6f5dd31fc24f99b576cfc0876e5f34ff6866dd73c41b826035d40b2bcd480515e64b11df3003a44aa41e4714ffd1dc0d0f3d863a6df3ce971\n        run: |\n          curl --fail --silent --show-error --proto \'=https\' --tlsv1.2 \\\n            --output "$RUNNER_TEMP/axe-core.tgz" \\\n            "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"\n          echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict\n          tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js\n      # The showcase'),
+        "the workflows fetch different axe-core")
+
+    # tools/ci.py run with the environment GitHub gives a step.
+    def ci_env(env, *args, show=None):
+        code = ("import os, runpy, sys\n"
+                f"os.environ.update({env!r})\n"
+                f"sys.argv = ['tools/ci.py', *{list(args)!r}]\n"
+                "try:\n"
+                "    runpy.run_path('tools/ci.py', run_name='__main__')\n"
+                "finally:\n"
+                f"    print(open({show!r}).read()) if {show!r} and os.path.exists({show!r}) else None\n")
+        return ["-c", code]
+
+    def plan_change(copy):
+        since(append("designs/plain/design.css", "\n/* a change */\n"))(copy)
+        out = str(copy / "_plan.txt")
+        return ci_env({"GITHUB_OUTPUT": out}, "plan", "--since", "HEAD~1", show=out)
+
+    def plan_all(copy):
+        out = str(copy / "_plan.txt")
+        return ci_env({"GITHUB_OUTPUT": out}, "plan", show=out)
+
+    yield ("plan: one design's change plans that design's job alone", plan_change,
+           Passes('designs=["plain"]\ncount=1\npage=false'))
+    yield ("plan: no base plans every design and the gallery page", plan_all,
+           Passes(f"count={sum(1 for p in (ROOT / 'designs').iterdir() if (p / 'design.json').is_file())}\npage=true"))
+
+    def judged(**env):
+        base = {"RESULT_PLAN": "success", "RESULT_FILES": "success", "RESULT_BROWSER": "success",
+                "RESULT_PAGE": "success", "PLANNED_COUNT": "3", "PLANNED_PAGE": "true"}
+        return lambda copy: ci_env({**base, **env}, "verdict")
+
+    yield "control: the verdict, every part passed as planned", judged(), Passes("all parts passed")
+    yield ("control: the verdict, nothing to check and both browser parts skipped", judged(
+        RESULT_BROWSER="skipped", RESULT_PAGE="skipped", PLANNED_COUNT="0", PLANNED_PAGE="false"),
+        Passes("all parts passed"))
+    yield "verdict: a design's job failed", judged(RESULT_BROWSER="failure"), "browser: failure, expected success"
+    yield "verdict: a design's job timed out", judged(RESULT_BROWSER="cancelled"), "browser: cancelled, expected success"
+    yield "verdict: the design jobs skipped though planned", judged(RESULT_BROWSER="skipped"), "browser: skipped, expected success"
+    yield ("verdict: the gallery page checked though not planned", judged(PLANNED_PAGE="false"),
+           "gallery page: success, expected skipped")
+    yield "verdict: the files job failed", judged(RESULT_FILES="failure"), "files: failure, expected success"
+    yield ("verdict: a plan that gave no plan", judged(PLANNED_COUNT="", PLANNED_PAGE=""),
+           "plan: success, expected success, with a plan")
+    yield "verdict: the plan failed", judged(RESULT_PLAN="failure", RESULT_BROWSER="skipped", RESULT_PAGE="skipped"), "plan: failure"
+
     yield ("workflows: the weekly run fetching another axe-core version", weekly(
         'AXE_VERSION: "4.14.0"', 'AXE_VERSION: "4.13.0"'), "the workflows fetch different axe-core")
     yield ("workflows: the weekly run checking another SHA-512", weekly(
