@@ -304,7 +304,62 @@ def chosen(since: str | None, as_of: str, gallery: Path) -> Selection | None:
     return selection
 
 
-def checks(quick: bool, axe: Path | None, since: str | None = None) -> None:
+def plan(since: str | None) -> None:
+    """The browser checks' share-out for a run on GitHub (ADR-0019, Changes,
+    2026-10-29): the designs whose pages to check, one job each, and whether
+    the gallery page is checked, written to GITHUB_OUTPUT as designs (a
+    JSON list), count and page. With no base, or on any doubt, every page."""
+    as_of = datetime.now(timezone.utc).strftime("%Y-%m")
+    with tempfile.TemporaryDirectory(prefix="pg-plan-") as tmp:
+        gallery = Path(tmp) / "gallery"
+        run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
+        names = sorted(p.parent.name for p in (gallery / "designs").glob("*/index.html"))
+        selection = chosen(since, as_of, gallery)
+    if selection is None or selection.everything:
+        designs, page = names, True
+        print(f"\n=== the plan: every page, {len(names)} design(s) and the gallery page")
+    else:
+        designs, page = selection.check, selection.page
+        print(f"\n=== the plan: {len(designs)} design(s){' and the gallery page' if page else ''}")
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with open(output, "a", encoding="utf-8") as out:
+            out.write(f"designs={json.dumps(designs)}\ncount={len(designs)}\npage={'true' if page else 'false'}\n")
+
+
+# The verdict's table: each part of a run on GitHub, the result it must
+# have, given the plan. A part the plan gave nothing to do must be skipped,
+# never failed or cancelled; any other result fails the run.
+def verdict(env: dict[str, str]) -> int:
+    count, page = env.get("PLANNED_COUNT", ""), env.get("PLANNED_PAGE", "")
+    expected = {
+        "plan": "success",
+        "files": "success",
+        "browser": "success" if count not in ("", "0") else "skipped",
+        "gallery page": "success" if page == "true" else "skipped",
+    }
+    keys = {"plan": "RESULT_PLAN", "files": "RESULT_FILES", "browser": "RESULT_BROWSER",
+            "gallery page": "RESULT_PAGE"}
+    if count == "" or page not in ("true", "false"):
+        expected["plan"] = "success, with a plan"
+    rows, ok = [], True
+    for part, want in expected.items():
+        got = env.get(keys[part], "") or "no result"
+        held = got == want
+        ok = ok and held
+        rows.append(f"  {'ok  ' if held else 'FAIL'} {part}: {got}, expected {want}")
+    lines = [f"the plan: {count or 'none'} design(s), the gallery page {'checked' if page == 'true' else 'not checked'}"]
+    lines += rows
+    print("\n".join(lines))
+    summary = env.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as out:
+            out.write("### The checks' verdict\n\n" + "\n".join(lines) + "\n")
+    print(f"\n=== {'all parts passed' if ok else 'FAILED: a part did not pass, or ran when it should not'}")
+    return 0 if ok else 1
+
+
+def checks(quick: bool, axe: Path | None, since: str | None = None, browser_checks: bool = True) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
     run("tools/check_workflows.py")
     run("tools/check_design.py")
@@ -334,7 +389,7 @@ def checks(quick: bool, axe: Path | None, since: str | None = None) -> None:
     run("build.py", "--as-of", as_of, "--gallery", "--out", gallery)
     run("tools/check_built.py", gallery)
     # Compared before the pictures are added to it, as the base is built.
-    selection = chosen(since, as_of, gallery)
+    selection = chosen(since, as_of, gallery) if browser_checks else None
     # The pictures, as the deploy's screenshot job makes them: so a
     # showcase screenshot Chrome cannot read fails here, on its pull
     # request, before it can reach main (ADR-0016, Changes, 2026-10-20).
@@ -346,6 +401,9 @@ def checks(quick: bool, axe: Path | None, since: str | None = None) -> None:
     # tree itself is reported by the check that finds it first.
     if (ROOT / ".github" / "template-cleanup" / "cleanup.py").is_file():
         run("tools/check_template_cleanup.py")
+    if not browser_checks:
+        print("\n=== the browser checks: run in their own jobs, as the plan shares them out")
+        return
     browser = ["tools/check_browser.py", gallery]
     if quick:
         browser.append("--quick")
@@ -474,8 +532,12 @@ def main(argv: list[str]) -> int:
     c.add_argument("--quick", action="store_true")
     c.add_argument("--axe", type=Path)
     c.add_argument("--since", metavar="REF")
+    c.add_argument("--no-browser", action="store_true")
     w = sub.add_parser("changes")
     w.add_argument("--since", metavar="REF", required=True)
+    n = sub.add_parser("plan")
+    n.add_argument("--since", metavar="REF")
+    sub.add_parser("verdict")
     b = sub.add_parser("build")
     b.add_argument("--mode", choices=("site", "gallery"), required=True)
     b.add_argument("--out", type=Path, default=ROOT / "_site")
@@ -489,7 +551,12 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "checks":
-            checks(args.quick, args.axe, args.since)
+            checks(args.quick, args.axe, args.since, browser_checks=not args.no_browser)
+        elif args.command == "plan":
+            plan(args.since)
+            return 0
+        elif args.command == "verdict":
+            return verdict(dict(os.environ))
         elif args.command == "changes":
             as_of = datetime.now(timezone.utc).strftime("%Y-%m")
             with tempfile.TemporaryDirectory(prefix="pg-head-") as tmp:

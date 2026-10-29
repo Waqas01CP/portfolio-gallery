@@ -6,12 +6,20 @@
 # engine. It blocks nothing: a failed run is the notice, sent to the user
 # who last changed the cron line below.
 #
+# Its work is shared out as in checks.yml (ADR-0019, Changes, 2026-10-29):
+# plan lists every design, files runs every check that needs no browser,
+# browser checks one design's page per job, side by side, gallery-page the
+# gallery page, and verdict fails unless every part passed.
+#
 # It holds no permissions at all, as a scheduled run must (the owner's
-# answer Q2, 2026-10-19; tools/check_workflows.py): it copies the default
-# branch by an anonymous clone, as any visitor could, and writes nothing.
-# GitHub disables a schedule in a public repository after 60 days without
-# activity there (GitHub Docs, "Events that trigger workflows"). Its
-# axe-core pin is checks.yml's, which tools/check_workflows.py holds equal.
+# answer Q2, 2026-10-19; tools/check_workflows.py): each job copies the
+# default branch by an anonymous clone, as any visitor could, and writes
+# nothing. GitHub disables a schedule in a public repository after 60 days
+# without activity there (GitHub Docs, "Events that trigger workflows").
+# Its axe-core pin is checks.yml's, which tools/check_workflows.py holds
+# equal. Every job runs only here: a copy's own checks run on its every
+# change; the template cleanup deletes this file, and it runs nothing if it
+# stays (ADR-0015).
 name: Checks, every page
 
 on:
@@ -23,15 +31,62 @@ on:
 permissions: {}
 
 jobs:
-  every-page:
-    # Only here: a copy's own checks run on its every change; the template
-    # cleanup deletes this file, and it runs nothing if it stays (ADR-0015).
+  plan:
     if: ${{ github.repository == 'Waqas01CP/portfolio-gallery' }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 20
+    outputs:
+      designs: ${{ steps.plan.outputs.designs }}
+      count: ${{ steps.plan.outputs.count }}
+      page: ${{ steps.plan.outputs.page }}
+    env:
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Copy the default branch, anonymously
+        run: git clone --quiet --depth 1 "https://github.com/$REPOSITORY.git" repo
+      - name: Create the environment; pip checks every file's hash
+        working-directory: repo
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Plan the browser checks, every page
+        id: plan
+        working-directory: repo
+        run: .venv/bin/python tools/ci.py plan
+
+  files:
+    if: ${{ github.repository == 'Waqas01CP/portfolio-gallery' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     env:
       # As in checks.yml: Ubuntu 24.04 restricts the user namespaces
       # Chrome's sandbox uses, and this job holds no token at all (ADR-0010).
+      PG_CHROME_NO_SANDBOX: "1"
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Copy the default branch, anonymously
+        run: git clone --quiet --depth 1 "https://github.com/$REPOSITORY.git" repo
+      - name: Create the environment; pip checks every file's hash
+        working-directory: repo
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Run every check but the browser's, on every design
+        working-directory: repo
+        run: .venv/bin/python tools/ci.py checks --no-browser
+
+  browser:
+    needs: plan
+    # Only after the plan succeeded, and gave this job pages to check.
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.count != '0' }}
+    name: browser, ${{ matrix.design }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        design: ${{ fromJSON(needs.plan.outputs.designs) }}
+    env:
       PG_CHROME_NO_SANDBOX: "1"
       REPOSITORY: ${{ github.repository }}
     steps:
@@ -52,6 +107,72 @@ jobs:
             "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
           echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
           tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
-      - name: Run every check on every page, axe included
+      - name: Build the gallery
         working-directory: repo
-        run: .venv/bin/python tools/ci.py checks --axe "$RUNNER_TEMP/package/axe.min.js"
+        run: .venv/bin/python build.py --gallery --out _gallery
+      - name: The browser checks on this design's page, axe included
+        working-directory: repo
+        env:
+          DESIGN: ${{ matrix.design }}
+        run: .venv/bin/python tools/check_browser.py _gallery --designs "$DESIGN" --skip-gallery-page --axe "$RUNNER_TEMP/package/axe.min.js"
+
+  gallery-page:
+    needs: plan
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.page == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PG_CHROME_NO_SANDBOX: "1"
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Copy the default branch, anonymously
+        run: git clone --quiet --depth 1 "https://github.com/$REPOSITORY.git" repo
+      - name: Create the environment; pip checks every file's hash
+        working-directory: repo
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Fetch axe-core; sha512sum checks it
+        env:
+          AXE_VERSION: "4.14.0"
+          AXE_SHA512: f564d9c448ec67b6f5dd31fc24f99b576cfc0876e5f34ff6866dd73c41b826035d40b2bcd480515e64b11df3003a44aa41e4714ffd1dc0d0f3d863a6df3ce971
+        run: |
+          curl --fail --silent --show-error --proto '=https' --tlsv1.2 \
+            --output "$RUNNER_TEMP/axe-core.tgz" \
+            "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
+          echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
+          tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
+      - name: Build the gallery and its pictures
+        working-directory: repo
+        run: |
+          .venv/bin/python build.py --gallery --out _gallery
+          .venv/bin/python tools/screenshots.py _gallery
+      - name: The browser checks on the gallery page, axe included
+        working-directory: repo
+        run: .venv/bin/python tools/check_browser.py _gallery --designs "" --axe "$RUNNER_TEMP/package/axe.min.js"
+
+  verdict:
+    needs: [plan, files, browser, gallery-page]
+    if: ${{ !cancelled() && github.repository == 'Waqas01CP/portfolio-gallery' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Copy the default branch, anonymously
+        run: git clone --quiet --depth 1 "https://github.com/$REPOSITORY.git" repo
+      - name: Create the environment; pip checks every file's hash
+        working-directory: repo
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: The verdict
+        working-directory: repo
+        env:
+          RESULT_PLAN: ${{ needs.plan.result }}
+          RESULT_FILES: ${{ needs.files.result }}
+          RESULT_BROWSER: ${{ needs.browser.result }}
+          RESULT_PAGE: ${{ needs.gallery-page.result }}
+          PLANNED_COUNT: ${{ needs.plan.outputs.count }}
+          PLANNED_PAGE: ${{ needs.plan.outputs.page }}
+        run: .venv/bin/python tools/ci.py verdict

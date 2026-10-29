@@ -122,8 +122,10 @@ to check_browser.py, ci.py checks or prove_checks.py.
 The workflows call these, and they run the same locally:
 
 ```
-python tools/ci.py checks [--quick] [--axe FILE] [--since REF]
+python tools/ci.py checks [--quick] [--axe FILE] [--since REF] [--no-browser]
 python tools/ci.py changes --since REF
+python tools/ci.py plan [--since REF]
+python tools/ci.py verdict
 python tools/ci.py build --mode site|gallery [--out DIR]
 python tools/ci.py assemble --site DIR --shots DIR
 python tools/ci.py pages --mode site|gallery
@@ -142,6 +144,17 @@ since REF alters, and the rest runs in full (ADR-0019); without it, every
 page, as a run started by hand on GitHub. `changes --since REF` prints
 what such a run would check and why, and runs no check: try
 `python tools/ci.py changes --since main` on a branch.
+
+On GitHub the checks workflow shares the work out (ADR-0019, Changes,
+2026-10-29): `plan` writes the designs to check, their count and whether
+the gallery page is checked to GITHUB_OUTPUT; `checks --no-browser` runs
+everything but the browser checks; each listed design's page is checked
+in a job of its own, `check_browser.py _gallery --designs NAME
+--skip-gallery-page`, and the gallery page in another, `--designs ""`;
+`verdict` reads each job's result from RESULT_PLAN, RESULT_FILES,
+RESULT_BROWSER and RESULT_PAGE, and the plan's from PLANNED_COUNT and
+PLANNED_PAGE, and fails unless every part passed or was skipped by the
+plan.
 
 ## Gates
 

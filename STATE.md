@@ -60,8 +60,10 @@ standing check that no page scrolls sideways; seventeen designs, ten of
 them for professions. On the branch checks-tuned, not yet pushed, the
 audit's fixes: build.py no longer checks every page, a failing selection
 checks every page instead of stopping the run, a new push to a pull
-request cancels its old run. Waiting: his push of checks-tuned; Phase 2,
-parallel jobs, due before 20 designs; step 5's policy, provable only on or
+request cancels its old run; on parallel-checks, cut from it, Phase 2:
+the checks shared out across jobs that run side by side on GitHub, a job
+per design to check, the required job giving the verdict. Waiting: his
+merge of checks-tuned, then his push of parallel-checks; step 5's policy, provable only on or
 after 2026-11-02; ADR-0012, held.
 
 ## Publishing
@@ -82,7 +84,7 @@ DONE rows are in docs/reference/completed.md.
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
-| Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; under checks-tuned's rule, pull request 26 replayed checks its five designs and the gallery page, 1,982 s against 75.4 minutes on GitHub for every page; [BELIEVED] a narrowed run on GitHub, not yet seen there. Phase 2, every page in parallel jobs, due before 20 designs: every page of seventeen takes 75.4 minutes of a 90-minute limit | 2026-10-29 | 27db869; ADR-0019, Changes |
+| Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; under checks-tuned's rule, pull request 26 replayed checks its five designs and the gallery page, 1,982 s against 75.4 minutes on GitHub for every page; [BELIEVED] a narrowed run on GitHub, not yet seen there. Phase 2, the jobs side by side, built on parallel-checks: its jobs rehearsed here in order, plan 11 s, files 113 s, one design's job 306 s, the gallery page's 212 s, the verdict passing; [BELIEVED] on GitHub until its first run there | 2026-10-29 | 27db869; ADR-0019, Changes |
 | CODEOWNERS and the issue templates | PARTIAL | [VERIFIED] CODEOWNERS asked the owner's review the moment pull request 22, the first from outside, opened, and its author filled the pull request template's showcase section (GitHub's API); [BELIEVED] the issue templates, which no one has used yet | 2026-10-28 | b798834; pull request 22 |
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
 | The README's routes and prompt; the Showcase entry and Question forms | PARTIAL | [VERIFIED] the prompt check and its defeat cases; on main, GitHub's own page serves the prompt's block with its copy button's text and the three pictures through its image proxy (2026-10-23); the forms parsed; [BELIEVED] the four forms in the issue chooser, which needs a sign-in, until the owner looks | 2026-10-23 | 0ce2c71, pull request 15; ADR-0017 |
@@ -93,7 +95,7 @@ DONE rows are in docs/reference/completed.md.
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging checks-tuned | The owner's push and merge | The owner | 2026-10-29 |
+| Merging checks-tuned, then parallel-checks | The owner's push and merge | The owner | 2026-10-29 |
 
 ## Known unverified
 

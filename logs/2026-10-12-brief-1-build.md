@@ -3283,3 +3283,76 @@ made in briefs/social-card/ (gitignored), for him to upload.
   page, so a five-design pull request takes about one page's time.
 - Nothing pushed: checks-tuned waits on the owner. It changes tools/ci.py,
   so its own run checks every page, about 75 minutes, once.
+
+# Round 21, 2026-10-29 UTC: Phase 2, the checks side by side on GitHub
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch parallel-checks, cut from checks-tuned
+while its pull request, 27, ran. Mode: mutating. No brief: the owner's
+approval of 2026-10-29 UTC: "whatever split is reasonable and is not on
+my computer but rather on github even if i were to close computer then it
+should run. in this case i approve." And his question: is the seat's
+share of CAPABILITIES.md being kept? It had been edited round by round
+but not read whole; read whole this round and brought current.
+
+## What was built
+
+- checks.yml as five jobs: plan (tools/ci.py plan: the selection, the
+  designs to check as a JSON list, their count, the gallery page or not),
+  files (tools/ci.py checks --no-browser: every check but the browser's,
+  on every design), browser (a job per listed design, side by side, the
+  design's name reaching the shell as a variable), gallery-page (the
+  pictures, then the gallery page's checks), and checks, the job the
+  ruleset requires: it runs after any failure, unless the run was
+  cancelled for a newer push, and tools/ci.py verdict fails it unless each
+  part passed or was skipped because the plan gave it nothing to do. A
+  required job skipped would count as passed; this one is never skipped.
+- checks-weekly.yml the same way, each job copying the default branch
+  anonymously, each only in this repository.
+- tools/check_workflows.py: a verdict job may name the results in its
+  steps, and must name every one; every job's axe-core pin compared, not
+  each file's first.
+- ADR-0019, Changes; standing-checks.md, commands.md, setup-on-github.md;
+  CAPABILITIES.md read whole and brought current.
+
+## Errors this seat made
+
+1. **Backslashes through the shell, again.** An edit script passed
+   through a heredoc put a line break into tools/check_workflows.py; the
+   checker's syntax error stopped it before anything ran, and the line was
+   mended by an exact edit.
+2. **A helper left in a case file**, naming nothing that existed; removed
+   before the run, with a variable used before its definition.
+3. **The first rehearsal ran from too deep a folder.** Windows' 260
+   characters stopped two builds at a font's path; rerun from a short
+   folder, every job passed. A limit for any Windows user with a deep
+   folder, now in CAPABILITIES.
+4. **always() at first for the verdict**, which would have run it in a
+   run cancelled for a newer push; !cancelled() instead.
+
+## Proofs
+
+- Both workflows parsed by a full YAML parser in a scratch environment:
+  the five jobs, the required job still named checks, no matrix value or
+  job output inside a shell line.
+- The jobs rehearsed here in order, each in a fresh copy, as their steps
+  call them: plan 11 s, all seventeen designs and the gallery page; files
+  113 s; browser for Frost, axe included, 306 s; gallery-page 212 s; the
+  verdict, all parts passed.
+- Fourteen new cases: the plan of one design's change lists that design
+  alone, with no base every design; the verdict fails on a failed, a
+  timed-out and a wrongly skipped design job, the gallery page run though
+  not planned, a failed files job, a plan with no plan and a failed plan,
+  and passes when every part passed and when there was nothing to check;
+  the workflow check refuses the verdict job missing a result, the
+  required job without its if:, and one job of a workflow pinning another
+  axe-core.
+- the file harness on parallel-checks: 163 defeat cases, 37 planted controls, 0 unproven, in 584 s.
+- check_workflows, check_template_cleanup: 0 problems.
+
+## Not done
+
+- The first run on GitHub, the proof of the parallel jobs there: this
+  branch's own pull request, which changes the checks, so it checks every
+  page, side by side.
+- Nothing pushed: parallel-checks waits on the owner, after checks-tuned.

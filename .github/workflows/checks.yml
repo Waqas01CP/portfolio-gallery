@@ -8,8 +8,15 @@
 # a page whose built files are the same is not checked again. Every page
 # is checked when the checks themselves change, when the base cannot be
 # read or built, and when the run is started by hand (Actions, Checks, Run
-# workflow); checks-weekly.yml checks every page each Monday. The job
-# keeps its name, checks, which the ruleset requires, and always runs.
+# workflow); checks-weekly.yml checks every page each Monday.
+#
+# The work runs side by side on GitHub's runners (ADR-0019, Changes,
+# 2026-10-29): plan decides which pages to check; files runs every check
+# that needs no browser; browser checks one design's page per job, all at
+# once; gallery-page checks the gallery page; and checks, the job the
+# ruleset requires, gives the verdict. It always runs and fails unless every
+# part passed or was skipped by the plan: a required job that was skipped
+# would count as passed.
 #
 # On a pull request from a fork, GitHub runs this with a read-only token and
 # no secrets, from the pull request's own copy of this file and of the
@@ -33,12 +40,47 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  checks:
+  plan:
     runs-on: ubuntu-24.04
-    # A run that checks every page takes about four to five minutes a design
-    # on this runner: 3,020 s for twelve on 2026-10-25. A pull request that
-    # changes one design checks that design's page alone.
-    timeout-minutes: 90
+    timeout-minutes: 20
+    outputs:
+      designs: ${{ steps.plan.outputs.designs }}
+      count: ${{ steps.plan.outputs.count }}
+      page: ${{ steps.plan.outputs.page }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # On a pull request, the merge commit and its first parent, the base.
+          fetch-depth: 2
+      - name: Create the environment; pip checks every file's hash
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      # The base to compare with. A pull request's is the merge's first
+      # parent, already here. A push's is the main before it, fetched; a new
+      # branch, or a fetch that fails, leaves none, and every page is
+      # checked. A run started by hand has none either.
+      - name: Find the base this change is compared with
+        id: base
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            echo "since=HEAD^1" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT" = push ] && git fetch --quiet --no-tags --depth=1 origin "$BEFORE"; then
+            echo "since=$BEFORE" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Plan the browser checks, one job per page that changed
+        id: plan
+        env:
+          SINCE: ${{ steps.base.outputs.since }}
+        run: .venv/bin/python tools/ci.py plan ${SINCE:+--since "$SINCE"}
+
+  files:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     env:
       # Ubuntu 24.04 restricts the user namespaces Chrome's sandbox uses.
       # This job holds no write token and no secret (ADR-0010).
@@ -60,6 +102,31 @@ jobs:
       - name: Fetch the showcase sites this pull request adds or changes
         if: ${{ github.event_name == 'pull_request' && hashFiles('tools/check_showcase.py') != '' }}
         run: .venv/bin/python tools/check_showcase.py --fetch-changed HEAD^1
+      - name: Run every check but the browser's, on every design
+        run: .venv/bin/python tools/ci.py checks --no-browser
+
+  browser:
+    needs: plan
+    # Only after the plan succeeded, and gave this job pages to check.
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.count != '0' }}
+    name: browser, ${{ matrix.design }}
+    runs-on: ubuntu-24.04
+    # One design's page takes about four to five minutes on this runner.
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        design: ${{ fromJSON(needs.plan.outputs.designs) }}
+    env:
+      PG_CHROME_NO_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Create the environment; pip checks every file's hash
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
       # axe-core at one exact version, checked against the npm registry's
       # integrity value before anything reads it (ADR-0011). AXE_SHA512 is
       # the registry's sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==
@@ -74,22 +141,72 @@ jobs:
             "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
           echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
           tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
-      # The base to compare with. A pull request's is the merge's first
-      # parent, already here. A push's is the main before it, fetched; a new
-      # branch, or a fetch that fails, leaves none, and every page is
-      # checked. A run started by hand has none either.
-      - name: Find the base this change is compared with
-        id: base
+      - name: Build the gallery
+        run: .venv/bin/python build.py --gallery --out _gallery
+      # The design's name comes from a folder a pull request may add, so it
+      # reaches the shell as a variable, never as text in the command.
+      - name: The browser checks on this design's page, axe included
         env:
-          EVENT: ${{ github.event_name }}
-          BEFORE: ${{ github.event.before }}
+          DESIGN: ${{ matrix.design }}
+        run: .venv/bin/python tools/check_browser.py _gallery --designs "$DESIGN" --skip-gallery-page --axe "$RUNNER_TEMP/package/axe.min.js"
+
+  gallery-page:
+    needs: plan
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.page == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PG_CHROME_NO_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Create the environment; pip checks every file's hash
         run: |
-          if [ "$EVENT" = pull_request ]; then
-            echo "since=HEAD^1" >> "$GITHUB_OUTPUT"
-          elif [ "$EVENT" = push ] && git fetch --quiet --no-tags --depth=1 origin "$BEFORE"; then
-            echo "since=$BEFORE" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Run every check, axe included, the browser checks on what changed
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Fetch axe-core; sha512sum checks it
         env:
-          SINCE: ${{ steps.base.outputs.since }}
-        run: .venv/bin/python tools/ci.py checks --axe "$RUNNER_TEMP/package/axe.min.js" ${SINCE:+--since "$SINCE"}
+          AXE_VERSION: "4.14.0"
+          AXE_SHA512: f564d9c448ec67b6f5dd31fc24f99b576cfc0876e5f34ff6866dd73c41b826035d40b2bcd480515e64b11df3003a44aa41e4714ffd1dc0d0f3d863a6df3ce971
+        run: |
+          curl --fail --silent --show-error --proto '=https' --tlsv1.2 \
+            --output "$RUNNER_TEMP/axe-core.tgz" \
+            "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
+          echo "$AXE_SHA512  $RUNNER_TEMP/axe-core.tgz" | sha512sum --check --strict
+          tar -xzf "$RUNNER_TEMP/axe-core.tgz" -C "$RUNNER_TEMP" package/axe.min.js
+      # The showcase's cards and larger copies are pictures the screenshot
+      # tool makes, as the deploy does; the gallery page's checks read them.
+      - name: Build the gallery and its pictures
+        run: |
+          .venv/bin/python build.py --gallery --out _gallery
+          .venv/bin/python tools/screenshots.py _gallery
+      - name: The browser checks on the gallery page, axe included
+        run: .venv/bin/python tools/check_browser.py _gallery --designs "" --axe "$RUNNER_TEMP/package/axe.min.js"
+
+  # The job the ruleset requires. It runs whatever happened before it, unless
+  # the whole run was cancelled for a newer push, and fails unless each part
+  # passed, or was skipped because the plan gave it nothing to do
+  # (tools/ci.py verdict).
+  checks:
+    needs: [plan, files, browser, gallery-page]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Create the environment; pip checks every file's hash
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: The verdict
+        env:
+          RESULT_PLAN: ${{ needs.plan.result }}
+          RESULT_FILES: ${{ needs.files.result }}
+          RESULT_BROWSER: ${{ needs.browser.result }}
+          RESULT_PAGE: ${{ needs.gallery-page.result }}
+          PLANNED_COUNT: ${{ needs.plan.outputs.count }}
+          PLANNED_PAGE: ${{ needs.plan.outputs.page }}
+        run: .venv/bin/python tools/ci.py verdict

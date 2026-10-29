@@ -529,6 +529,12 @@ every page at any time: **Actions**, **Checks** or **Checks, every
 page**, **Run workflow**. Like the showcase check, GitHub disables its
 schedule after 60 days without activity; enable it the same way.
 
+A run of **Checks** is several jobs side by side (ADR-0019, Changes,
+2026-10-29): **plan**, **files**, a **browser** job for each design it
+checks, **gallery-page**, and last **checks**, the one the ruleset
+requires, which fails unless every other part passed. When a run fails,
+open it: the failed job is marked, and its last step names the problem.
+
 ## What the tests prove, and what they do not
 
 - Test 1 proves the scope check runs from the default branch and refuses a
