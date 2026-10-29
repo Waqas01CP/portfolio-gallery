@@ -35,7 +35,7 @@
   python tools/ci.py changes --since REF
       Only what `checks --since REF` would check, and why.
 
-  python tools/ci.py build --mode site|gallery [--out DIR]
+  python tools/ci.py build --mode site|gallery [--out DIR] [--likes FILE]
       The deploy workflow's build: the site, or the gallery, built and its
       files checked, with the content trace for a site. No browser.
 
@@ -453,8 +453,9 @@ def checks(quick: bool, axe: Path | None, since: str | None = None, browser_chec
               "npm ci --ignore-scripts --prefix tools/lighthouse (ADR-0012)")
 
 
-def build(mode: str, out: Path) -> None:
-    run("build.py", *(["--gallery"] if mode == "gallery" else []), "--out", out)
+def build(mode: str, out: Path, likes: Path | None = None) -> None:
+    run("build.py", *(["--gallery"] if mode == "gallery" else []), "--out", out,
+        *(["--likes", likes] if likes else []))
     run("tools/check_built.py", out)
     if mode == "site":
         run("tools/check_content.py", "--page", out / "index.html")
@@ -576,6 +577,7 @@ def main(argv: list[str]) -> int:
     b = sub.add_parser("build")
     b.add_argument("--mode", choices=("site", "gallery"), required=True)
     b.add_argument("--out", type=Path, default=ROOT / "_site")
+    b.add_argument("--likes", type=Path)
     a = sub.add_parser("assemble")
     a.add_argument("--site", type=Path, required=True)
     a.add_argument("--shots", type=Path, required=True)
@@ -600,7 +602,7 @@ def main(argv: list[str]) -> int:
                 chosen(args.since, as_of, Path(tmp) / "gallery")
             return 0
         elif args.command == "build":
-            build(args.mode, args.out.resolve())
+            build(args.mode, args.out.resolve(), args.likes.resolve() if args.likes else None)
         elif args.command == "pictures":
             run("tools/screenshots.py", args.gallery.resolve())
             pictures(args.gallery.resolve())

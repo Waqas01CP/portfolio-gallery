@@ -266,7 +266,7 @@ def copy_facts(prompt: str) -> list[tuple[str, object, object]]:
     deploy, deploy_jobs, deploy_steps = workflow("deploy.yml")
     checks, _, _ = workflow("checks.yml")
     settings = find(r"`content/config\.json`: the settings, (.*?)\.", lambda s: set(re.findall(r"\"(\w+)\"", s)))
-    jobs = re.search(r"with the jobs (\w+), (\w+), (\w+) and (\w+)\. A fifth, (\w+), is skipped", prompt)
+    jobs = re.search(r"with the jobs (\w+), (\w+), (\w+) and (\w+)\. Two more, (\w+) and (\w+), are skipped", prompt)
     step = find(r"its failed step, usually \"([^\"]+)\"")
     return [
         ("the settings named, each in content/config.json", settings <= set(config) if settings else None, True),

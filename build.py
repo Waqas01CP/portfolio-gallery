@@ -68,6 +68,11 @@ DEFAULT_OUT = ROOT / "_site"
 # turn the credit off in config.json (ADR-0002).
 PROJECT_NAME = "portfolio-gallery"
 PROJECT_URL = "https://github.com/Waqas01CP/portfolio-gallery"
+# The gallery's like button: a post per template and site in Discussions,
+# category Likes (ADR-0021). Without a count, a card links to the category.
+LIKES_URL = f"{PROJECT_URL}/discussions/categories/likes"
+LIKED_RE = re.compile(re.escape(f"{PROJECT_URL}/discussions/") + r"[1-9][0-9]{0,8}")
+LIKE_KEY_RE = re.compile(r"(?:designs|showcase)/[a-z0-9-]+")
 
 # Every page carries this policy in a meta tag, so a browser refuses
 # scripts, styles, fonts and images from any other origin even if a check
@@ -1099,8 +1104,34 @@ def load_samples(as_of: str) -> dict[str, dict]:
     return samples
 
 
+def load_likes(path: Path | None) -> dict[str, dict]:
+    """The like counts tools/likes.py wrote, each checked: a key naming a
+    template or a site, a post in this repository's Discussions, a whole
+    number. Anything else stops the build."""
+    if path is None:
+        return {}
+    try:
+        found = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise BuildError(f"{path.name} cannot be read: {error}") from None
+    if not isinstance(found, dict):
+        raise BuildError(f"{path.name}: must be an object, as tools/likes.py writes it")
+    for key, value in found.items():
+        if not (LIKE_KEY_RE.fullmatch(key) and isinstance(value, dict) and set(value) == {"url", "likes"}
+                and isinstance(value["url"], str) and LIKED_RE.fullmatch(value["url"])
+                and type(value["likes"]) is int and value["likes"] >= 0):
+            raise BuildError(f"{path.name}: {key!r} must be a post in {PROJECT_URL}/discussions/ "
+                             f"and a whole number of likes (ADR-0021)")
+    return found
+
+
+def liked(item: dict, key: str, likes: dict[str, dict]) -> None:
+    item["like_url"], item["likes"] = ((likes[key]["url"], likes[key]["likes"]) if key in likes
+                                       else (LIKES_URL, None))
+
+
 def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
-          content_dir: Path = CONTENT_DIR) -> str:
+          content_dir: Path = CONTENT_DIR, likes_file: Path | None = None) -> str:
     main = load_content(content_dir, as_of)
     config, items, base = main["config"], main["items"], main["page"]
     samples = load_samples(as_of) if gallery else {}
@@ -1108,6 +1139,11 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
     names = design_names() if gallery else [design_override or config["design"]]
     designs = [load_design(name) for name in names]
     showcase = load_showcase() if gallery else []
+    likes = load_likes(likes_file) if gallery else {}
+    for item in designs if gallery else []:
+        liked(item, f"designs/{item['slug']}", likes)
+    for item in showcase:
+        liked(item, f"showcase/{item['login']}", likes)
     env = environment()
 
     pages: dict[str, str] = {}
@@ -1196,11 +1232,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--content", type=Path, default=CONTENT_DIR, metavar="DIR",
                         help="the content folder; default: content/. A sample person's, "
                              "samples/<design>/, builds that person's site")
+    parser.add_argument("--likes", type=Path, metavar="FILE",
+                        help="the gallery only: each card's like count, as tools/likes.py writes it")
     args = parser.parse_args(argv)
+    if args.likes and not args.gallery:
+        parser.error("--likes applies to the gallery only")
     as_of = args.as_of or datetime.now(timezone.utc).strftime("%Y-%m")
     try:
         check_environment()
-        print(build(args.out.resolve(), as_of, args.design, args.gallery, args.content.resolve()))
+        print(build(args.out.resolve(), as_of, args.design, args.gallery, args.content.resolve(),
+                    args.likes.resolve() if args.likes else None))
     except BuildError as error:
         print(f"build failed:\n{error}", file=sys.stderr)
         return 1

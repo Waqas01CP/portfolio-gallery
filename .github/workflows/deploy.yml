@@ -6,7 +6,11 @@
 # of this repository therefore publishes its owner's site with no change
 # here (docs/how-to/use-this-template.md).
 #
-# Five jobs, each with the least it needs (ADR-0006, ADR-0010):
+# Six jobs, each with the least it needs (ADR-0006, ADR-0010):
+#   likes     the gallery only: makes the Likes post in Discussions of any
+#             template or showcase site without one, and counts each
+#             post's thumbs up for build (ADR-0021); Discussions: write
+#             and nothing else; never fails the run over Discussions
 #   build     builds and checks the files; read-only; no browser
 #   pages     asks GitHub whether Pages is on, publishing from GitHub
 #             Actions; Pages: read only. In a copy whose owner has not
@@ -42,7 +46,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  likes:
+    if: ${{ vars.PORTFOLIO_GALLERY == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      discussions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Make any missing post; count each post's likes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/likes.py --out likes.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: likes
+          path: likes.json
+          retention-days: 1
+          if-no-files-found: error
+
   build:
+    needs: likes
+    # After likes, or without it: in a copy it is skipped, and should it
+    # fail, the gallery is built without counts rather than not at all.
+    if: ${{ !cancelled() && needs.likes.result != 'cancelled' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -63,10 +93,19 @@ jobs:
         run: |
           python3 -m venv .venv
           .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: ${{ needs.likes.result == 'success' }}
+        with:
+          name: likes
       - name: Build and check
         env:
           MODE: ${{ steps.mode.outputs.mode }}
-        run: .venv/bin/python tools/ci.py build --mode "$MODE" --out _site
+        run: |
+          if [ "$MODE" = gallery ] && [ -f likes.json ]; then
+            .venv/bin/python tools/ci.py build --mode "$MODE" --out _site --likes likes.json
+          else
+            .venv/bin/python tools/ci.py build --mode "$MODE" --out _site
+          fi
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: site
@@ -97,7 +136,7 @@ jobs:
 
   shots:
     needs: build
-    if: needs.build.outputs.mode == 'gallery'
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.mode == 'gallery' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
