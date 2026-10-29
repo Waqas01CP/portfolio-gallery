@@ -115,8 +115,11 @@ PAGES_SETTING = "Settings, Pages, Build and deployment, Source: GitHub Actions"
 # The files that decide how a page is checked rather than what it is: a
 # change to any of them means every page is checked (ADR-0019). The pages
 # themselves are compared as built, so the engine, the designs, the content
-# and the samples need no entry here.
-CHECKING = ("build.py", "requirements.txt", "tools/ci.py", "tools/check_browser.py", "tools/cdp.py",
+# and the samples need no entry here; build.py neither, since what it does
+# to a page shows in the page. Its one part in the checking, the showcase's
+# shape limits the packing check reads, is covered by checking the gallery
+# page whenever build.py changes (ADR-0019, Changes, 2026-10-29).
+CHECKING = ("requirements.txt", "tools/ci.py", "tools/check_browser.py", "tools/cdp.py",
             ".github/workflows/checks.yml")
 
 
@@ -276,7 +279,8 @@ def select(since: str, as_of: str, gallery: Path) -> Selection:
                     if p.is_file() and p.relative_to(root).parts[0] != "designs"}
         here, there = outside(gallery), outside(out)
         page = (here != there or any(not filecmp.cmp(gallery / n, out / n, shallow=False) for n in here)
-                or any(n.startswith("showcase/") for n in changed))
+                or any(n.startswith("showcase/") for n in changed)
+                or "build.py" in changed)
         return Selection(check=check, unchanged=[n for n in names if n not in check], page=page)
 
 
@@ -285,7 +289,12 @@ def chosen(since: str | None, as_of: str, gallery: Path) -> Selection | None:
     GitHub; None for a run with no base, which checks every page."""
     if not since:
         return None
-    selection = select(since, as_of, gallery)
+    # A fault in the selection itself checks every page rather than stop
+    # the run: as safe, and nobody waits on a red run for nothing.
+    try:
+        selection = select(since, as_of, gallery)
+    except Exception as error:  # noqa: BLE001
+        selection = Selection(f"the selection failed ({type(error).__name__}: {error})")
     lines = selection.lines(since)
     print("\n=== the browser checks, " + "\n".join(lines), flush=True)
     summary = os.environ.get("GITHUB_STEP_SUMMARY")

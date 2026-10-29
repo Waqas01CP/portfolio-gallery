@@ -26,6 +26,12 @@ on:
 permissions:
   contents: read
 
+# A new push to a pull request stops the run for its old commit, which no
+# one will merge. On main every run finishes: each merge is checked.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   checks:
     runs-on: ubuntu-24.04

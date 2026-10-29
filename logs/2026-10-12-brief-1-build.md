@@ -3182,3 +3182,104 @@ screens at 1366 by 768, 390 by 844 and 1080 by 1920:
   briefs/round19-shots (gitignored).
 - Nothing pushed: more-professions waits on the owner, after
   checks-for-changes and width-check.
+
+# Round 20, 2026-10-29 UTC: an audit of the checks' time and guard
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. HEAD at start: main at 52bd61a, after pull requests 24 to 26.
+Work on the branch checks-tuned. Mode: mutating. No brief: the owner's
+request of 2026-10-29 UTC, after the three merges: "audit whether the
+implementation was successful or not", whether the merges "are optimized
+and are not taking extra time", and the checks as "a bodyguard checking
+what is coming in": "comprehensive and thorough and deliberate". He
+thought more-professions took perhaps 25 to 40 minutes. Before it, in
+the same message: a social preview card for links to the repository,
+made in briefs/social-card/ (gitignored), for him to upload.
+
+## What was found
+
+- **Every run checked every page, as designed.** GitHub's API: pull
+  request 24, 52.1 minutes, and its merge 53.1; 25, 53.2 and 54.7; 26,
+  75.4 and 75.4. Nearly all of each is the one step that runs the checks
+  (4,514 s of run 40776363105). The job logs need a sign-in, so each
+  run's selection was replayed on the same commits: 24 for tools/ci.py,
+  checks.yml and tools/check_browser.py; 25 for tools/check_browser.py;
+  26 for build.py. The first two were meant to: they changed the checks.
+- **The fault: build.py in CHECKING.** Pull request 26's build.py change,
+  the fix for left-out sections, altered no existing page by a byte;
+  with build.py off the list the same selection checks the five new
+  designs and the gallery page. What build.py does to a page shows in
+  the page; its one part in the checking is the showcase's shape limits
+  the packing check imports, which checking the gallery page covers.
+- **Where a narrowed run's time goes.** Pull request 26 replayed under
+  the tuned rule: 1,982 s, of which the browser checks on five pages and
+  the gallery page 1,827 s; everything else, both builds of the site and
+  gallery, the traces, the pictures and the file checks, about 155 s. The
+  checks of one page take about 5 minutes; the remaining saving is to run
+  pages side by side (Phase 2), not to check less.
+- **The run on main after a merge** repeats the pull request's run when
+  main has not moved. It blocks no merge. A skip was considered and left:
+  GitHub keeps no record of the base a merged pull request's run used
+  (pull_requests is empty on run 40776363105), so it could not be proven
+  safe. The merge's tree equals the one tested when main has not moved
+  (58cd973 recomputed from 7fecb7b and cb363d3).
+- **The limit.** Every page of seventeen designs takes 75.4 minutes of 90;
+  about 4.4 minutes a design, so about 20 designs reach the limit, and
+  then the weekly run and any change to the checks would fail on time.
+
+## The guard, audited
+
+- What may come in is decided by Scope, unchanged: pull_request_target
+  from the default branch, reading only file names. main's rules, read
+  from GitHub's API: changes by pull request only, checks and scope
+  required, no force push, no deletion; up to date before merging is
+  off, which the run on main after each merge covers.
+- A contributor's pull request may change one design folder or their own
+  showcase entry. Checked here: samples/ refused, alone and beside a
+  design, and a maintained design refused; a case added for the first,
+  which had none. So a contributor can change neither the selection's code
+  nor what another page is built from; the pages a pull request can alter
+  are exactly the pages it is checked on.
+- Every file check runs in full on every run: no script, no @import, no
+  address outside the design's own fonts and images, sizes, licences, on
+  all seventeen designs. The browser's request check, nothing from
+  another origin, runs on every page a change alters. Deploy builds and
+  pictures every page always; the narrowing touches only the checks.
+- Doubt checks every page: the checks' own code changed, the base
+  missing, unreadable or unbuildable, a run by hand, the weekly run. The
+  base's tree is unpacked with Python's data filter, which refused a
+  planted link out of the folder; until this round that refusal ended the
+  run red, now it checks every page. The base comes from main, never from
+  the pull request; the push's base reaches the shell through an
+  environment variable, never inline.
+- Workflows' permissions: checks.yml contents read; scope.yml contents
+  and pull requests read; the weekly runs and Deploy's top level none.
+
+## What was done
+
+- tools/ci.py: build.py out of CHECKING, the gallery page checked when it
+  changes; a selection that raises checks every page. checks.yml: a new
+  push to a pull request cancels its old run; never on main.
+- Defeat cases: build.py alone checks the gallery page and no design; a
+  base with a link out of the folder checks every page (both fail on the
+  old code); scope, a sample person beside a design.
+- ADR-0019, Changes; standing-checks.md; STATE; completed.md for pull
+  requests 24 to 26; CAPABILITIES' numbers.
+
+## Proofs
+
+- Pull request 26 replayed under the tuned rule in a scratch clone: the
+  five designs and the gallery page, every check with axe, PASS, 1,982 s.
+- The new cases each on a fresh copy, and failing with tools/ci.py
+  reverted: build.py alone selected every page; the link out crashed the
+  run with tarfile.AbsoluteLinkError.
+- the file harness on checks-tuned: 153 defeat cases, 33 planted controls, 0 unproven, in 858 s.
+- check_workflows, check_template_cleanup: 0 problems.
+
+## Not done
+
+- Phase 2: every page in parallel jobs, a final job still named checks,
+  before the gallery reaches 20 designs; for a narrowed run too, a job per
+  page, so a five-design pull request takes about one page's time.
+- Nothing pushed: checks-tuned waits on the owner. It changes tools/ci.py,
+  so its own run checks every page, about 75 minutes, once.
