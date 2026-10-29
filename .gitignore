@@ -23,6 +23,10 @@ _gallery/
 _samples/
 .build-*/
 
+# Lighthouse, installed for the speed checks by npm ci from its committed
+# lockfile (ADR-0012); the packages are never committed.
+tools/lighthouse/node_modules/
+
 # axe-core, fetched for the checks on your own computer
 # (docs/reference/commands.md); the checks workflow fetches its own.
 .cache/

@@ -33,6 +33,12 @@ page and the checks of each change judge pages by the same rules
 failure on purpose so as to fail itself, may name the results it needs in
 its steps rather than its if:, and must name every one.
 
+Every `uses:` names an action at a full commit SHA, which no one can
+move, as a tag can be. npm runs only as `npm ci --ignore-scripts`: every
+package checked against a committed lockfile's hash, and no package's
+install script run; no `npm install`, no `npx`, no other package
+manager (ADR-0012).
+
 A workflow that publishes with actions/deploy-pages must ask first
 whether GitHub Pages is on (the owner's decision of 2026-10-23; ADR-0015,
 Changes): a job named pages running `tools/ci.py pages`; the publishing
@@ -88,6 +94,9 @@ PAGES_TABLE = (
 
 KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)\s*:(?:\s+(.*))?$")
 VERDICT = "tools/ci.py verdict"
+USES = re.compile(r"^\s*(?:-\s+)?uses:\s*(\S+)")
+PINNED = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+@[0-9a-f]{40}")
+PACKAGES = re.compile(r"\b(npm|npx|pnpm|yarn|bun)\b(.*)")
 STATUS = re.compile(r"\b(always|cancelled|failure)\s*\(\s*\)")
 RESULT = re.compile(r"""needs\s*(?:\.\s*([A-Za-z0-9_-]+)|\[\s*['"]([A-Za-z0-9_-]+)['"]\s*\])\s*\.\s*result""")
 
@@ -315,6 +324,23 @@ def skippable(jobs: dict[str, dict]) -> set[str]:
     return found
 
 
+def supply_problems(text: str, shown: str) -> list[str]:
+    """Actions at a full SHA; npm only as npm ci --ignore-scripts."""
+    problems = []
+    for number, line in enumerate(text.splitlines(), start=1):
+        code = strip_comment(line)
+        uses = USES.match(code)
+        if uses and not PINNED.fullmatch(unquote(uses.group(1))):
+            problems.append(f"{shown}, line {number}: {uses.group(1)} is not pinned to a full commit SHA")
+        if re.match(r"\s*(?:-\s+)?name:", code):
+            continue
+        for tool, rest in PACKAGES.findall(code):
+            if tool != "npm" or not re.match(r"\s+ci\b", rest) or "--ignore-scripts" not in rest.split():
+                problems.append(f"{shown}, line {number}: {tool} runs only as `npm ci --ignore-scripts`, "
+                                f"from a committed lockfile with no install script (ADR-0012)")
+    return problems
+
+
 def check_file(path: Path) -> list[str]:
     shown = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
     text = path.read_text(encoding="utf-8")
@@ -322,7 +348,8 @@ def check_file(path: Path) -> list[str]:
         jobs = read_jobs(text)
     except Unreadable as error:
         return [f"{shown}: unreadable under jobs:, {error}"]
-    problems = schedule_problems(text, jobs, shown) + pages_problems(text, jobs, shown)
+    problems = (schedule_problems(text, jobs, shown) + pages_problems(text, jobs, shown)
+                + supply_problems(text, shown))
     can_skip = skippable(jobs)
     for name, job in jobs.items():
         where = f"{shown}, job '{name}' (line {job['line']})"

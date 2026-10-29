@@ -1,6 +1,6 @@
 """The one entry point the workflows call, and the same commands locally.
 
-  python tools/ci.py checks [--quick] [--axe FILE]
+  python tools/ci.py checks [--quick] [--axe FILE] [--speed]
       Everything a pull request must pass: the workflows' job conditions
       (tools/check_workflows.py); every design checked; the showcase's
       files checked, while the project has the tool (tools/check_showcase.py,
@@ -15,7 +15,10 @@
       screenshot Chrome cannot read fails
       here) and held to assemble's rules; the template cleanup, while
       there is one (tools/check_template_cleanup.py); and the browser checks on
-      every design's page, with axe when given axe.min.js.
+      every design's page, with axe when given axe.min.js; with --speed,
+      Lighthouse on the same pages against ADR-0009's goals
+      (tools/check_speed.py, ADR-0012), once installed by
+      `npm ci --ignore-scripts --prefix tools/lighthouse`.
       .github/workflows/checks.yml runs this, always with --axe, after
       fetching axe-core and checking its SHA-512 (ADR-0011).
 
@@ -120,7 +123,8 @@ PAGES_SETTING = "Settings, Pages, Build and deployment, Source: GitHub Actions"
 # shape limits the packing check reads, is covered by checking the gallery
 # page whenever build.py changes (ADR-0019, Changes, 2026-10-29).
 CHECKING = ("requirements.txt", "tools/ci.py", "tools/check_browser.py", "tools/cdp.py",
-            ".github/workflows/checks.yml")
+            ".github/workflows/checks.yml", "tools/check_speed.py",
+            "tools/lighthouse/package.json", "tools/lighthouse/package-lock.json")
 
 
 def pages_verdict(mode: str, status: int, build_type: str | None) -> tuple[str, str]:
@@ -238,6 +242,21 @@ def differs(a: Path, b: Path) -> bool:
     return not (a.is_dir() and b.is_dir()) or bool(same_tree(a, b))
 
 
+def demos_load(gallery: Path) -> set[str]:
+    """The files under static/ a design's demo loads: each named in a demo's
+    page, or in a file so named, and so on. A name is found as text, so a
+    doubt counts as a use, and checks every page."""
+    static = {p.relative_to(gallery / "static").as_posix(): p
+              for p in (gallery / "static").rglob("*") if p.is_file()}
+    texts = [p.read_text(encoding="utf-8", errors="replace") for p in (gallery / "designs").glob("*/index.html")]
+    used: set[str] = set()
+    while texts:
+        found = {n for n in static if n not in used and any(Path(n).name in t for t in texts)}
+        used |= found
+        texts = [static[n].read_text(encoding="utf-8", errors="replace") for n in found]
+    return used
+
+
 def select(since: str, as_of: str, gallery: Path) -> Selection:
     """Compare the gallery built from this tree with the one built from
     `since`. Any doubt checks every page: the base unreadable or unbuildable,
@@ -268,8 +287,14 @@ def select(since: str, as_of: str, gallery: Path) -> Selection:
         if built.returncode != 0:
             last = (built.stdout + built.stderr).strip().splitlines()[-1:] or ["no output"]
             return Selection(f"the base {sha[:7]} does not build: {last[0]}")
-        if differs(gallery / "static", out / "static"):
-            return Selection("the engine's shared files differ")
+        # A static file no demo loads, in either build, is the gallery
+        # page's own, as gallery.css and gallery.js are: it changes the
+        # gallery page alone, found below (ADR-0019, Changes, 2026-10-29).
+        if not ((gallery / "static").is_dir() and (out / "static").is_dir()):
+            return Selection("the engine's shared files differ: a build has no static/")
+        shared = set(same_tree(gallery / "static", out / "static")) & (demos_load(gallery) | demos_load(out))
+        if shared:
+            return Selection(f"the engine's shared files differ: {', '.join(sorted(shared))}")
         names = sorted(p.parent.name for p in (gallery / "designs").glob("*/index.html"))
         check = [n for n in names if differs(gallery / "designs" / n, out / "designs" / n)]
         # The gallery page: its own files, everything outside designs/, and
@@ -359,7 +384,8 @@ def verdict(env: dict[str, str]) -> int:
     return 0 if ok else 1
 
 
-def checks(quick: bool, axe: Path | None, since: str | None = None, browser_checks: bool = True) -> None:
+def checks(quick: bool, axe: Path | None, since: str | None = None, browser_checks: bool = True,
+           speed: bool = False) -> None:
     as_of = datetime.now(timezone.utc).strftime("%Y-%m")
     run("tools/check_workflows.py")
     run("tools/check_design.py")
@@ -409,14 +435,22 @@ def checks(quick: bool, axe: Path | None, since: str | None = None, browser_chec
         browser.append("--quick")
     if axe:
         browser += ["--axe", axe]
+    narrow = []
     if selection and not selection.everything:
         if not selection.check and not selection.page:
             print("\n=== the browser checks: no page changed; nothing to check")
             return
-        browser += ["--designs", ",".join(selection.check)]
+        narrow = ["--designs", ",".join(selection.check)]
         if not selection.page:
-            browser.append("--skip-gallery-page")
-    run(*browser)
+            narrow.append("--skip-gallery-page")
+    run(*browser, *narrow)
+    # Speed, on the same pages (ADR-0012); checks.yml runs it in each page's
+    # own job.
+    if speed:
+        run("tools/check_speed.py", gallery, *narrow)
+    else:
+        print("\n=== speed: not run; pass --speed, after "
+              "npm ci --ignore-scripts --prefix tools/lighthouse (ADR-0012)")
 
 
 def build(mode: str, out: Path) -> None:
@@ -533,6 +567,7 @@ def main(argv: list[str]) -> int:
     c.add_argument("--axe", type=Path)
     c.add_argument("--since", metavar="REF")
     c.add_argument("--no-browser", action="store_true")
+    c.add_argument("--speed", action="store_true")
     w = sub.add_parser("changes")
     w.add_argument("--since", metavar="REF", required=True)
     n = sub.add_parser("plan")
@@ -551,7 +586,8 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "checks":
-            checks(args.quick, args.axe, args.since, browser_checks=not args.no_browser)
+            checks(args.quick, args.axe, args.since, browser_checks=not args.no_browser,
+                   speed=args.speed)
         elif args.command == "plan":
             plan(args.since)
             return 0

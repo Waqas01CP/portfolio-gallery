@@ -1172,6 +1172,13 @@ def file_cases():
     yield ("changes: the engine's stylesheet checks every page", since(
         append("src/static/base.css", "\n/* a change */\n")),
         Passes("every page is checked: the engine's shared files differ"))
+    # A static file only the gallery page loads changes the gallery page
+    # alone; one a demo loads through another file is still shared.
+    yield ("changes: the gallery page's own stylesheet checks the gallery page and no design", since(
+        append("src/static/gallery.css", "\n/* a change */\n")), Passes(nobody + "  the gallery page: checked"))
+    yield ("changes: a script a demo loads through another checks every page", since(
+        append("src/static/knot.js", "\n// a change\n")),
+        Passes("every page is checked: the engine's shared files differ: knot.js"))
     yield ("changes: a file that decides how pages are checked checks every page", since(
         append("tools/cdp.py", "\n# a change\n")), Passes("every page is checked: tools/cdp.py changed"))
     # build.py's changes show in the pages it builds; its one part in the
@@ -1236,6 +1243,66 @@ def file_cases():
     # naming both; the start that recovers is a browser case.
     yield ("browser: Chrome that never opens its debugging port", chrome_start("stuck"),
            ("starting Chrome once more", "within 2 s, at both of two starts"))
+
+    # What a workflow may run (ADR-0012): actions at a full SHA; npm only
+    # as npm ci --ignore-scripts.
+    def probe_workflow(step):
+        def plant(copy):
+            (copy / ".github/workflows/probe.yml").write_text(
+                "on: push\npermissions: {}\njobs:\n  probe:\n    runs-on: ubuntu-24.04\n"
+                "    steps:\n" + step, encoding="utf-8")
+            return ["tools/check_workflows.py"]
+        return plant
+
+    yield ("workflows: an action at a tag, not a commit", probe_workflow(
+        "      - uses: actions/checkout@v7\n"), "is not pinned to a full commit SHA")
+    yield ("workflows: npm install", probe_workflow(
+        "      - run: npm install lighthouse\n"), "runs only as `npm ci --ignore-scripts`")
+    yield ("workflows: npm ci running install scripts", probe_workflow(
+        "      - run: npm ci --prefix tools/lighthouse\n"), "runs only as `npm ci --ignore-scripts`")
+    yield ("workflows: npx", probe_workflow(
+        "      - run: npx lighthouse https://example.com/\n"), "npx runs only as")
+    yield ("workflows: an action at a commit, npm ci without install scripts", probe_workflow(
+        "      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n"
+        "      - run: npm ci --ignore-scripts --prefix tools/lighthouse\n"), Passes())
+
+
+def speed_cases():
+    """Lighthouse against ADR-0009's goals (ADR-0012), on Plain's demo, one
+    run each; with --speed, once Lighthouse is installed in tools/lighthouse."""
+    # A copy holds no installed packages; it uses this clone's Lighthouse.
+    os.environ.setdefault("PG_LIGHTHOUSE", str(ROOT / "tools/lighthouse/node_modules/lighthouse/cli/index.js"))
+
+    def measured(change=None):
+        def plant(copy):
+            out = build_site(copy, "--gallery")
+            if change:
+                change(out)
+            return ["tools/check_speed.py", out, "--designs", "plain", "--skip-gallery-page", "--runs", "1"]
+        return plant
+
+    def append(rel, text):
+        def change(out):
+            with open(out / rel, "a", encoding="utf-8") as f:
+                f.write(text)
+        return change
+
+    # ADR-0012's own defeat case, a 600 ms synchronous script, run when the
+    # page has loaded: run as the script starts, before the first paint, it
+    # delays LCP instead and TBT does not count it (seen 2026-10-29).
+    yield ("speed: a 600 ms script once the page has loaded", measured(append(
+        "static/site.js", '\naddEventListener("load", () => { const end = Date.now() + 600; '
+        'while (Date.now() < end) {} });\n')), "TBT median")
+    # Over TBT's goal and under its ceiling: reported, not failed.
+    yield ("speed: a 100 ms script once the page has loaded", measured(append(
+        "static/site.js", '\naddEventListener("load", () => { const end = Date.now() + 100; '
+        'while (Date.now() < end) {} });\n')), Passes("reported, since TBT follows the runner's load"))
+    yield ("speed: a stylesheet of 3 MB", measured(append(
+        "designs/plain/design.css", "\n/* " + "x" * 3_000_000 + " */\n")), "LCP median")
+    yield ("speed: the page moved down after it loads", measured(append(
+        "static/site.js", '\naddEventListener("load", () => { const d = document.createElement("div"); '
+        'd.style.height = "600px"; document.body.prepend(d); });\n')), "CLS median")
+    yield "speed: Plain's demo as built", measured(), Passes("PASS: 0 failure(s)")
 
 
 def axe_file(argv: list[str]) -> Path | None:
@@ -1471,6 +1538,8 @@ def main(argv: list[str]) -> int:
     axe = axe_file(argv)
     if "--browser" in argv:
         cases += [(label, lean(plant), expected) for label, plant, expected in browser_cases(axe)]
+    if "--speed" in argv:
+        cases += [(label, lean(plant), expected) for label, plant, expected in speed_cases()]
     work = Path(tempfile.mkdtemp(prefix="pg-prove-"))
     unproven, ran = [], 0
     try:

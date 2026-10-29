@@ -313,8 +313,9 @@ You should see **scope** fail within a minute, its summary saying
    **Rulesets**, `main`; under **Require status checks to pass**, **Add
    checks**, choose **scope** (source **GitHub Actions**), and **Save
    changes**.
-5. Back on the pull request, wait for **checks** to pass, about 10
-   minutes. You should see both checks marked **Required**, and the merge
+5. Back on the pull request, wait for **checks** to pass, about 2
+   minutes: a change to the README alters no page, so no browser job
+   runs (ADR-0019; 1.5 minutes on 2026-10-29). You should see both checks marked **Required**, and the merge
    button disabled because scope failed.
 6. **Close pull request**, then **Delete branch**.
 
@@ -357,8 +358,9 @@ summary::-webkit-details-marker { display: none; }
    description, and **Create pull request**.
 
 You should see **scope** pass ("In scope: 2 file(s), all in
-designs/test-design/") and **checks** pass after about 15 minutes (13.5
-on 2026-10-18). Wait for both before going on.
+designs/test-design/") and **checks** pass after about 7 minutes: the
+new design's page and the gallery page, each in a job of its own with
+Lighthouse (13.5 minutes on one runner on 2026-10-18). Wait for both before going on.
 
 4. **Close pull request**, then **Delete branch**.
 

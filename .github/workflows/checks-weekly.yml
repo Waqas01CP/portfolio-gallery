@@ -79,7 +79,8 @@ jobs:
     needs: plan
     # Only after the plan succeeded, and gave this job pages to check.
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.count != '0' }}
-    name: browser, ${{ matrix.design }}
+    # No name of its own: GitHub then shows "browser (frost)", and plain
+    # "browser" when the plan skips it, not the unexpanded matrix name.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
@@ -115,6 +116,21 @@ jobs:
         env:
           DESIGN: ${{ matrix.design }}
         run: .venv/bin/python tools/check_browser.py _gallery --designs "$DESIGN" --skip-gallery-page --axe "$RUNNER_TEMP/package/axe.min.js"
+      # Lighthouse from its lockfile (ADR-0012): npm ci checks every package
+      # against the lockfile's hash and, with --ignore-scripts, runs none of
+      # their install scripts.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install Lighthouse from its lockfile
+        working-directory: repo
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix tools/lighthouse
+      - name: Speed on this design's page, Lighthouse five times
+        env:
+          DESIGN: ${{ matrix.design }}
+        working-directory: repo
+        run: .venv/bin/python tools/check_speed.py _gallery --designs "$DESIGN" --skip-gallery-page
 
   gallery-page:
     needs: plan
@@ -150,6 +166,19 @@ jobs:
       - name: The browser checks on the gallery page, axe included
         working-directory: repo
         run: .venv/bin/python tools/check_browser.py _gallery --designs "" --axe "$RUNNER_TEMP/package/axe.min.js"
+      # Lighthouse from its lockfile (ADR-0012): npm ci checks every package
+      # against the lockfile's hash and, with --ignore-scripts, runs none of
+      # their install scripts.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install Lighthouse from its lockfile
+        working-directory: repo
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefix tools/lighthouse
+      - name: Speed on the gallery page, Lighthouse five times
+        working-directory: repo
+        run: .venv/bin/python tools/check_speed.py _gallery --designs ""
 
   verdict:
     needs: [plan, files, browser, gallery-page]
