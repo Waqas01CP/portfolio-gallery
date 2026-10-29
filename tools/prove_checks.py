@@ -337,6 +337,11 @@ def file_cases():
         return plant
 
     yield "scope: a file in tools/", scope(["modified\ttools/check_design.py"]), "outside designs/"
+    # A sample person decides what a design's demo shows, and the checks
+    # select pages by what changed (ADR-0019): a contributor may not touch
+    # one, beside their design or alone.
+    yield ("scope: a sample person beside a design", scope(
+        ["added\tdesigns/a/design.css", "modified\tsamples/a/site.json"]), "outside designs/")
     yield ("scope: a workflow", scope(["added\tdesigns/a/design.css", "modified\t.github/workflows/scope.yml"]),
            "outside designs/")
     yield "scope: two designs", scope(["added\tdesigns/a/design.css", "added\tdesigns/b/design.css"]), "one pull request carries one design"
@@ -1044,6 +1049,33 @@ def file_cases():
         Passes("every page is checked: the engine's shared files differ"))
     yield ("changes: a file that decides how pages are checked checks every page", since(
         append("tools/cdp.py", "\n# a change\n")), Passes("every page is checked: tools/cdp.py changed"))
+    # build.py's changes show in the pages it builds; its one part in the
+    # checking, the showcase's shape limits, is covered by the gallery page
+    # (ADR-0019, Changes, 2026-10-29).
+    yield ("changes: build.py alone checks the gallery page and no design", since(
+        append("build.py", "\n# a change\n")), Passes(nobody + "  the gallery page: checked"))
+
+    # A base whose archive holds a link out of the folder, which the safe
+    # extraction refuses: the selection fails, and every page is checked.
+    def link_out(copy):
+        env = {**os.environ, "GIT_AUTHOR_NAME": "case", "GIT_AUTHOR_EMAIL": "case@example.com",
+               "GIT_COMMITTER_NAME": "case", "GIT_COMMITTER_EMAIL": "case@example.com"}
+
+        def git(*args, data=None):
+            return subprocess.run(["git", *args], cwd=copy, env=env, check=True, capture_output=True,
+                                  input=data).stdout.decode().strip()
+        git("init", "-q")
+        git("add", "-A")
+        blob = git("hash-object", "-w", "--stdin", data=b"/etc/passwd")
+        git("update-index", "--add", "--cacheinfo", f"120000,{blob},link-out")
+        git("commit", "-q", "-m", "base")
+        append("designs/plain/design.css", "\n/* a change */\n")(copy)
+        git("add", "-A")
+        git("commit", "-q", "-m", "change")
+        return ["tools/ci.py", "changes", "--since", "HEAD~1"]
+
+    yield ("changes: a selection that fails checks every page", link_out,
+           Passes("every page is checked: the selection failed"))
     yield ("changes: a base not in the clone checks every page", since(
         lambda copy: None, base="0123456789abcdef0123456789abcdef01234567"), Passes("is not in this clone"))
 
