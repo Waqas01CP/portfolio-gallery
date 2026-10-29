@@ -59,11 +59,13 @@ cannot read; its usual setting saves PNG.
    case, and write:
 
 ```
-{"name": "Your Name", "url": "https://your-site.example/", "description": "One line about you or your work."}
+{"name": "Your Name", "url": "https://your-site.example/", "description": "One line about you or your work.", "professions": ["software"]}
 ```
 
    The description is optional, one line of at most 120 characters; the
-   name at most 80. Click **Commit changes**.
+   name at most 80. `professions` is optional too: one to three ids from
+   `src/professions.json`, such as `["mobile"]`, shown on your card
+   (ADR-0020). Click **Commit changes**.
 3. In your fork, open the `showcase/<your-login>/` folder, click **Add
    file**, then **Upload files**, add your screenshot as your tool saved
    it, under the name it was given, and **Commit changes**.

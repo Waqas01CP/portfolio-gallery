@@ -3415,3 +3415,56 @@ that follows (the profession tags, Lighthouse), each its own round.
 - Nothing pushed: chrome-start waits on the owner.
 - A narrowed run on GitHub, a pull request changing some designs only,
   and the weekly run shared out, not yet seen there.
+
+# Round 23, 2026-10-29 UTC: profession tags
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch profession-tags, cut from chrome-start.
+Mode: mutating. No brief: the owner's approval of 2026-10-29 UTC: "the
+professional tag is approved and you can work on it". He had asked
+whether each profile he uploads could carry a profession tag "so later
+it can have its own sections or filtered"; this seat recommended a label
+now and a filter when the showcase is big enough to fill one.
+
+## What was built
+
+- src/professions.json: fourteen ids and the labels the gallery shows,
+  proposed by this seat for the owner to change by pull request.
+- `professions` in design.json and in a showcase entry: optional, one to
+  three ids, each once. tools/check_design.py reads the list and holds
+  the rule; tools/check_showcase.py takes both from it, so a copy, which
+  loses the showcase check, keeps them. build.py refuses an id it has no
+  label for.
+- The gallery's cards show "Profession:" and the labels, in the HTML.
+- Tagged: the ten designs made for a profession and both entries, the
+  contributor's as mobile and the owner's as machine learning.
+- ADR-0020; ADR-0006 and ADR-0016, Changes; the README's prompt; the two
+  contributor guides; standing-checks.md; CAPABILITIES; STATE.
+
+## Errors this seat made
+
+1. **Output files at the drive's root**, refused by the shell, as in an
+   earlier round; rerun with them in the scratchpad.
+2. **Backslashes through a heredoc**, once more, in a scratch edit;
+   redone with exact edits.
+
+## Proofs
+
+- check_design, check_showcase, check_prompt, check_workflows and
+  check_template_cleanup on the tagged tree: 0 problems each.
+- The gallery built: twelve labels, the ten designs' and the two
+  entries'; check_built, 0 problems.
+- The gallery page checked in Chrome with axe as its job on GitHub checks it, after the pictures: 0 failures in 160 s (width, packing, overlay, motion, axe).
+- Nine cases alone: in design.json a profession not on the list, the
+  field as text, four, one twice and an empty list each fail naming the
+  rule; one not on the list in an entry fails; the build refuses an id
+  with no label; controls from the list pass in both. Run against
+  chrome-start's code, before the tags, in a worktree: all nine fail, the
+  defeat cases without the rule's words, the controls as an unknown
+  field, and the build accepts the id, so each proves the new rule.
+- tools/prove_checks.py on the branch: 171 file defeat cases fail as built and 39 planted file controls pass, in 647 s.
+
+## Not done
+
+- Nothing pushed: profession-tags waits on the owner, after chrome-start.
+- Sections or a filter by profession: not built (ADR-0020).

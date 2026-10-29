@@ -226,7 +226,8 @@ The name is lower-case letters, digits and single hyphens. Rules:
 - design.json: "name", "author", "author_url", "description" (one line), "dark"
   (true if the design styles a dark theme too, else false), "preload" (fonts on the
   first screen), "assets" (every font and image with its licence), and optionally
-  "in_use", the https address of their own live site built with it.
+  "in_use", the https address of their own live site built with it, and
+  "professions", one to three ids from src/professions.json that it suits.
 - Licences allowed for fonts and images: OFL-1.1, Apache-2.0, MIT, CC0-1.0. A font
   whose licence reserves its name must be the unmodified original.
 Steps:
@@ -273,9 +274,10 @@ browser.
    setting saves PNG.
 3. Fork the repository. In the fork, Add file, Create new file, named
    showcase/<login>/entry.json with their GitHub login in lower case, holding:
-     {"name": "Their Name", "url": "https://their-site.example/", "description": "One line."}
+     {"name": "Their Name", "url": "https://their-site.example/", "description": "One line.", "professions": ["software"]}
    The name is at most 80 characters, the url an https address, the description
-   optional and at most 120 characters; no other field. Commit changes.
+   optional and at most 120 characters, professions optional, one to three ids
+   from src/professions.json; no other field. Commit changes.
 4. In showcase/<login>/, Add file, Upload files, add the screenshot as saved,
    Commit changes.
 5. Contribute, Open pull request. The description opens with two sections: keep

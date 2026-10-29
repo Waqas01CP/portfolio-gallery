@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For developer advocates: a live show's graphics, the name as a lower third on a programme monitor, a moving ticker, segment bumpers, an episode guide of projects and work as end credits. Light only.",
+  "professions": ["devrel"],
   "preload": [
     "fonts/archivo-latin-wdth-normal.woff2"
   ],

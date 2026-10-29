@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For mobile work: the page as a phone app, framed on a bright gradient on a wide screen, with an app bar of chips, widgets, grouped lists and bottom sheets. Light only.",
+  "professions": ["mobile"],
   "preload": [
     "fonts/plus-jakarta-sans-latin-wght-normal.woff2"
   ],

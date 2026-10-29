@@ -63,6 +63,7 @@ itself a decision.
 | [0017](0017-documents-for-people-and-their-ai.md) | Documents a person and their AI can both follow | Accepted |
 | [0018](0018-a-template-shown-with-its-own-sample-person.md) | A template shown with its own sample person | Accepted |
 | [0019](0019-checks-on-what-a-change-alters.md) | Checks on what a change alters | Accepted |
+| [0020](0020-profession-tags.md) | Profession tags on designs and showcase entries | Accepted |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
 on 2026-10-12 by the implementing seat from the brief that recorded them;

@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For game developers: a pause screen at night, the name on a player card, the figures as achievements, projects as a level-select grid, skills as an inventory, and a hotbar of numbered slots as the menu. Always dark.",
+  "professions": ["games"],
   "preload": [
     "fonts/pixelify-sans-latin-wght-normal.woff2"
   ],

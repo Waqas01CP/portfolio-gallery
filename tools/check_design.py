@@ -48,6 +48,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DESIGNS = ROOT / "designs"
+# The professions a design may suit and a showcase entry may name, by id,
+# with the label the gallery shows (ADR-0020). One list, src/professions.json,
+# which build.py reads too and the showcase check takes from here.
+PROFESSIONS: dict[str, str] = json.loads((ROOT / "src" / "professions.json").read_text(encoding="utf-8"))
+PROFESSIONS_MOST = 3
 
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 FILE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
@@ -69,7 +74,8 @@ LICENCES = {"OFL-1.1", "Apache-2.0", "MIT", "CC0-1.0"}
 LICENCE_TEXT = {"OFL-1.1": ("SIL Open Font License", "Version 1.1"),
                 "Apache-2.0": ("Apache License", "Version 2.0"),
                 "MIT": ("Permission is hereby granted",)}
-META_FIELDS = {"name", "author", "author_url", "description", "dark", "preload", "assets", "in_use"}
+META_FIELDS = {"name", "author", "author_url", "description", "dark", "preload", "assets", "in_use",
+               "professions"}
 ASSET_FIELDS = {"file", "licence", "licence_file", "source"}
 
 REFUSED_FUNCTIONS = {"image-set", "-webkit-image-set", "src", "element", "-moz-element",
@@ -318,6 +324,13 @@ def _https(value) -> bool:
     return isinstance(value, str) and re.match(r"^https://[^\s/]+\.[^\s/]+(/\S*)?$", value) is not None
 
 
+def professions_ok(value) -> bool:
+    """One to PROFESSIONS_MOST ids from the list, each once (ADR-0020)."""
+    return (isinstance(value, list) and 1 <= len(value) <= PROFESSIONS_MOST
+            and all(isinstance(p, str) and p in PROFESSIONS for p in value)
+            and len(set(value)) == len(value))
+
+
 def meta_problems(name: str, texts: dict[str, str], files: dict[str, Path]) -> list[str]:
     problems = []
 
@@ -344,6 +357,9 @@ def meta_problems(name: str, texts: dict[str, str], files: dict[str, Path]) -> l
     if "in_use" in meta and not (_https(meta["in_use"]) and len(meta["in_use"]) <= 300):
         fail("in_use, if given, must be the https:// address of your own live site built with "
              "this design (ADR-0016)")
+    if "professions" in meta and not professions_ok(meta["professions"]):
+        fail(f"professions, if given, must list one to {PROFESSIONS_MOST} of these ids, each once: "
+             f"{', '.join(PROFESSIONS)} (src/professions.json)")
     if not isinstance(meta.get("dark"), bool):
         fail("dark must be true or false: true if the design styles a dark theme, which gives "
              "the page the Dark switch; false gives it one theme, the same on every device")

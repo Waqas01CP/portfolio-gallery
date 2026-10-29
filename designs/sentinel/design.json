@@ -4,6 +4,7 @@
   "author_url": "https://github.com/Waqas01CP",
   "dark": false,
   "description": "For security work: a clearance card as the first screen, then a dashboard of bracketed panels on a graphite ground, signal orange for what matters. Always dark.",
+  "professions": ["security"],
   "preload": [
     "fonts/chakra-petch-latin-600-normal.woff2"
   ],
