@@ -419,12 +419,21 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
+class QuietServer(http.server.ThreadingHTTPServer):
+    def handle_error(self, request, client_address) -> None:
+        # A browser dropping a connection it no longer needs, as Lighthouse's
+        # Chrome does when a run ends, is not an error to print.
+        if isinstance(sys.exc_info()[1], (ConnectionResetError, BrokenPipeError)):
+            return
+        super().handle_error(request, client_address)
+
+
 class Server:
     """Serves a built folder on 127.0.0.1 at a free port, in a thread."""
 
     def __init__(self, folder: Path) -> None:
         handler = functools.partial(QuietHandler, directory=str(folder))
-        self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        self.httpd = QuietServer(("127.0.0.1", 0), handler)
         self.origin = f"http://127.0.0.1:{self.httpd.server_address[1]}"
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
         self.thread.start()

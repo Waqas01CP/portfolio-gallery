@@ -82,7 +82,27 @@ To prove the checks can fail, run each on the case built to defeat it:
 python tools/prove_checks.py            the file checks, about a minute
 python tools/prove_checks.py --browser  also the browser checks
 python tools/prove_checks.py --browser --axe .cache/package/axe.min.js
+python tools/prove_checks.py --speed    the speed checks, once Lighthouse is installed
 ```
+
+### Lighthouse
+
+The checks workflows install Lighthouse in each page's job and run it
+there (ADR-0012). On your own computer, with Node 22.19 or later:
+
+```
+npm ci --ignore-scripts --prefix tools/lighthouse
+python tools/check_speed.py _site
+python tools/check_speed.py _gallery --designs plain --skip-gallery-page --runs 1
+python tools/ci.py checks --speed
+```
+
+`npm ci` installs exactly the packages tools/lighthouse/package-lock.json
+names, each checked against its hash, into tools/lighthouse/node_modules/,
+which git ignores; `--ignore-scripts` runs none of their install scripts.
+Never `npm install` there: it may change the lockfile. Five runs a page
+take about a minute and a half on the seat's machine. TBT follows the
+machine's load: measure with little else running.
 
 ### axe-core
 
@@ -122,7 +142,7 @@ to check_browser.py, ci.py checks or prove_checks.py.
 The workflows call these, and they run the same locally:
 
 ```
-python tools/ci.py checks [--quick] [--axe FILE] [--since REF] [--no-browser]
+python tools/ci.py checks [--quick] [--axe FILE] [--since REF] [--no-browser] [--speed]
 python tools/ci.py changes --since REF
 python tools/ci.py plan [--since REF]
 python tools/ci.py verdict

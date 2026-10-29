@@ -55,7 +55,7 @@ itself a decision.
 | [0009](0009-quality-goals.md) | Quality goals, for every site and every design | Accepted |
 | [0010](0010-headless-chrome-from-the-standard-library.md) | Headless Chrome, driven from Python's standard library | Accepted |
 | [0011](0011-axe-core-in-ci.md) | axe-core in CI | Accepted |
-| [0012](0012-lighthouse-in-ci.md) | Lighthouse in CI | Proposed |
+| [0012](0012-lighthouse-in-ci.md) | Lighthouse in CI | Accepted |
 | [0013](0013-default-design-keeps-the-owners-look.md) | The default design keeps the owner's site's look | Accepted |
 | [0014](0014-web-fonts-with-font-display-optional.md) | Web fonts with font-display: optional | Accepted |
 | [0015](0015-a-copy-cleans-itself-once.md) | A copy cleans itself up, once | Accepted |
@@ -74,9 +74,8 @@ the brief is never committed, so these records and the session log of
 
 Decisions identified but not yet concluded. Each waits on the owner.
 
-- **ADR-0012, Lighthouse in CI.** Held as proposed by the owner on
-  2026-10-15. Until he accepts it, the speed goals of ADR-0009 are
-  measured locally by the maintainer, not by CI.
+None. ADR-0012, Lighthouse in CI, held as proposed by the owner on
+2026-10-15, was accepted by him on 2026-10-29.
 
 The owner's answers, dated 2026-10-16 in his local time (UTC+5) and
 given on 2026-10-15 UTC, concluded the rest: CSS only (ADR-0006); the

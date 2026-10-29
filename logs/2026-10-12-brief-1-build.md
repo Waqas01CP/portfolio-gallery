@@ -3468,3 +3468,85 @@ now and a filter when the showcase is big enough to fill one.
 
 - Nothing pushed: profession-tags waits on the owner, after chrome-start.
 - Sections or a filter by profession: not built (ADR-0020).
+
+# Round 24, 2026-10-29 UTC: Lighthouse in CI, with the owner's option A
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch lighthouse, from main at b806cc4 after the
+owner merged pull requests 29 and 30. Mode: mutating. No brief: The owner's instruction of 2026-10-29 UTC: "the things that are pending such as the lighthouse is your end of work so if you can do it now then do it". The
+seat built it, measured every page, and found Bento's demo over TBT's
+goal; it put three options to him. His choice the same day, after the seat put TBT's variance to him: "do recheck that specific part otherwise i choose option A as long as you weigh in the cons properly".
+
+## What GitHub showed
+
+- Pull request 29, Chrome's start: every page in 5.2 min, all eighteen
+  starts within it; its merge's run on main 5.1 min.
+- Pull request 30, the profession tags: green, but every design's job
+  ran, about 3.5 min of it queued behind main's run, for a change that
+  altered only the gallery page: static/gallery.css counted as shared.
+- Test 1, run by the owner at 20:21 UTC: scope failed in 4 s and blocked
+  the merge; checks passed in about 1.5 min with no browser job. It ran
+  before 2026-11-02, so it does not yet prove step 5's policy. The
+  skipped matrix job showed as "browser, ${{ matrix.design }}".
+
+## What was built
+
+- tools/lighthouse/: Lighthouse 13.5.0 alone and its lockfile: 114
+  packages, all from registry.npmjs.org with their hashes, none with an
+  install script; licences MIT, Apache-2.0, BSD, ISC, 0BSD and one
+  MPL-2.0. 13.6.0 was two days old, so not taken.
+- tools/check_speed.py: the default mobile run five times on each page,
+  narrowed as check_browser.py is; LCP and CLS fail over the goals; TBT
+  over 200 ms reported, over 600 ms failed; a table in the job summary;
+  error reporting off; PG_LIGHTHOUSE names another install, for the
+  proofs' copies.
+- checks.yml and checks-weekly.yml: in each page's job, after its browser
+  checks, Node 24 from actions/setup-node v7.1.0 at a full SHA, `npm ci
+  --ignore-scripts`, then the speed check. The matrix job has no name of
+  its own, so GitHub shows "browser (frost)", and "browser" when skipped.
+- tools/ci.py: checks --speed; the speed check and the lockfile in
+  CHECKING; a static file no demo loads changes the gallery page alone.
+- tools/check_workflows.py: every action at a full commit SHA; npm only
+  as `npm ci --ignore-scripts`; no npx, no other package manager.
+- tools/cdp.py: the page server no longer prints a browser's dropped
+  connection, which Lighthouse's Chrome makes at each run's end.
+- ADR-0012 accepted, Changes; ADR-0009 and ADR-0019, Changes; the
+  records' index; CLAUDE.md's runtime; standing-checks.md; commands.md;
+  the setup guide's waits for Tests 1 and 2; CAPABILITIES; STATE.
+
+## Errors this seat made
+
+1. **A gate built on one machine's TBT.** The first full measurement ran
+   while the machine was busy; Bento measured 298 ms. Rechecked at the
+   owner's word with it quieter: 59 and 25 ms. The variance is the
+   reason for option A.
+2. **ADR-0012's defeat case first written at the script's start**, where
+   it lands before the first paint: it failed LCP, not TBT. Moved to run
+   once the page has loaded.
+3. **"It checks the gallery page and the files"**, told the owner of pull
+   request 30, without replaying its plan: every page ran. Replayed here,
+   the rule found, and narrowed.
+4. **"Today is 2026-10-30 UTC"**, told the owner, from his local date; it
+   was 2026-10-29 20:30 UTC.
+
+## Proofs
+
+- Every page measured here, five runs each: LCP 1,459 to 2,105 ms (Default and Frost the highest), CLS 0 on every page, TBT 0 to 145 ms but Bento's 298 ms with the machine busy, 59 and 25 ms rechecked with it quieter.
+- The five speed cases alone: a 600 ms script once the page has loaded
+  fails on TBT, 1,369 ms; a 100 ms one is reported, 394 ms, and passes; a
+  3 MB stylesheet fails on LCP, 16,080 ms; the page moved down after it
+  loads fails on CLS, 0.783; Plain's demo as built passes.
+- The five workflow cases alone: an action at a tag, npm install, npm ci
+  running install scripts and npx each refused; a control passes.
+- The plan cases alone: the gallery page's own stylesheet checks it and
+  no design; knot.js, loaded through site.js, checks every page; the
+  engine's stylesheet and build.py as before.
+- check_workflows on the six workflows: 0 problems.
+- tools/prove_checks.py --speed on the branch: 178 file and speed defeat cases fail as built and 44 planted controls pass, in 808 s.
+
+## Not done
+
+- Nothing pushed: lighthouse waits on the owner.
+- The numbers on GitHub's runner: its pull request's run, which checks
+  every page, since the checks change.
+- The like button, approved: the next round.

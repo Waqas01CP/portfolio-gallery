@@ -102,10 +102,11 @@ machine from .git/info/never-commit, which is never committed.
 Python 3.12, a venv at .venv/, Jinja2 and MarkupSafe pinned by hash in
 requirements.txt (ADR-0004). Nothing else at build time. The browser
 checks, the previews and the showcase's served copies use Google Chrome,
-driven from the standard library by tools/cdp.py (ADR-0010). From npm, one file: the checks
-workflow fetches axe-core at one exact version and checks its SHA-512
-before running it (ADR-0011). Nothing else from npm while ADR-0012 is
-proposed.
+driven from the standard library by tools/cdp.py (ADR-0010). From npm: the checks
+workflows fetch axe-core at one exact version and check its SHA-512
+before running it (ADR-0011), and install Lighthouse 13.5.0 by `npm ci
+--ignore-scripts` from tools/lighthouse/package-lock.json (ADR-0012).
+Nothing else from npm.
 
 ## Conventions
 

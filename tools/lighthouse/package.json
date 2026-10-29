@@ -1,0 +1,9 @@
+{
+  "name": "portfolio-gallery-lighthouse",
+  "private": true,
+  "description": "Lighthouse alone, for tools/check_speed.py (ADR-0012). Installed by npm ci --ignore-scripts, which checks every package against package-lock.json and runs no install script.",
+  "license": "MIT",
+  "dependencies": {
+    "lighthouse": "13.5.0"
+  }
+}
