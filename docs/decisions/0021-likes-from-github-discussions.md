@@ -39,7 +39,10 @@ requires every word in the initial HTML (line 3), and any paid service
   seat's knowledge, not read, and labelled Sourced in error (annotated
   2026-10-30, Brief 15).
 - A2. GitHub allows one reaction of each kind per account on a post.
-  **Sourced in part; unverified in words for a discussion.** GitHub Docs,
+  **Measured** by the owner on 2026-10-30, on post 51: a thumbs up
+  added, then clicked again, went away; an upvote clicked twice went to
+  1 and back to 0 (Changes, 2026-10-30). Before that, sourced in part and
+  unverified in words for a discussion: GitHub Docs,
   "Reactions" (REST), read 2026-10-30 UTC, says it of issues and
   comments, not discussions: "A response with an HTTP 200 status means
   that you already added the reaction type to this issue." The GraphQL
@@ -150,3 +153,4 @@ file as likes.py writes it builds.
 | 2026-10-30 | **A like is an upvote or a thumbs up on the post, the two added together.** The owner's own test like landed on a comment, which counts nothing: a visitor reaches for the upvote arrow as readily as the thumbs up. GitHub allows one of each per account, so one person counts at most twice; comments, and anything on them, count nothing. The workflow rewrites the text of its own posts that still say a thumbs up alone; the owner's posts are left as he wrote them. Cases: upvotes and thumbs up added, upvotes alone, the rewrite; with upvotes left out, the case fails. | The owner's choice of 2026-10-30 UTC, after his own like landed on a comment: "counting both is reasonable because not many people will do both as those who know about this will rarely both upvote and leave like emoji and those that do not know will just only leave a like." |
 | 2026-10-30 | **A1 corrected: the workflow's token may make a post but not edit one, even its own.** At the first publish after the row above, each rewrite was refused, "Resource not accessible by integration", a warning each; counting and the publish went on, and the owner's upvote on Frost's post showed on its card as 1 like. The rewrite is removed: the nineteen first posts keep their first wording, asking for a thumbs up, and an upvote on them counts all the same; a post made from now on names both. | The likes job's annotations on the merge's Deploy run, read through GitHub's API 2026-10-30; the live gallery and post 41's page. |
 | 2026-10-30 | **Form and evidence; nothing decided moves.** A1 marked measured, citing the rows of 2026-10-29 and 2026-10-30; A2 read from GitHub's documentation and quoted: sourced for issues and comments and by the GraphQL schema, unverified in words for a discussion, the upvote one per account in words; the Decision Outcome reworded as We will lines, its substance as written on 2026-10-29, the rows above amending it as before. | The architecture chat's review of ADR-0018 to ADR-0021, Brief 15, 2026-10-30 UTC. |
+| 2026-10-30 | **A2 measured**: on a discussion, one account holds one thumbs up and one upvote; a second click takes it away. One person counts at most twice, as the row of 2026-10-30 on counting both said. | The owner's test of 2026-10-30 UTC on post 51: "i click on smiley face, selected the thumbs up then one appeared then i clicked it again and then the thums up went away"; and of the upvote, "it went to 1 then back to 0". |

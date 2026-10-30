@@ -3783,5 +3783,11 @@ in substance, five defects in form.
 ## Not done
 
 - Nothing pushed: records-form waits on the owner.
-- ADR-0021's A2 for a discussion, until the owner measures it: a thumbs
-  up given twice on one post by one account counts once.
+- Nothing else: A2 measured since, below.
+
+## Round 28, after its commit: A2 measured
+
+The owner measured it on post 51, 2026-10-30 UTC: a thumbs up added, then
+clicked again, went away; an upvote clicked twice went to 1 and back to 0.
+ADR-0021's A2 is now Measured, with a Changes row, its fifth; a second
+commit on records-form, which he had pushed.
