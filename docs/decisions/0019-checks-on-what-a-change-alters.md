@@ -53,9 +53,13 @@ pages a change alters, without ever skipping one it does?
   design folder or its own showcase entry fails the scope check, which
   runs from the default branch. Basis: ADR-0006; scope.yml.
 - A5. A workflow skipped by a `paths` filter leaves a required check
-  waiting, so the pull request cannot merge. Basis: GitHub's
-  documentation on required status checks, as this seat knows it; not
-  read this session.
+  waiting, so the pull request cannot merge. **Sourced**: GitHub Docs,
+  "Troubleshooting required status checks", section "Handling skipped
+  but required checks", read 2026-10-30 UTC: for the cause "A workflow is
+  skipped by path filtering, branch filtering, or a commit message", the
+  result "Associated checks stay in a "Pending" state and block
+  merging". Until then from the seat's knowledge, not read (annotated
+  2026-10-30, Brief 15).
 - A6. A scheduled run holds no permissions. Basis: stated by the owner,
   answer Q2 of 2026-10-19; tools/check_workflows.py enforces it.
 
@@ -72,38 +76,43 @@ pages a change alters, without ever skipping one it does?
 
 Chosen: option 4, with every page checked whenever there is doubt.
 
-- **The base.** On a pull request, the merge's first parent, the main it
-  merges into. On a push to main, the main before it, fetched. A run
-  started by hand (Actions, Checks, Run workflow) has none.
-- **The selection** (tools/ci.py, `select`). The gallery is built from
-  the base as well, by the base's own build.py, as of the same month. A
-  design's demo is checked when any file under its built folder
-  differs, or is new. The gallery page is checked when anything outside
-  designs/ differs, or the showcase's sources changed. When the engine's
-  shared files (static/) differ, every page is checked.
-- **Every page** is checked when a file that decides how pages are
-  checked changed (CHECKING in tools/ci.py: build.py, requirements.txt,
-  tools/ci.py, tools/check_browser.py, tools/cdp.py, checks.yml, which
-  pins axe-core); when the base is not in the clone, cannot be read, or
-  does not build; when there is no base; and each Monday, in
-  checks-weekly.yml, which copies the default branch anonymously and
-  holds no permissions. Its axe-core pin is held equal to checks.yml's
-  by tools/check_workflows.py.
-- **Only the browser checks narrow.** The file checks, both builds of
-  the site and the gallery, the content traces, the pictures and the
-  cleanup check run in full on every run; they take minutes, not hours.
-- **The job keeps its name** and always runs, so the required check
-  always reports. Its summary on GitHub lists what was checked and what
-  was unchanged.
-- **Locally**, `tools/ci.py checks` without `--since` checks every page,
-  as before; `tools/ci.py changes --since REF` shows the selection alone.
+We will compare each change with its base: on a pull request, the
+merge's first parent, the main it merges into; on a push to main, the
+main before it, fetched. A run started by hand (Actions, Checks, Run
+workflow) has none.
+We will build the gallery from the base as well, by the base's own
+build.py, as of the same month (tools/ci.py, `select`), and check a
+design's demo when any file under its built folder differs, or is new;
+the gallery page when anything outside designs/ differs, or the
+showcase's sources changed; and every page when the engine's shared
+files (static/) differ.
+We will check every page when a file that decides how pages are checked
+changed (CHECKING in tools/ci.py: build.py, requirements.txt,
+tools/ci.py, tools/check_browser.py, tools/cdp.py, checks.yml, which
+pins axe-core); when the base is not in the clone, cannot be read, or
+does not build; when there is no base; and each Monday, in
+checks-weekly.yml, which copies the default branch anonymously and holds
+no permissions, its axe-core pin held equal to checks.yml's by
+tools/check_workflows.py.
+We will narrow only the browser checks: the file checks, both builds of
+the site and the gallery, the content traces, the pictures and the
+cleanup check run in full on every run; they take minutes, not hours.
+We will keep the job's name and run it always, so the required check
+always reports, its summary on GitHub listing what was checked and what
+was unchanged.
+We will keep `tools/ci.py checks` without `--since` checking every page
+locally, as before, and `tools/ci.py changes --since REF` showing the
+selection alone.
 
 ### Consequences
 
 - Good, because a pull request that changes one design checks that
-  design's page, and the gallery page only if it changed: on this
-  machine, one design's change through the whole run took MEASURED
-  (2026-10-28), where every page took 3,676 s for twelve (2026-10-25).
+  design's page, and the gallery page only if it changed: on the seat's
+  Windows machine, one design's change through the whole run took 362 s,
+  `tools/ci.py checks --since HEAD~1 --axe` on a scratch clone with
+  Bento's stylesheet changed, its browser checks 286 s of it on Bento
+  alone (2026-10-28, the session log's Round 17), where every page took
+  3,676 s for twelve on the same machine (2026-10-25).
 - Good, because the selection compares what is built, not file names: a
   change to content/ checks exactly the designs shown with that content,
   and none shown with their own sample person (ADR-0018).
@@ -184,10 +193,11 @@ no design.
 
 ## Changes
 
-| Date | Change |
-|---|---|
-| 2026-10-28 | Written, from the owner's word of 2026-10-25 and his instruction of 2026-10-28 UTC. |
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-28 | Written. | The owner's word of 2026-10-25 and his instruction of 2026-10-28 UTC. |
 | 2026-10-29 | **build.py leaves CHECKING; a change to it checks the gallery page.** The audit at the owner's request found every run since this record checked every page, each for a file then in CHECKING: tools/ci.py (pull request 24), tools/check_browser.py (25), and build.py (26), whose change, a fix for left-out sections, altered no existing page by a byte. What build.py does to a page shows in the page, which the selection compares; its one part in the checking is the showcase's shape limits the packing check reads, so its change now checks the gallery page. Replayed with this rule, pull request 26 checks its five new designs and the gallery page instead of seventeen. **A selection that fails checks every page** rather than end the run red. **A new push to a pull request cancels the run for its old commit**; on main every run finishes. Considered and left: skipping the run on main after a merge whose tree its pull request already checked, because GitHub keeps no record of the base a merged pull request's run was tested against (the run's pull_requests field is empty after the merge), so the skip could not be proven safe. Measured: every page of seventeen designs takes 75.4 minutes on GitHub's runner (runs 40776363105 and 40844380486), about 4.4 minutes a design; the 90-minute limit falls at about 20 designs, so Phase 2, runs of every page in parallel jobs, is due before the gallery reaches 20. | The owner's request of 2026-10-29 UTC for an audit of the merges' time and of the checks as a guard; the session log, Round 20. |
 | 2026-10-29 | **Phase 2: the work shared out across jobs on GitHub's runners**, option 5 taken as the record foresaw. A job plan runs the selection and lists the designs to check; a job files runs every check that needs no browser; a job per listed design runs the browser checks on that design's page, all at once; a job gallery-page checks the gallery page; and the job checks, which the ruleset requires, gives the verdict (tools/ci.py verdict): it runs after any failure, unless the whole run was cancelled for a newer push, and fails unless each part passed or was skipped because the plan gave it nothing to do, since a required job that was skipped would count as passed. tools/check_workflows.py accepts a verdict job naming the results in its steps, and refuses one missing any. checks-weekly.yml shares out its run of every page the same way. Locally, tools/ci.py checks runs as before. Expected: a run of every page about one design's length plus setup, not 75 minutes; GitHub's free plan runs 20 jobs at once, so past about 18 designs the jobs of a full run queue in waves. | The owner's approval of 2026-10-29 UTC: "whatever split is reasonable ... on github even if i were to close computer then it should run". |
 | 2026-10-29 | **Phase 2 seen on GitHub.** Pull request 28's run checked every page, as a change to the checks should, in 5 min 8 s (15:46:28 to 15:51:36 UTC), against 76 min for pull request 27's run on one runner; a design's job took about 4.5 min. One design's job failed at Chrome's start (ADR-0010, Changes, 2026-10-29) and the verdict failed with it, as built; rerun, the run passed. **A correction to the audit's row above**: on main a started run is never stopped, but a merge's run waits behind the one in progress, and a newer merge's run takes a waiting one's place; it holds that merge's changes too, so nothing goes unchecked. checks.yml's comment says so. | GitHub's API, read 2026-10-29; the waiting seen on main, 40c9610's run behind 5e2f479's; the replacing as GitHub's documentation on concurrency describes it, not yet seen here. |
 | 2026-10-29 | **A static file no design's demo loads changes the gallery page alone.** Pull request 30 changed static/gallery.css, which only the gallery page loads, and every page was checked: the rule took all of static/ as shared. Now a demo's files under static/ are those named in its page, or in a file so named, found as text in either build, so a doubt is a use; a static file outside them is the gallery page's own. knot.js, named only by site.js, stays shared. A build with no static/ checks every page. | Pull request 30's run on GitHub, 2026-10-29: every design's job ran for a change that altered the gallery page alone. |
+| 2026-10-30 | **Form and evidence; nothing decided moves.** The Consequences' measurement filled in, 362 s, from the session log's Round 17; this table given its Why column, which GitHub dropped from every row, and its first row a Why; A5 read from GitHub's documentation and quoted; the Decision Outcome reworded as We will lines, its substance as written on 2026-10-28, the rows above amending it as before. | The architecture chat's review of ADR-0018 to ADR-0021, Brief 15, 2026-10-30 UTC. |

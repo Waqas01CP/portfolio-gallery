@@ -3712,3 +3712,76 @@ request 53 for that answer found this.
 ## Not done
 
 - Nothing pushed: likes-no-rewrite waits on the owner.
+
+# Round 28, 2026-10-30 UTC: Brief 15, four records' form and evidence
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch records-form, from main at f19e5a1. Mode:
+mutating, records only. Brief 15 from the portfolio architecture chat,
+via the owner, 2026-10-30 UTC, stored word for word in
+briefs/implementation-seat.md, replacing Brief 14 (executed, ticked)
+after it was read; it carries the owner's quality floor and trade-off
+from Brief 14 and his aim from Brief 9. The chat reviewed ADR-0018 to
+ADR-0021, written while it was out of the loop (2026-10-24 to 30): sound
+in substance, five defects in form.
+
+## What was done
+
+1. ADR-0019, Consequences: the placeholder MEASURED filled from Round 17:
+   362 s, `tools/ci.py checks --since HEAD~1 --axe` on a scratch clone
+   with Bento's stylesheet changed, its browser checks 286 s, the seat's
+   Windows machine, 2026-10-28; against 3,676 s for every page of twelve,
+   2026-10-25.
+2. ADR-0019, Changes: the header given its Why column, which GitHub
+   dropped from every row; the first row, two cells, given a Why. Every
+   record's Changes table counted after: every header and row three
+   cells; ADR-0003 and ADR-0014 hold an empty Changes section.
+3. Assumptions resting on the seat's memory, read from GitHub's own
+   documentation on 2026-10-30 and checked word for word against the raw
+   pages:
+   - ADR-0019's A5, sourced: "Troubleshooting required status checks",
+     "Handling skipped but required checks": for "A workflow is skipped by
+     path filtering, branch filtering, or a commit message", "Associated
+     checks stay in a "Pending" state and block merging". It holds; the
+     decision stands.
+   - ADR-0021's A1, measured: the posts made and counted on 2026-10-29;
+     the edit refused on 2026-10-30.
+   - ADR-0021's A2, sourced in part: the REST "Reactions" page says it of
+     issues and comments ("A response with an HTTP 200 status means that
+     you already added the reaction type to this issue."), not of
+     discussions; the GraphQL "Reactions" reference gives each emoji on a
+     Discussion one yes or no per account (viewerHasReacted). No page says
+     in words that a discussion takes one of each kind per account; the
+     seat has no account to measure it; the owner can, in a minute. The
+     upvote is one per account in words (viewerHasUpvoted, "already
+     upvoted"). No decision moves; the chat is told.
+4. ADR-0019, ADR-0020 and ADR-0021: the Decision Outcome reworded as We
+   will lines, as ADR-0018 has them; each substance as first decided, the
+   Changes rows amending it as before.
+5. ADR-0006, Changes: dark false means one theme, no switch, the same on
+   every device, which may be dark (Console and Sentinel, each with one
+   `color-scheme: dark` rule).
+- Each record's Changes rows after: ADR-0006 5, ADR-0019 6, ADR-0020 1,
+  ADR-0021 4; none at eight.
+
+## Errors this seat made
+
+1. **Four assumptions written from memory**, two of them labelled
+   Sourced, against the owner's rule that each carries its basis; and a
+   placeholder left in a record merged on 2026-10-28. Found by the chat.
+2. **ADR-0019's Changes header written with two columns** for rows of
+   three, so GitHub showed no row's Why for two days.
+
+## Proofs
+
+- check_prompt and check_workflows: exit 0; no checked fact moved.
+- The gates on the commit.
+- The pre-publish search on the commit 2100921, before this line was
+  added to it: 806 blobs at 789 paths across 118 commits and their
+  headers; PASS, none found outside the allowed places.
+
+## Not done
+
+- Nothing pushed: records-form waits on the owner.
+- ADR-0021's A2 for a discussion, until the owner measures it: a thumbs
+  up given twice on one post by one account counts once.
