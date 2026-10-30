@@ -1,7 +1,7 @@
 ---
 status: accepted
 topic: build
-description: "Each template and showcase site has a like button: a post in the repository's Discussions, category Likes, whose thumbs up the deploy counts into the gallery's HTML. Read before changing the like button, the deploy's likes job, or what the gallery page loads."
+description: "Each template and showcase site has a like button: a post in the repository's Discussions, category Likes, whose upvotes and thumbs up the deploy counts into the gallery's HTML. Read before changing the like button, the deploy's likes job, or what the gallery page loads."
 date: 2026-10-29
 decision-makers: Waqas01CP, the repository's owner
 # consulted:
@@ -128,3 +128,5 @@ file as likes.py writes it builds.
 
 | Date | Change | Why |
 |---|---|---|
+| 2026-10-29 | **A1 proven on GitHub**: after the owner's step 13, Deploy run by hand made the nineteen posts, numbers 34 to 52, written by github-actions in the category Likes, an Open-ended discussion; the live gallery's nineteen cards each link to their post. | The run's log of the likes job, sent by the owner; the live gallery, read 2026-10-30. |
+| 2026-10-30 | **A like is an upvote or a thumbs up on the post, the two added together.** The owner's own test like landed on a comment, which counts nothing: a visitor reaches for the upvote arrow as readily as the thumbs up. GitHub allows one of each per account, so one person counts at most twice; comments, and anything on them, count nothing. The workflow rewrites the text of its own posts that still say a thumbs up alone; the owner's posts are left as he wrote them. Cases: upvotes and thumbs up added, upvotes alone, the rewrite; with upvotes left out, the case fails. | The owner's choice of 2026-10-30 UTC, after his own like landed on a comment: "counting both is reasonable because not many people will do both as those who know about this will rarely both upvote and leave like emoji and those that do not know will just only leave a like." |

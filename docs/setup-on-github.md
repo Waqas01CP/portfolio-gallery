@@ -296,20 +296,22 @@ second. Not the address.
 GitHub Docs, "Enabling or disabling GitHub Discussions for a repository"
 and "Managing categories for discussions". Each template and showcase
 site on the gallery has a like button: a post in the category Likes,
-whose thumbs up the deploy counts (ADR-0021).
+whose upvotes and thumbs up the deploy counts (ADR-0021).
 
 1. **Settings**, **General**, under **Features** tick **Discussions**.
 2. Open the new **Discussions** tab, then the pencil beside
    **Categories**, then **New category**.
 3. **Category name**: `Likes`, exactly. **Description**: `One post per
-   template and showcase site: a thumbs up on a post is a like.`
+   template and showcase site: an upvote or a thumbs up on a post is a
+   like.`
    **Discussion format**: **Open-ended discussion**. **Create**.
 4. **Actions**, **Deploy**, **Run workflow** on main.
 
 You should see the job **likes** pass, its log ending "19 item(s)
 written", one line "created the post" for each template and site; under
 **Discussions**, **Likes**, those posts, written by github-actions. Each
-card's **Like on GitHub** opens its post. A thumbs up shows as "1 like"
+card's **Like on GitHub** opens its post. An upvote or a thumbs up on the
+post itself, not on a comment, shows as "1 like"
 on the card after the next publish: a merge, or Deploy run by hand.
 
 **Send back:** the likes job's result and its last ten lines.

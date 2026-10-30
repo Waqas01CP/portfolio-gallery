@@ -204,8 +204,9 @@ class Pages(http.server.BaseHTTPRequestHandler):
 
     # A fake GitHub GraphQL API, for the like counts' cases (ADR-0021):
     # /api/likes-<state>/graphql. Its posts: a stranger's look-alike for
-    # Plain, numbered first, with 50; the workflow's own for Plain with 2;
-    # the owner's for Default with 4.
+    # Plain, numbered first, with 50 and 20 upvotes; the workflow's own for
+    # Plain, in its first wording, with 2 and 3 upvotes; the owner's for
+    # Default with upvotes alone, 4.
     def do_POST(self):
         parts = self.path.split("/")
         if len(parts) != 4 or parts[1] != "api" or not parts[2].startswith("likes-") or parts[3] != "graphql":
@@ -213,11 +214,13 @@ class Pages(http.server.BaseHTTPRequestHandler):
         state = parts[2][len("likes-"):]
         query = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}").get("query", "")
 
-        def post(number, author, key, thumbs):
-            return {"number": number, "url": f"https://github.com/tester/gallery/discussions/{number}",
+        def post(number, author, key, thumbs, upvotes):
+            return {"id": f"D{number}", "upvoteCount": upvotes, "number": number, "url": f"https://github.com/tester/gallery/discussions/{number}",
                     "body": f"Like it.\n\n<!-- portfolio-gallery likes: {key} -->", "author": {"login": author},
                     "reactionGroups": [{"content": "THUMBS_UP", "reactors": {"totalCount": thumbs}}]}
-        if "createDiscussion" in query:
+        if "updateDiscussion" in query:
+            data = {"updateDiscussion": {"discussion": {"number": 7}}}
+        elif "createDiscussion" in query:
             data = {"createDiscussion": {"discussion": {
                 "number": 99, "url": "https://github.com/tester/gallery/discussions/99"}}}
         elif "hasDiscussionsEnabled" in query:
@@ -225,8 +228,8 @@ class Pages(http.server.BaseHTTPRequestHandler):
                 "nodes": [] if state == "nocategory" else [{"id": "C", "name": "Likes"}]}}}
         else:
             data = {"repository": {"discussions": {"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": [
-                post(3, "mallory", "designs/plain", 50), post(7, "github-actions", "designs/plain", 2),
-                post(9, "tester", "designs/default", 4)]}}}
+                post(3, "mallory", "designs/plain", 50, 20), post(7, "github-actions", "designs/plain", 2, 3),
+                post(9, "tester", "designs/default", 0, 4)]}}}
         self.answer(200, json.dumps({"data": data}).encode(), "application/json")
 
     def do_GET(self):
@@ -814,10 +817,12 @@ def file_cases():
                     "--api", local_site(f"/api/likes-{state}")]
         return plant
 
-    yield ("likes: a look-alike post by anyone else is not counted", likes_run("counted"),
-           Passes("likes: designs/plain: 2 like(s), post 7"))
-    yield ("likes: the owner's own post counts", likes_run("counted"),
+    yield ("likes: a look-alike post by anyone else is not counted, upvotes and thumbs up added",
+           likes_run("counted"), Passes("likes: designs/plain: 5 like(s), post 7"))
+    yield ("likes: the owner's own post counts, by upvotes alone", likes_run("counted"),
            Passes("likes: designs/default: 4 like(s), post 9"))
+    yield ("likes: the workflow's post in its first wording is rewritten", likes_run("counted"),
+           Passes("likes: rewrote the text of the post for designs/plain, post 7"))
     yield ("likes: a template with no post gets one", likes_run("counted"),
            Passes("likes: created the post for designs/assert, post 99"))
     yield ("likes: Discussions off, a warning and no count", likes_run("off"),

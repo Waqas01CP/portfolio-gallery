@@ -3,17 +3,19 @@
   python tools/likes.py --out likes.json [--no-create] [--api URL]
 
 The gallery's like button is a post in the repository's Discussions, in
-the category named Likes, one per template and per showcase site: a 👍 on
-the post is a like. This tool, run by the deploy workflow before the
+the category named Likes, one per template and per showcase site: an
+upvote or a 👍 on the post is a like, the two added together, since a
+visitor reaches for either (the owner's choice, ADR-0021, Changes). This tool, run by the deploy workflow before the
 gallery is built, makes the post for any template or site that has none,
-counts each post's 👍, and writes likes.json for build.py --likes:
+counts each post's upvotes and 👍, rewrites the text of any post of its
+own that still says otherwise, and writes likes.json for build.py --likes:
 
   {"designs/frost": {"url": "https://github.com/.../discussions/7", "likes": 3}}
 
 A post counts only if the workflow's own account or the repository's
 owner wrote it, so a look-alike post by anyone else is ignored; each post
 carries its item in a marker, never matched by title. GitHub allows one
-👍 per account. Names reach GitHub as GraphQL variables and only in
+upvote and one 👍 per account, so one person counts at most twice. Names reach GitHub as GraphQL variables and only in
 titles, which notify no one.
 
 The page itself makes no request: the counts are written into its HTML
@@ -48,9 +50,12 @@ POSTS = """query($owner: String!, $name: String!, $category: ID!, $after: String
   repository(owner: $owner, name: $name) {
     discussions(first: 100, categoryId: $category, after: $after) {
       pageInfo { hasNextPage endCursor }
-      nodes { number url body author { login } reactionGroups { content reactors { totalCount } } }
+      nodes { id number url body upvoteCount author { login } reactionGroups { content reactors { totalCount } } }
     }
   }
+}"""
+REWRITE = """mutation($id: ID!, $body: String!) {
+  updateDiscussion(input: {discussionId: $id, body: $body}) { discussion { number } }
 }"""
 CREATE = """mutation($repository: ID!, $category: ID!, $title: String!, $body: String!) {
   createDiscussion(input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}) {
@@ -64,7 +69,7 @@ class Trouble(Exception):
 
 
 def items() -> dict[str, tuple[str, str]]:
-    """Every template and showcase site: key -> (title, what a 👍 likes)."""
+    """Every template and showcase site: key -> (title, what a like likes)."""
     found = {}
     for path in sorted((ROOT / "designs").glob("*/design.json")):
         name = json.loads(path.read_text(encoding="utf-8"))["name"]
@@ -73,6 +78,13 @@ def items() -> dict[str, tuple[str, str]]:
         name = json.loads(path.read_text(encoding="utf-8"))["name"]
         found[f"showcase/{path.parent.name}"] = (f"{name} (showcase)", "this portfolio site")
     return found
+
+
+def text(what: str, key: str) -> str:
+    """A post's text: how to like, and the marker naming its item."""
+    return (f"To like {what}, click the upvote arrow beside this post, or give it a 👍. "
+            f"The gallery counts both when it is next published.\n\n"
+            f"<!-- portfolio-gallery likes: {key} -->")
 
 
 def graphql(api: str, token: str, query: str, variables: dict) -> dict:
@@ -115,15 +127,16 @@ def likes(api: str, token: str, repository: str, owner: str, create: bool) -> di
                 continue
             thumbs = next((g["reactors"]["totalCount"] for g in post["reactionGroups"]
                            if g["content"] == "THUMBS_UP"), 0)
-            posts[key] = {"number": post["number"], "url": post["url"], "likes": thumbs}
+            posts[key] = {"id": post["id"], "number": post["number"], "url": post["url"],
+                          "likes": post["upvoteCount"] + thumbs, "body": post.get("body") or "",
+                          "own": author in WORKFLOW}
         if not found["pageInfo"]["hasNextPage"]:
             break
         after = found["pageInfo"]["endCursor"]
     counted = {}
     for key, (title, what) in items().items():
         if key not in posts and create:
-            body = (f"Like {what} with a 👍 on this post. The gallery counts each one when it is next "
-                    f"published.\n\n<!-- portfolio-gallery likes: {key} -->")
+            body = text(what, key)
             # One post that cannot be made leaves the others counted.
             try:
                 made = graphql(api, token, CREATE, {"repository": repo["id"], "category": category,
@@ -133,6 +146,15 @@ def likes(api: str, token: str, repository: str, owner: str, create: bool) -> di
                 continue
             posts[key] = {"number": made["number"], "url": made["url"], "likes": 0}
             print(f"likes: created the post for {key}, post {made['number']}")
+        # A post of the workflow's own whose text says otherwise, as the
+        # first ones said a 👍 alone, is rewritten; the owner's are his.
+        elif (key in posts and posts[key]["own"] and create
+              and posts[key]["body"].replace("\r\n", "\n").strip() != text(what, key)):
+            try:
+                graphql(api, token, REWRITE, {"id": posts[key]["id"], "body": text(what, key)})
+                print(f"likes: rewrote the text of the post for {key}, post {posts[key]['number']}")
+            except Trouble as trouble:
+                print(f"::warning::likes: could not rewrite the post for {key}: {trouble}")
         if key in posts:
             counted[key] = {"url": posts[key]["url"], "likes": posts[key]["likes"]}
             print(f"likes: {key}: {posts[key]['likes']} like(s), post {posts[key]['number']}")

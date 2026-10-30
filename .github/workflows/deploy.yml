@@ -9,7 +9,7 @@
 # Six jobs, each with the least it needs (ADR-0006, ADR-0010):
 #   likes     the gallery only: makes the Likes post in Discussions of any
 #             template or showcase site without one, and counts each
-#             post's thumbs up for build (ADR-0021); Discussions: write
+#             post's upvotes and thumbs up for build (ADR-0021); Discussions: write
 #             and nothing else; never fails the run over Discussions
 #   build     builds and checks the files; read-only; no browser
 #   pages     asks GitHub whether Pages is on, publishing from GitHub

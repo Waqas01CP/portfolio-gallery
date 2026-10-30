@@ -3613,3 +3613,62 @@ him, with the scope floor's lines each crossed. The owner's choice of 2026-10-29
 - Nothing pushed: likes waits on the owner, after lighthouse.
 - The first run against GitHub's API: after his step 13, by a merge or
   Deploy run by hand.
+
+# Round 26, 2026-10-30 UTC: a like is an upvote or a thumbs up
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch likes-both, from main at 131895e after the
+owner merged pull requests 32 (lighthouse) and 33 (likes). Mode:
+mutating. No brief: The owner's choice of 2026-10-30 UTC, after his own like landed on a comment: "counting both is reasonable because not many people will do both as those who know about this will rarely both upvote and leave like emoji and those that do not know will just only leave a like."
+
+## What GitHub showed
+
+- Pull request 32, Lighthouse: every page, Lighthouse included, in 6.4
+  min, green; its merge's run 6.2 min. Pull request 33, likes: every page,
+  11.3 min with about 4 queued, since it changed tools/ci.py, which
+  decides how pages are checked; this seat had told the owner about 4
+  minutes without counting that file.
+- The deploy after the merge: likes passed, Discussions then off.
+- The owner turned Discussions on, made the category Likes and ran Deploy
+  by hand: the likes job made posts 34 to 52, nineteen, each with 0, and
+  wrote nineteen items (its log, sent by him). The live gallery's
+  nineteen cards link to their posts with "0 likes".
+- His test like, read from the public page of post 41: a comment, and an
+  upvote on that comment; the post itself had no upvote and no thumbs up,
+  so nothing counted, as built. He chose that both should count.
+
+## What was built
+
+- tools/likes.py: a post's likes are its upvotes and its thumbs up added
+  together; the workflow's own posts whose text says otherwise are
+  rewritten to name both, the owner's left alone; the text compared with
+  line endings made plain, so a post is rewritten once.
+- The fake API: ids, upvotes and the rewrite; three cases where there
+  were two.
+- ADR-0021, Changes, with A1 proven; deploy.yml's and the gallery
+  template's comments; the setup guide's step 13; both contributor
+  guides; standing-checks.md; CAPABILITIES; STATE.
+
+## Errors this seat made
+
+1. **"About 4 minutes" for pull request 33**, told the owner without
+   counting its change to tools/ci.py, which checks every page by design.
+2. **The first wording asked for a thumbs up alone**, though a GitHub post
+   offers an upvote arrow as plainly; the owner's own test showed it.
+
+## Proofs
+
+- The seven like cases alone: upvotes and thumbs up added, 5 for the
+  workflow's post with 2 and 3, a stranger's look-alike with 70 ignored;
+  the owner's post by upvotes alone, 4; the workflow's post in its first
+  wording rewritten; a missing post made; Discussions off, no category,
+  no token each a warning and exit 0. In a copy with upvotes left out of
+  the sum, the owner's case fails; with the author rule removed, the
+  look-alike case fails.
+- check_workflows, check_prompt, check_template_cleanup: exit 0.
+- tools/prove_checks.py on the branch: 178 file defeat cases fail as built and 50 planted file controls pass, in 846 s.
+
+## Not done
+
+- Nothing pushed: likes-both waits on the owner. At the next publish after
+  its merge, the workflow rewrites its nineteen posts and counts both.
