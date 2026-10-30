@@ -77,8 +77,8 @@ The pull request may hold your folder and nothing else: `entry.json` and
 the one screenshot.
 
 Once merged, your card gets a like button: a post in the repository's
-Discussions, made for it at the next publish, where a thumbs up counts
-(ADR-0021).
+Discussions, made for it at the next publish, where an upvote or a
+thumbs up counts (ADR-0021).
 
 ## What is checked
 
