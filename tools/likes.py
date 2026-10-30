@@ -5,18 +5,21 @@
 The gallery's like button is a post in the repository's Discussions, in
 the category named Likes, one per template and per showcase site: an
 upvote or a 👍 on the post is a like, the two added together, since a
-visitor reaches for either (the owner's choice, ADR-0021, Changes). This tool, run by the deploy workflow before the
-gallery is built, makes the post for any template or site that has none,
-counts each post's upvotes and 👍, rewrites the text of any post of its
-own that still says otherwise, and writes likes.json for build.py --likes:
+visitor reaches for either (the owner's choice, ADR-0021, Changes). This
+tool, run by the deploy workflow before the gallery is built, makes the
+post for any template or site that has none, counts each post's upvotes
+and 👍, and writes likes.json for build.py --likes:
 
   {"designs/frost": {"url": "https://github.com/.../discussions/7", "likes": 3}}
 
 A post counts only if the workflow's own account or the repository's
 owner wrote it, so a look-alike post by anyone else is ignored; each post
 carries its item in a marker, never matched by title. GitHub allows one
-upvote and one 👍 per account, so one person counts at most twice. Names reach GitHub as GraphQL variables and only in
-titles, which notify no one.
+upvote and one 👍 per account, so one person counts at most twice. Names
+reach GitHub as GraphQL variables and only in titles, which notify no
+one. A post keeps the text it was made with: GitHub refuses the
+workflow's token an edit, even of its own post ("Resource not accessible
+by integration", 2026-10-30).
 
 The page itself makes no request: the counts are written into its HTML
 when it is built, so they change when the gallery is next published
@@ -50,12 +53,9 @@ POSTS = """query($owner: String!, $name: String!, $category: ID!, $after: String
   repository(owner: $owner, name: $name) {
     discussions(first: 100, categoryId: $category, after: $after) {
       pageInfo { hasNextPage endCursor }
-      nodes { id number url body upvoteCount author { login } reactionGroups { content reactors { totalCount } } }
+      nodes { number url body upvoteCount author { login } reactionGroups { content reactors { totalCount } } }
     }
   }
-}"""
-REWRITE = """mutation($id: ID!, $body: String!) {
-  updateDiscussion(input: {discussionId: $id, body: $body}) { discussion { number } }
 }"""
 CREATE = """mutation($repository: ID!, $category: ID!, $title: String!, $body: String!) {
   createDiscussion(input: {repositoryId: $repository, categoryId: $category, title: $title, body: $body}) {
@@ -127,9 +127,7 @@ def likes(api: str, token: str, repository: str, owner: str, create: bool) -> di
                 continue
             thumbs = next((g["reactors"]["totalCount"] for g in post["reactionGroups"]
                            if g["content"] == "THUMBS_UP"), 0)
-            posts[key] = {"id": post["id"], "number": post["number"], "url": post["url"],
-                          "likes": post["upvoteCount"] + thumbs, "body": post.get("body") or "",
-                          "own": author in WORKFLOW}
+            posts[key] = {"number": post["number"], "url": post["url"], "likes": post["upvoteCount"] + thumbs}
         if not found["pageInfo"]["hasNextPage"]:
             break
         after = found["pageInfo"]["endCursor"]
@@ -146,15 +144,6 @@ def likes(api: str, token: str, repository: str, owner: str, create: bool) -> di
                 continue
             posts[key] = {"number": made["number"], "url": made["url"], "likes": 0}
             print(f"likes: created the post for {key}, post {made['number']}")
-        # A post of the workflow's own whose text says otherwise, as the
-        # first ones said a 👍 alone, is rewritten; the owner's are his.
-        elif (key in posts and posts[key]["own"] and create
-              and posts[key]["body"].replace("\r\n", "\n").strip() != text(what, key)):
-            try:
-                graphql(api, token, REWRITE, {"id": posts[key]["id"], "body": text(what, key)})
-                print(f"likes: rewrote the text of the post for {key}, post {posts[key]['number']}")
-            except Trouble as trouble:
-                print(f"::warning::likes: could not rewrite the post for {key}: {trouble}")
         if key in posts:
             counted[key] = {"url": posts[key]["url"], "likes": posts[key]["likes"]}
             print(f"likes: {key}: {posts[key]['likes']} like(s), post {posts[key]['number']}")
