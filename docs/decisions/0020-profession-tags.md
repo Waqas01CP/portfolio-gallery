@@ -50,21 +50,21 @@ Chosen option: "An optional list of ids from one fixed list", because a
 fixed list makes groups a filter can trust, and an optional field leaves
 every design, entry, pull request and copy valid as it is.
 
-- `professions`, in design.json and in a showcase entry's entry.json: one
-  to three ids from src/professions.json, each once. Left out, the design
-  suits anyone, or the entry names none.
-- src/professions.json maps each id to the label the gallery shows,
-  fourteen to start: software, frontend, backend, mobile, devops,
-  security, ml, data, embedded, games, qa, devrel, writing, design. The
-  seat proposed them; the owner changes the list by a pull request to that
-  file.
-- tools/check_design.py reads the list and holds the rule;
-  tools/check_showcase.py takes both from it, so a copy of the template,
-  which removes the showcase check, keeps them. build.py refuses an id it
-  has no label for.
-- Each card shows "Profession:" or "Professions:" and the labels, in the
-  page's HTML.
-- The ten designs made for a profession and the two entries are tagged.
+We will let design.json and a showcase entry's entry.json carry
+`professions`: one to three ids from src/professions.json, each once.
+Left out, the design suits anyone, or the entry names none.
+We will keep one list, src/professions.json, mapping each id to the
+label the gallery shows, fourteen to start: software, frontend, backend,
+mobile, devops, security, ml, data, embedded, games, qa, devrel,
+writing, design. The seat proposed them; the owner changes the list by a
+pull request to that file.
+We will hold the rule in tools/check_design.py, which reads the list,
+and have tools/check_showcase.py take both from it, so a copy of the
+template, which removes the showcase check, keeps them; and have
+build.py refuse an id it has no label for.
+We will show on each card "Profession:" or "Professions:" and the
+labels, in the page's HTML.
+We will tag the ten designs made for a profession and the two entries.
 
 ### Consequences
 
@@ -109,3 +109,4 @@ Controls from the list pass in both.
 
 | Date | Change | Why |
 |---|---|---|
+| 2026-10-30 | **Form; nothing decided moves.** The Decision Outcome reworded as We will lines, its substance unchanged. | The architecture chat's review of ADR-0018 to ADR-0021, Brief 15, 2026-10-30 UTC. |
