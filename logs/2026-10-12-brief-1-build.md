@@ -3672,3 +3672,43 @@ mutating. No brief: The owner's choice of 2026-10-30 UTC, after his own like lan
 
 - Nothing pushed: likes-both waits on the owner. At the next publish after
   its merge, the workflow rewrites its nineteen posts and counts both.
+
+# Round 27, 2026-10-30 UTC: GitHub refuses the workflow an edit
+
+Model: Claude Opus 5.5 (claude-opus-5-5), in Claude Code, the same session
+continued. Work on the branch likes-no-rewrite, from main at def435f.
+Mode: mutating. No brief: the owner asked whether the project is
+complete and the briefs ready to send; checking the merge of pull
+request 53 for that answer found this.
+
+## What GitHub showed
+
+- Pull request 53, likes-both: checks 1.4 min, no page changed, as told.
+- Its merge's Deploy: likes passed with a warning for each post, "could
+  not rewrite the post ... GitHub's API refused: Resource not accessible
+  by integration" (the job's annotations, read through the API). The
+  token that makes a post may not edit one. Counting went on: the owner's
+  upvote on Frost's post shows on the live card as 1 like.
+
+## What was built
+
+- tools/likes.py: the rewrite removed, with the fields that served it; a
+  post keeps the text it was made with. The fake API and the cases lose
+  the rewrite.
+- ADR-0021, Changes, A1 corrected; standing-checks.md; CAPABILITIES;
+  STATE.
+
+## Errors this seat made
+
+1. **A1 taken as covering edits.** Making a post was proven on 2026-10-29;
+   editing one was assumed from the same permission and built without a
+   way to try it first. The fail-safe held: a warning, not a failed run.
+
+## Proofs
+
+- The six like cases alone pass.
+- tools/prove_checks.py on the branch: 178 file defeat cases fail as built and 49 planted file controls pass, in 848 s.
+
+## Not done
+
+- Nothing pushed: likes-no-rewrite waits on the owner.
