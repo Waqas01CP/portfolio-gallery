@@ -13,6 +13,11 @@ CODE_OF_CONDUCT.md
 # drops "in_use" from every design.json.
 showcase
 
+# The gallery page's link preview, the picture a shared link to the
+# project's gallery shows (ADR-0022). Without it a copy's gallery names no
+# address of the project's.
+src/social-card.jpg
+
 # The gallery's sample people, each shown with one template (ADR-0018). A
 # copy builds only its owner's site, from content/.
 samples

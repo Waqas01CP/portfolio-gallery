@@ -897,6 +897,50 @@ def file_cases():
     yield ("built: the credit naming the project as the design's author", project_as_author,
            "names the project as the design's author")
 
+    # The gallery page's link preview (ADR-0022): every tag, the picture
+    # within LinkedIn's limits and its own, and none in a copy or a site.
+    def preview(old=None, new=None, card=None, where="src/templates/gallery.html.j2", after=None):
+        def plant(copy):
+            if old is not None:
+                edit(copy / where, old, new)
+            if card is not None:
+                (copy / "src/social-card.jpg").write_bytes(card)
+            out = build_site(copy, *(() if where.endswith("base.html.j2") else ("--gallery",)))
+            if after:
+                after(copy)
+            return ["tools/check_built.py", out]
+        return plant
+
+    yield ("built: the gallery's link preview without og:image", preview(
+        '<meta property="og:image" content="{{ social.image }}">\n', ""), "the link preview lacks og:image")
+    yield ("built: the link preview's picture named relative to the page", preview(
+        'content="{{ social.image }}"', 'content="social-card.jpg"'), "the link preview's og:image is 'social-card.jpg'")
+    yield ("built: the link preview's picture smaller than LinkedIn's least", preview(card=jpeg(1200, 600)),
+           "smaller than LinkedIn's least, 1200x627")
+    yield ("built: the link preview's picture over 5 MB", preview(card=jpeg(2560, 1280) + b"\0" * (5 * 1024 * 1024)),
+           "over LinkedIn's 5 MB")
+    yield ("built: the link preview's picture carrying EXIF", preview(card=jpeg(2560, 1280, tiff(0x0112))),
+           "carries an APP1 block (Exif)")
+    yield ("built: the link preview stating a size not its picture's", preview(
+        'content="{{ social.size[0] }}"', 'content="1200"'), "says its picture is 1200x1280, but it is 2560x1280")
+    yield ("built: a stale count of designs in the description", preview(
+        '" ~ designs|length ~ "', '" ~ 16 ~ "'), "a description says 16 designs, but the gallery shows")
+    yield ("built: the gallery without its link preview while its picture is here", preview(
+        '"social": social})', '"social": None})', where="build.py"), "the gallery page has no link preview")
+    yield ("built: a copy's gallery claiming the project's address", preview(
+        after=lambda copy: (copy / "src/social-card.jpg").unlink()), "a copy's gallery may not claim")
+    yield ("built: a site page with a link preview", preview(
+        '<meta name="viewport"', '<meta property="og:url" content="https://example.com/">\n<meta name="viewport"',
+        where="src/templates/base.html.j2"), "a link preview (og: or twitter: tags) on a page other than")
+
+    def copy_gallery(copy):
+        # As the template cleanup leaves a copy: the picture gone first.
+        (copy / "src/social-card.jpg").unlink()
+        return ["tools/check_built.py", build_site(copy, "--gallery")]
+
+    yield ("control: a copy's gallery, without the link preview's picture, passes", copy_gallery,
+           Passes("0 problem(s)"))
+
     # Each card's picture keeps its shape within the limits, and its box is
     # reserved at the size of its copy (ADR-0016, Changes, 2026-10-20).
     def shaped(files, old=None, new=None, where="build.py"):

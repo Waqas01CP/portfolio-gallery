@@ -65,6 +65,7 @@ itself a decision.
 | [0019](0019-checks-on-what-a-change-alters.md) | Checks on what a change alters | Accepted |
 | [0020](0020-profession-tags.md) | Profession tags on designs and showcase entries | Accepted |
 | [0021](0021-likes-from-github-discussions.md) | Likes from GitHub Discussions | Accepted |
+| [0022](0022-a-link-preview-for-the-gallery-page.md) | A link preview for the gallery page | Proposed |
 
 Records 0001 to 0005 carry the owner's decisions of 2026-10-11 UTC, written
 on 2026-10-12 by the implementing seat from the brief that recorded them;
@@ -75,8 +76,13 @@ the brief is never committed, so these records and the session log of
 
 Decisions identified but not yet concluded. Each waits on the owner.
 
-None. ADR-0012, Lighthouse in CI, held as proposed by the owner on
-2026-10-15, was accepted by him on 2026-10-29.
+- ADR-0022, a link preview for the gallery page, proposed 2026-11-04 from
+  Brief 16: built as the brief asks; his acceptance confirms its reading
+  that ADR-0007 leaves Open Graph's absolute addresses outside it, and
+  whether a copy's own site should carry a preview waits on his word.
+
+ADR-0012, Lighthouse in CI, held as proposed by the owner on 2026-10-15,
+was accepted by him on 2026-10-29.
 
 The owner's answers, dated 2026-10-16 in his local time (UTC+5) and
 given on 2026-10-15 UTC, concluded the rest: CSS only (ADR-0006); the

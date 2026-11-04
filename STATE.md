@@ -6,12 +6,12 @@ status: current
 
 # STATE
 
-**Verified against main at f19e5a1 and the branch records-form after it,
-2026-10-30 UTC, by the Brief 1 implementing session's twenty-eighth
-round, Brief 15**: the four records read whole; GitHub's documentation
-read and quoted for ADR-0019's A5 and ADR-0021's A2; every record's
-Changes table counted; the gates and the pre-publish search
-(logs/2026-10-12-brief-1-build.md, Round 28). This is the only line in
+**Verified against main at b0db50f and the branch link-preview after it,
+2026-11-04 UTC, by the Brief 1 implementing session's twenty-ninth
+round, Brief 16**: the gallery built and checked with its link preview;
+the new defeat cases, the whole file harness, the template cleanup's
+check, the gates and the pre-publish search
+(logs/2026-10-12-brief-1-build.md, Round 29). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -64,10 +64,13 @@ with the owner's option A; a like button on each template and site, a
 post in Discussions, nineteen made on 2026-10-29 (ADR-0021), a like an
 upvote or a thumbs up on the post, added together, the owner's choice.
 No attempt to edit a post, which GitHub refuses the workflow (pull
-request 54). On the branch records-form, not yet pushed: Brief 15's
-corrections to the form and evidence of ADR-0006 and ADR-0019 to 0021.
-Waiting: his push of records-form; step 5's policy, provable only on or
-after 2026-11-02 (Test 1 ran on 2026-10-29, before it).
+request 54). Brief 15's corrections to four records' form merged in pull
+request 55. On the branch link-preview, not yet pushed: a link preview on
+the gallery page, Open Graph and X card tags and a committed picture, for
+LinkedIn (ADR-0022, proposed). Waiting: his push and merge of
+link-preview, then LinkedIn's Post Inspector on the address; his word on
+ADR-0022; step 5's policy, provable on or after 2026-11-02 (Test 1 ran on
+2026-10-29, before it).
 
 ## Publishing
 
@@ -79,7 +82,7 @@ after 2026-11-02 (Test 1 ran on 2026-10-29, before it).
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
-| None open | DONE | ADR-0012 accepted by the owner, with option A for TBT | 2026-10-29 | ADR-0012, Changes |
+| A link preview for the gallery page: its reading of ADR-0007, and whether a copy's own site carries one | PENDING | [VERIFIED] built and checked as Brief 16 asks; [BELIEVED] the reading, until he accepts the record | 2026-11-04 | ADR-0022 |
 
 ## Built, not yet complete
 
@@ -90,6 +93,7 @@ DONE rows are in docs/reference/completed.md.
 | Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; Phase 2 on GitHub, pull request 28's run checking every page side by side in 5 min 8 s against 76 min for pull request 27's on one runner, one design's job failing at Chrome's start and the verdict with it, as built, then green on a rerun; pull request 29, Chrome's start fixed, every page in 5.2 min with all eighteen starts within it; pull request 30 checked every page for a change to the gallery page's own stylesheet, the rule narrowed on lighthouse; [BELIEVED] a narrowed run on GitHub, and the weekly run shared out, not yet seen there | 2026-10-29 | 27db869, 40c9610; ADR-0019, Changes |
 | Profession tags | DONE | [VERIFIED] pull request 30 green on GitHub and merged; the gallery built with twelve labels; nine cases | 2026-10-29 | ADR-0020; pull request 30 |
 | Speed in CI | PARTIAL | [VERIFIED] on GitHub: pull request 32's run checked every page with Lighthouse in 6.4 min, green, and its merge's 6.2; here, every page measured and the speed cases; [BELIEVED] the weekly run's numbers, not yet seen, which decide whether TBT's 600 ms can come down | 2026-10-30 | ADR-0012, Changes |
+| The gallery's link preview | PARTIAL | [VERIFIED] here: the gallery built with eleven og: and twitter: tags and its picture, check_built passing, its ten defeat cases failing as built and a copy's gallery without the picture passing; the template cleanup removes the picture; [BELIEVED] LinkedIn's preview, until the owner runs its Post Inspector after the merge | 2026-11-04 | ADR-0022 |
 | Like buttons | DONE | [VERIFIED] on GitHub: nineteen posts made by the workflow on 2026-10-29; after pull request 53, the owner's upvote on Frost's post counted, the live card showing 1 like; the rewrite of the first posts refused by GitHub, a warning each, removed in pull request 54; here, the like cases, and with the author rule or the upvotes removed each case fails | 2026-10-30 | ADR-0021, Changes |
 | CODEOWNERS and the issue templates | PARTIAL | [VERIFIED] CODEOWNERS asked the owner's review the moment pull request 22, the first from outside, opened, and its author filled the pull request template's showcase section (GitHub's API); [BELIEVED] the issue templates, which no one has used yet | 2026-10-28 | b798834; pull request 22 |
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
@@ -101,7 +105,7 @@ DONE rows are in docs/reference/completed.md.
 | Item | Blocked on | Who | Since |
 |---|---|---|---|
 | Step 5's proof | The date: Test 1 again on or after 2026-11-02 | The owner | 2026-10-18 |
-| Merging records-form | The owner's push and merge | The owner | 2026-10-30 |
+| Merging link-preview | The owner's push and merge | The owner | 2026-11-04 |
 
 ## Known unverified
 
