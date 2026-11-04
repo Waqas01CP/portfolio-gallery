@@ -35,6 +35,15 @@ seen without running anything:
     the limits, at most SHOWCASE_TALL times as tall as it is wide and
     SHOWCASE_WIDE times as wide as it is tall: a screenshot beyond them is
     shown within them, with bands (ADR-0016, Changes, 2026-10-20);
+  - the gallery page carries a link preview, the og: and twitter: tags a
+    site such as LinkedIn reads when its address is shared, exactly when
+    src/social-card.jpg is in the tree: every tag the build writes, its
+    address and its picture's absolute and the project's own, the picture
+    beside the page, a JPEG at least 1200 by 627 and at most 5 MB, its
+    stated size its own, holding no EXIF, XMP, comment or other block
+    beyond its image and colour profile; any other page, a site's among
+    them, and a copy's gallery carry none (ADR-0022). A count of designs
+    in its descriptions is the number it shows;
   - with --previews, every design in a gallery has its preview image, the
     gallery its own picture at the root, which the README shows (ADR-0017,
     Changes, 2026-10-23), and every showcase card its served copies, each
@@ -57,8 +66,8 @@ from urllib.parse import unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from build import (CSP, PREVIEW_FILE, PROJECT_URL, SHOWCASE_CARD, SHOWCASE_FULL,  # noqa: E402
-                   SHOWCASE_TALL, SHOWCASE_WIDE)
+from build import (CSP, GALLERY_URL, PREVIEW_FILE, PROJECT_URL, SHOWCASE_CARD,  # noqa: E402
+                   SHOWCASE_FULL, SHOWCASE_TALL, SHOWCASE_WIDE, SOCIAL_CARD, SOCIAL_FILE)
 from check_design import CSSError, tokens  # noqa: E402
 
 RESOURCE_ATTRS = {"src", "srcset", "poster", "data", "action", "formaction", "background",
@@ -67,6 +76,18 @@ REFUSED_ELEMENTS = {"iframe", "object", "embed", "form", "base", "frame", "frame
                     "applet", "portal", "fencedframe"}
 LINK_RELS_LOADING = {"stylesheet", "preload", "modulepreload", "prefetch", "icon",
                      "manifest", "preconnect", "dns-prefetch", "prerender", "apple-touch-icon"}
+# The gallery page's link preview (ADR-0022): each tag the build writes, and
+# its value where only one is right. LinkedIn's sharing needs og:title,
+# og:description, og:url and og:image, the picture at least 1200 by 627
+# and at most 5 MB ("Make your website shareable on LinkedIn", read
+# 2026-11-04); X takes the og tags but needs its own card type.
+PREVIEW_TAGS = {"og:type": "website", "og:url": GALLERY_URL, "og:title": None, "og:description": None,
+                "og:image": GALLERY_URL + SOCIAL_FILE, "og:image:type": "image/jpeg",
+                "og:image:width": None, "og:image:height": None, "og:image:alt": None,
+                "twitter:card": "summary_large_image", "twitter:image:alt": None}
+PREVIEW_LEAST = (1200, 627)
+PREVIEW_MOST_BYTES = 5 * 1024 * 1024
+JPEG_SOF = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
 
 
 class Page(HTMLParser):
@@ -92,6 +113,8 @@ class Page(HTMLParser):
         self.in_credit = False
         self.contributed: str | None = None  # "site" in a showcase card, "in_use" in its line
         self.sized: list[tuple[str, int, int]] = []  # each showcase picture's src and reserved size
+        self.preview: dict[str, str] = {}  # the link preview's og: and twitter: tags
+        self.descriptions: list[str] = []  # the description tag's and og:description's text
 
     VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
             "source", "track", "wbr"}
@@ -111,6 +134,13 @@ class Page(HTMLParser):
             self.viewport = True
         if tag == "meta" and a.get("name") == "color-scheme":
             self.color_scheme = " ".join(a.get("content", "").split())
+        key = a.get("property") or a.get("name") or ""
+        if tag == "meta" and key.startswith(("og:", "twitter:")):
+            if key in self.preview:
+                self.problems.append(f"the link preview's {key} appears more than once")
+            self.preview[key] = a.get("content", "")
+        if tag == "meta" and key in ("description", "og:description"):
+            self.descriptions.append(a.get("content", ""))
         if "data-theme-switch" in a:
             self.theme_switches += 1
         if "data-nav-box" in a:
@@ -310,6 +340,12 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
             if (facts["width"], facts["height"]) != (width, height):
                 problems.append(f"the showcase picture {src} is reserved at {width}x{height} but is "
                                 f"{facts['width']}x{facts['height']}, so the page would shift as it loads")
+    demos = len(list((root / "designs").glob("*/index.html")))
+    problems += preview_problems(page, root, gallery_page=path == root / "index.html" and demos > 0)
+    for text in page.descriptions if path == root / "index.html" and demos else []:
+        for said in re.findall(r"\b(\d+) designs?\b", text):
+            if int(said) != demos:
+                problems.append(f"a description says {said} designs, but the gallery shows {demos}")
     ids = set(page.ids)
     for duplicate in sorted({i for i in page.ids if page.ids.count(i) > 1}):
         problems.append(f"id '{duplicate}' is used more than once")
@@ -332,6 +368,93 @@ def check_html(path: Path, root: Path, previews: bool = False) -> list[str]:
             if problem:
                 problems.append(f"the link {problem}")
     return problems
+
+
+def preview_problems(page: Page, root: Path, gallery_page: bool) -> list[str]:
+    """The link preview: on the gallery page while its picture is in the
+    tree, every tag the build writes, its picture published beside the page
+    within LinkedIn's limits and holding its image and nothing else; on any
+    other page, and in a copy, none, since neither may name an address of
+    its own (ADR-0007; ADR-0022)."""
+    tags = page.preview
+    if not gallery_page:
+        return (["a link preview (og: or twitter: tags) on a page other than the gallery's own: a site "
+                 "names no address of its own (ADR-0007; ADR-0022)"] if tags else [])
+    if not SOCIAL_CARD.is_file():
+        return ([f"a link preview naming {GALLERY_URL}, yet src/{SOCIAL_CARD.name} is not here: a copy's "
+                 f"gallery may not claim the project's address (ADR-0022)"] if tags else [])
+    if not tags:
+        return [f"the gallery page has no link preview, yet src/{SOCIAL_CARD.name} is here (ADR-0022)"]
+    problems = []
+    for key, want in PREVIEW_TAGS.items():
+        value = tags.get(key, "")
+        if not value.strip():
+            problems.append(f"the link preview lacks {key}")
+        elif want and value != want:
+            problems.append(f"the link preview's {key} is {value!r}, not {want!r}")
+    for key in sorted(set(tags) - set(PREVIEW_TAGS)):
+        problems.append(f"the link preview's {key} is not a tag the build writes")
+    if problems:
+        return problems
+    file = root / SOCIAL_FILE
+    if file.is_symlink() or not file.is_file():
+        return [f"the link preview's picture {SOCIAL_FILE} is not in the built folder"]
+    data = file.read_bytes()
+    if len(data) > PREVIEW_MOST_BYTES:
+        problems.append(f"the link preview's picture is {len(data):,} bytes, over LinkedIn's 5 MB")
+    try:
+        width, height, extra = jpeg_parts(data)
+    except ValueError as error:
+        return problems + [f"the link preview's picture {SOCIAL_FILE}: {error}"]
+    if width < PREVIEW_LEAST[0] or height < PREVIEW_LEAST[1]:
+        problems.append(f"the link preview's picture is {width}x{height}, smaller than LinkedIn's least, "
+                        f"{PREVIEW_LEAST[0]}x{PREVIEW_LEAST[1]}")
+    if (tags["og:image:width"], tags["og:image:height"]) != (str(width), str(height)):
+        problems.append(f"the link preview says its picture is {tags['og:image:width']}x"
+                        f"{tags['og:image:height']}, but it is {width}x{height}")
+    if extra:
+        problems.append(f"the link preview's picture carries {', '.join(extra)}: a published picture holds "
+                        f"its image and nothing else")
+    return problems
+
+
+def jpeg_parts(data: bytes) -> tuple[int, int, list[str]]:
+    """A JPEG's width and height, and every block in it but the image's own:
+    a JFIF header and a colour profile are its image's; EXIF, XMP, IPTC,
+    comments and anything else are refused."""
+    if data[:3] != b"\xff\xd8\xff":
+        raise ValueError("not a JPEG image")
+    size, extra, pos = None, [], 2
+    while pos + 4 <= len(data):
+        if data[pos] != 0xFF:
+            raise ValueError("its JPEG segments cannot be read")
+        marker = data[pos + 1]
+        if marker == 0xFF:
+            pos += 1
+            continue
+        if marker in (0x01, 0xD8) or 0xD0 <= marker <= 0xD7:
+            pos += 2
+            continue
+        if marker == 0xD9:
+            break
+        length = struct.unpack(">H", data[pos + 2:pos + 4])[0]
+        body = data[pos + 4:pos + 2 + length]
+        if marker in JPEG_SOF and len(body) >= 5:
+            height, width = struct.unpack(">HH", body[1:5])
+            size = (width, height)
+        elif marker == 0xE0 and body.startswith(b"JFIF\0"):
+            pass
+        elif marker == 0xE2 and body.startswith(b"ICC_PROFILE\0"):
+            pass
+        elif 0xE0 <= marker <= 0xEF or marker == 0xFE:
+            name = body.split(b"\0", 1)[0][:20].decode("latin-1", "replace") or "unnamed"
+            extra.append("a comment" if marker == 0xFE else f"an APP{marker - 0xE0} block ({name})")
+        if marker == 0xDA:
+            break
+        pos += 2 + length
+    if not size:
+        raise ValueError("its JPEG header gives no size")
+    return size[0], size[1], extra
 
 
 def later_picture(url: str) -> bool:

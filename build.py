@@ -73,6 +73,15 @@ PROJECT_URL = "https://github.com/Waqas01CP/portfolio-gallery"
 LIKES_URL = f"{PROJECT_URL}/discussions/categories/likes"
 LIKED_RE = re.compile(re.escape(f"{PROJECT_URL}/discussions/") + r"[1-9][0-9]{0,8}")
 LIKE_KEY_RE = re.compile(r"(?:designs|showcase)/[a-z0-9-]+")
+# The gallery page's link preview: the picture and words LinkedIn, X and
+# others show when its address is shared (ADR-0022). Open Graph needs
+# absolute URLs, so this one page names its own address, as PROJECT_URL
+# names the repository; a site names none (ADR-0007). The template cleanup
+# removes the picture, and with it the preview, so a copy's gallery never
+# claims this address.
+GALLERY_URL = "https://waqas01cp.github.io/portfolio-gallery/"
+SOCIAL_CARD = ROOT / "src" / "social-card.jpg"
+SOCIAL_FILE = "social-card.jpg"
 
 # Every page carries this policy in a meta tag, so a browser refuses
 # scripts, styles, fonts and images from any other origin even if a check
@@ -1125,6 +1134,22 @@ def load_likes(path: Path | None) -> dict[str, dict]:
     return found
 
 
+def load_social_card() -> dict | None:
+    """The gallery's link preview: its address, its picture's address and
+    size; None in a copy, whose cleanup removed the picture. The full rules,
+    the limits of the sites that show it, are tools/check_built.py's."""
+    if not SOCIAL_CARD.is_file():
+        return None
+    sys.path.insert(0, str(ROOT / "tools"))
+    from check_showcase import ImageError, jpeg_facts
+    try:
+        facts = jpeg_facts(SOCIAL_CARD.read_bytes())
+    except (ImageError, struct.error) as error:
+        raise BuildError(f"src/{SOCIAL_CARD.name} is not a JPEG image whose size can be read: "
+                         f"{error or 'its header'}") from None
+    return {"url": GALLERY_URL, "image": GALLERY_URL + SOCIAL_FILE, "size": (facts["width"], facts["height"])}
+
+
 def liked(item: dict, key: str, likes: dict[str, dict]) -> None:
     item["like_url"], item["likes"] = ((likes[key]["url"], likes[key]["likes"]) if key in likes
                                        else (LIKES_URL, None))
@@ -1140,6 +1165,7 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
     designs = [load_design(name) for name in names]
     showcase = load_showcase() if gallery else []
     likes = load_likes(likes_file) if gallery else {}
+    social = load_social_card() if gallery else None
     for item in designs if gallery else []:
         liked(item, f"designs/{item['slug']}", likes)
     for item in showcase:
@@ -1167,7 +1193,8 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
         pages["index.html"] = render(env, "gallery.html.j2", {
             "as_of": as_of, "csp": CSP, "designs": designs, "project_name": PROJECT_NAME,
             "project_url": PROJECT_URL, "preview_file": PREVIEW_FILE,
-            "preview_size": PREVIEW_SIZE, "sample_name": base["site"]["name"], "showcase": showcase})
+            "preview_size": PREVIEW_SIZE, "sample_name": base["site"]["name"], "showcase": showcase,
+            "social": social})
     else:
         design = designs[0]
         pages["index.html"] = render(env, "base.html.j2", {
@@ -1195,6 +1222,8 @@ def build(out: Path, as_of: str, design_override: str | None, gallery: bool,
                 shutil.copyfile(STATIC_SRC / name, static / name)
             for design in designs:
                 copy_design(design, staging / "designs" / design["slug"])
+            if social:
+                shutil.copyfile(SOCIAL_CARD, staging / SOCIAL_FILE)
             # The showcase's served copies come later, from the screenshot
             # job, as the previews do; the authors' own files stay here.
         else:

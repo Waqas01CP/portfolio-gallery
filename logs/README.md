@@ -44,6 +44,7 @@ subdirectories and leave this index at the top pointing into them.
 
 | Date (UTC) | Log file | Session | What was done | Outcome |
 |---|---|---|---|---|
+| 2026-11-04 | 2026-10-12-brief-1-build.md | Brief 16, Round 29: a link preview on the gallery page | Open Graph and X card tags and a committed picture on the gallery page, none in a copy or a site; the description corrected, its count the build's; check_built holds it, ten defeat cases and a control; ADR-0022 proposed | On the branch link-preview, not pushed |
 | 2026-10-30 | 2026-10-12-brief-1-build.md | Brief 15, Round 28: four records' form and evidence | ADR-0019's placeholder filled and Changes header fixed; A5 and A2 read from GitHub's documentation and quoted, A1 measured; three Decision Outcomes as We will lines; ADR-0006's one-theme dark row | On the branch records-form, not pushed |
 | 2026-10-30 | 2026-10-12-brief-1-build.md | The owner's question, Round 27: is it complete | GitHub refused the workflow an edit of its own posts, a warning each; the rewrite removed; the owner's upvote counted live | On the branch likes-no-rewrite, not pushed |
 | 2026-10-30 | 2026-10-12-brief-1-build.md | The owner's choice, Round 26: a like is an upvote or a thumbs up | The first run made nineteen posts; his test like on a comment counted nothing; now upvotes and thumbs up on the post are added, and the workflow's posts rewritten to say so | On the branch likes-both, not pushed |

@@ -3791,3 +3791,123 @@ The owner measured it on post 51, 2026-10-30 UTC: a thumbs up added, then
 clicked again, went away; an upvote clicked twice went to 1 and back to 0.
 ADR-0021's A2 is now Measured, with a Changes row, its fifth; a second
 commit on records-form, which he had pushed.
+
+# Round 29, 2026-11-04 UTC: Brief 16, a link preview on the gallery page
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session continued, after a summary of its earlier context. Work on the
+branch link-preview, from main at b0db50f, level with GitHub (fetched
+2026-11-04: nothing since pull request 55). Mode: mutating. Brief 16 from
+the portfolio architecture chat, via the owner, 2026-11-03 UTC, stored
+word for word in briefs/implementation-seat.md with its addendum (Working
+Method 1.3, the seat's parts, which changes nothing here), replacing
+Brief 15 (executed, ticked) after it was read; it carries the owner's
+quality floor, his trade-off and his aim, as Brief 15 did.
+
+## What was asked
+
+Open Graph tags and an X card on the gallery page, its addresses
+absolute, with the social card the seat made on 2026-10-29 as the
+picture, served from the published site and not inherited by a copy; the
+description's false "each contributed by pull request" corrected; any
+count kept from going stale; and a report on what link previews on a
+copy's own site would take, building nothing for it.
+
+## Errors this seat made
+
+1. **One defeat case wired wrong**: "build.py" passed where the picture
+   belonged, so the harness stopped on the template, naming the case
+   ("gallery.html.j2 no longer holds ...; update the case"). Found by its
+   first run; passed by name; it then failed as built.
+
+## What was done
+
+1. src/social-card.jpg: the card, byte for byte (SHA-256 47c45012...,
+   both files) [VERIFIED]. 2560 by 1280, 365,061 bytes; a JFIF header and
+   a 472-byte colour profile, no EXIF, XMP or comment (its segments read);
+   viewed: the title over the gallery's design previews, every person in
+   them invented, no count [VERIFIED].
+2. build.py: GALLERY_URL, the gallery's address, beside PROJECT_URL;
+   load_social_card reads the picture's size with the showcase check's
+   JPEG reader; the gallery publishes it at its root as social-card.jpg
+   [VERIFIED].
+3. gallery.html.j2: one description for the description tag and
+   og:description, its count of designs the build's own: "A free,
+   MIT-licensed portfolio template for GitHub Pages: write your content
+   once, pick one of 17 designs, and publish without installing anything.
+   Every design is checked automatically for accessibility, and more are
+   welcome by pull request." While the picture is in the tree: og:type,
+   og:url, og:title ("Portfolio Gallery: a free portfolio template for
+   GitHub Pages", the owner's wording), og:description, og:image with its
+   type, width, height and alt, twitter:card summary_large_image and
+   twitter:image:alt [VERIFIED: the built head, read].
+4. remove.txt: src/social-card.jpg, so a copy loses the picture and with
+   it the preview; the cleanup's check: 108 files removed, the cleaned
+   copy's gallery built and checked [VERIFIED].
+5. tools/check_built.py: the link preview held both ways (ADR-0022) and a
+   description's count of designs held to the gallery's [VERIFIED].
+6. Ten defeat cases and a control in tools/prove_checks.py, each run by
+   name: og:image left out; og:image relative; the picture 1200x600; over
+   5 MB; carrying EXIF; its stated width 1200; a count of 16; no preview
+   while the picture is here; a copy's gallery keeping it; a site page
+   with an og: tag; each failed as built naming its fault; the control,
+   a copy's gallery without the picture, passed [VERIFIED].
+7. ADR-0022, proposed; the index and its Pending; CAPABILITIES (what it
+   does, two numbers, the timeline); standing-checks; STATE.
+
+## Sources read
+
+- LinkedIn, "Make your website shareable on LinkedIn" (a521928), read
+  2026-11-04: og:title, og:image, og:description and og:url; "Max file
+  size: 5 MB"; "Minimum image dimensions: 1200 (w) x 627 (h) pixels";
+  "Recommended ratio: 1.91:1". It lists "JPG, PNG, or GIF" only for
+  single image ads, not for shared links, against the brief's reading;
+  JPEG is in both. It says nothing of absolute addresses or the Post
+  Inspector.
+- X's developer documentation, "Cards markup", through a search's
+  excerpts, 2026-11-04: the og: tags stand in where X's own are missing;
+  twitter:card chooses the large picture. The pages answered this seat's
+  fetch with 402 and 404, so not read whole (ADR-0022, A2).
+
+## Rejected alternatives
+
+- A JPEG of the gallery page taken by the deploy: always current, but a
+  page's first screen read at a thumbnail's size, and a new picture job.
+- The address from configure-pages: a local and a deployed build would
+  differ, which ADR-0007 refused.
+- The picture in src/static/: a copy keeps that folder whole; its own
+  path makes one line in remove.txt.
+
+## Checked and found already correct
+
+- The checks' planning rule: a file outside designs/ that differs checks
+  the gallery page, so the picture needs nothing new in tools/ci.py.
+- The tags make no request; the page's policy and loads are unchanged.
+
+## Not done
+
+- Link previews on a copy's own site: reported in ADR-0022, More
+  Information; nothing built, as the brief says.
+- CLAUDE.md's opening line also says the designs are "each contributed by
+  pull request"; the owner's file, reported, not changed.
+- Nothing pushed.
+
+## Proofs
+
+- The file harness, `tools/prove_checks.py` on the branch, 11:35Z to
+  11:47Z: 188 defeat cases failing as built, 50 planted controls passing,
+  0 unproven, 735 s [VERIFIED]. Before it, 178 and 49.
+- `tools/check_template_cleanup.py`, `tools/ci.py build --mode gallery`
+  and `--mode site`, `tools/check_prompt.py`: each exit 0 [VERIFIED].
+- The gates on the commit: A, B and C passed [VERIFIED].
+- The pre-publish search on the commit bbd85f2, before this line was
+  added to it, with the gallery built: 821 blobs at 803 paths across 120
+  commits and their headers, 84 built files; PASS, none found outside the
+  allowed places. The picture's readable bytes hold no name, path or
+  address [VERIFIED].
+
+## Findings and recommendations
+
+- ADR-0007 says "We will configure no site URL". ADR-0022 reads the
+  gallery's fixed address as outside it, as PROJECT_URL is; proposed, for
+  the owner to confirm or refuse (recommendation: confirm).
