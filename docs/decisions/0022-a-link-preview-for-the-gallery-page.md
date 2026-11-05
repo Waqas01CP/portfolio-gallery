@@ -54,8 +54,11 @@ WebP, which LinkedIn does not list.
   previews, lettered in the Default design's Manrope and Instrument Serif,
   both under the OFL.
 - A4. LinkedIn shows a 2:1 picture cropped a little toward 1.91:1.
-  **Believed**, from the brief; LinkedIn's page does not say. The owner's
-  Post Inspector run after the merge shows it.
+  **Measured** 2026-11-05 by the owner: LinkedIn's Post Inspector on the
+  address, after pull request 56, showed the picture, its sides at most
+  slightly trimmed to the eye, the title, waqas01cp.github.io, and the description
+  word for word. Until then believed, from the brief (Changes,
+  2026-11-05).
 - A5. The gallery is published only at
   https://waqas01cp.github.io/portfolio-gallery/. **Measured**: the deploy
   builds the gallery only where the variable PORTFOLIO_GALLERY is true,
@@ -163,3 +166,4 @@ on the address shows the picture, the title and the description.
 
 | Date | Change | Why |
 |---|---|---|
+| 2026-11-05 | **Evidence; nothing decided moves.** A4 measured; the Live only clause seen: Post Inspector fetched the address (206), read the title, description and picture, and showed the preview; it labels the type Article and finds no author or date, which a site's page does not give. Still proposed, for the owner's word. | The owner's Post Inspector run, 2026-11-05, his screenshot; the live page's head read the same day: the eleven tags, social-card.jpg 200, image/jpeg, 365,061 bytes. |

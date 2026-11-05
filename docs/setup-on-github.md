@@ -20,8 +20,12 @@ Test 6 passed on 2026-10-20: his own entry, from a plain snip of
 pull request 13 and merged; Deploy, with its shots and assemble jobs,
 passed on main; Showcase links, run by hand, passed (run 39507307570).
 An earlier head of that branch, entry.json alone, failed checks at the
-fetch step, as an entry without a screenshot should. One proof waits:
-Test 1 again on or after 2026-11-02 (below).
+fetch step, as an entry without a screenshot should. Step 5's policy
+is proven since: on 2026-11-04, after GitHub's block took effect on
+2026-11-02, scope ran on `pull_request_target` for pull request 56 and
+its job completed (run 41825721430), and the scope check is unchanged
+since Test 1 refused a change outside designs/ on 2026-10-29. Test 1
+need not be run again.
 
 Each step is one action. "Send back" lists what to paste to the chat.
 
@@ -569,8 +573,9 @@ open it: the failed job is marked, and its last step names the problem.
   change outside designs/, and that a failed required check blocks a merge.
   It proves step 5's policy only when run on or after 2026-11-02: until
   then GitHub only evaluates its block on `pull_request_target`, so the
-  scope check runs with or without the policy. Run Test 1 once more on or
-  after that date; scope must run and fail as before.
+  scope check runs with or without the policy. Proven since by a scope
+  run after that date, pull request 56's on 2026-11-04 (run 41825721430),
+  with the scope check unchanged since Test 1.
 - Test 2 proves a design passes the scope check and the full checks on
   GitHub's runner, browser checks included.
 - Test 3 proves the ruleset binds main.
