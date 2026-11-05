@@ -3911,3 +3911,52 @@ copy's own site would take, building nothing for it.
 - ADR-0007 says "We will configure no site URL". ADR-0022 reads the
   gallery's fixed address as outside it, as PROJECT_URL is; proposed, for
   the owner to confirm or refuse (recommendation: confirm).
+
+# Round 30, 2026-11-05 UTC: after pull request 56
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session. Work on the branch after-link-preview, from main at 878f7f8,
+the owner's merge of pull request 56. Mode: mutating, records only. No
+brief: the owner's questions of 2026-11-05.
+
+## What was asked
+
+Is LinkedIn's Post Inspector result right; what is the weekly run, and
+run it if it is the seat's; is Test 1's rerun still needed.
+
+## Errors this seat made
+
+None in this round.
+
+## What was done
+
+1. The live gallery, read 2026-11-05 10:43Z: its head carries the eleven
+   tags as built; social-card.jpg answers 200, image/jpeg, 365,061 bytes
+   [VERIFIED]. The owner's Post Inspector screenshot: fetched and
+   canonical URL the gallery's, answered 206; the picture, the title, the
+   domain and the description word for word; type labelled Article (its
+   own label: the page says website); no author or date, which the page
+   does not give [VERIFIED from his screenshot]. ADR-0022's A4 measured,
+   a Changes row; still proposed.
+2. The weekly run, Checks, every page, of Monday 2026-11-02: scheduled
+   for 04:41Z, run from 12:50Z to 12:56Z on b0db50f, 21 jobs (plan,
+   files, seventeen design jobs of 316 to 346 s, gallery-page 230 s,
+   verdict), all success; no annotations on a design's job (GitHub's API,
+   run 41447942168) [VERIFIED]. Lighthouse ran in each page's job and no
+   median failed; the TBT medians are in the jobs' summaries, which need
+   a sign-in [BELIEVED under 600 ms, as no job failed].
+3. Step 5's policy: scope ran on pull_request_target for pull request
+   56 on 2026-11-04, its job completing from 12:01:41Z to 12:01:48Z (run
+   41825721430), after GitHub's block took effect on 2026-11-02 by its
+   own page; the scope check's two files last changed in cb363d3
+   (2026-10-28 19:45Z), before Test 1 refused a change outside designs/
+   on 2026-10-29 [VERIFIED]. So Test 1 need not run again. Whether
+   GitHub's enforcement began on its date is not visible to the seat;
+   either way the scope check runs, which is what the step guards.
+4. STATE, completed.md (two rows moved), the setup guide's two lines on
+   the waiting proof.
+
+## Not done
+
+- The weekly run's TBT medians: only the owner can read the summaries.
+- Nothing pushed.
