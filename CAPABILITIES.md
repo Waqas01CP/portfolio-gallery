@@ -204,7 +204,7 @@ gallery is live at https://waqas01cp.github.io/portfolio-gallery/.
 | Showcase screenshots | Full-screen snips of four pages, a wall of photographs among them, by headless Chrome 155 and re-encoded by Windows' WIC and GDI+: at full HD up to 2,525,046 bytes, at 4K up to 12,439,711, on a 5K display up to 16,928,260 (all the photo wall, GDI+); the cap is 20 MiB. Their served copies, WebP at 0.82: the card at most 147,498 bytes, the full view 401,498 | 2026-10-20 | the session log, Round 9 |
 | Gallery with a showcase | 0, 10 and 50 cards packed in their pictures' shapes, copies drawn from 13 real snips of every shape, the owner's among them: page 4,729, 10,383 and 32,599 bytes, gallery.js 3,094; Lighthouse 13.5.0 default mobile, median of five: LCP 1,075, 1,504 and 1,654 ms, CLS 0 in every run, TBT 38, 0 and 0 ms, 74,587, 309,817 and 330,177 bytes loaded at first; desktop preset, three columns packed, at 10 and 50: LCP 365 and 406 ms, CLS 0 in every run, TBT 0; every card, scrolled to the end, 2,964,813 bytes at 50 | 2026-10-21 | the session log, Round 10 |
 | Showcase shapes | First screens 0.56 to 0.62 times as tall as wide on desktops and laptops, 2.16 to 2.22 on phones; ultrawide monitors 2.39 and 3.56 times as wide as tall; whole pages of eight portfolio sites 0.56 to 10.21 at desktop widths, 2.16 to 34.76 at a phone's; the owner's snip 1.59. Limits set at 2.4 either way. Card copies at most 1,024 wide: the largest 128,784 bytes | 2026-10-21 | the session log, Round 10 |
-| Decision records | 22: 21 accepted, ADR-0022 proposed | 2026-11-04 | docs/decisions/ |
+| Decision records | 22, all accepted | 2026-11-06 | docs/decisions/ |
 | Gallery picture | The gallery page's top, 1366 by 1280 CSS pixels at full size, WebP: 89,268 bytes, the heading, the links and the first row of templates; the limit is 300 KB | 2026-10-23 | tools/screenshots.py; the session log |
 | Link preview picture | social-card.jpg, 2560 by 1280 pixels, 365,061 bytes, a JFIF header and a colour profile and no other metadata; LinkedIn's least is 1200 by 627 and its most 5 MB | 2026-11-04 | tools/check_built.py; the session log, Round 29 |
 
@@ -294,6 +294,9 @@ dependency without a record; designs are CSS only (ADR-0006).
   median; under ADR-0009 a fail on any machine is a fail.
 - **One degree on the timeline**; English labels; eight sections in a
   fixed order (docs/reference/content.md).
+- **No link preview on a site**: only the gallery page carries Open Graph
+  tags; a copy's own site carries none, deferred by the owner on
+  2026-11-06 until a user asks (docs/deferred/link-previews-on-a-site.md).
 - **Tested in Chrome on Windows only**, 154 to 156. No other browser, and
   no screen reader by ear: the joins check is a model of NVDA, validated
   on the owner's site's known-bad page.

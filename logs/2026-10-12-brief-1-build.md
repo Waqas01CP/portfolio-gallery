@@ -3960,3 +3960,51 @@ None in this round.
 
 - The weekly run's TBT medians: only the owner can read the summaries.
 - Nothing pushed.
+
+# Round 31, 2026-11-09 UTC: Brief 17, the owner's decisions on Report 17
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session. Work on the branch report-17-decisions, from main at 6d65e12,
+level with GitHub (fetched 2026-11-09). Mode: mutating, records only.
+Brief 17 from the portfolio architecture chat, via the owner, 2026-11-07
+UTC, stored word for word in briefs/implementation-seat.md, replacing
+Brief 16 (executed, ticked 2026-11-07) after it was read; it carries the
+owner's quality floor, his trade-off and his aim, as Brief 16 did.
+
+## What was asked
+
+His decisions of 2026-11-06 UTC, all as Report 17 recommended: ADR-0022
+accepted; link previews on a copy's own site deferred until a user asks;
+CLAUDE.md's line 19 reworded. And the weekly run's TBT medians, if
+GitHub's CLI is signed in here, changing nothing.
+
+## Errors this seat made
+
+None in this round.
+
+## What was done
+
+1. ADR-0022: status accepted; a Changes row of 2026-11-06, its third,
+   in date order; More Information points to the deferred entry. The
+   index: Accepted; its Pending list empty again [VERIFIED: read after].
+2. docs/deferred/link-previews-on-a-site.md: what was proposed, why not
+   built (ADR-0007's "We will configure no site URL and no base path"),
+   what it would take (Report 17, 6.2), the trigger (a user asks), and
+   what revisiting would have to produce. docs/deferred/ is on the
+   cleanup's list, so a copy does not receive it.
+3. CLAUDE.md, line 19: "for it, open to contribution by pull request,
+   checked automatically and", his approval of 2026-11-06 [VERIFIED:
+   the diff, one line].
+4. CAPABILITIES: 22 records, all accepted; a limit line, no link preview
+   on a site. STATE: the verified line, the headline, the decisions row.
+5. The weekly run's TBT medians: not read. GitHub's CLI is not installed
+   here (`which gh`, `where.exe gh`: none). Without a sign-in, GitHub's
+   API refuses a job's log ("Must have admin rights to Repository.",
+   403, job 125285708004, browser (bento)) and gives no summary in the
+   check run's output [VERIFIED]. The owner is given the clicks.
+
+## Not done
+
+- The TBT medians, and so no view on lowering ADR-0012's 600 ms: they
+  wait on the owner's copy of the speed tables.
+- Nothing pushed.

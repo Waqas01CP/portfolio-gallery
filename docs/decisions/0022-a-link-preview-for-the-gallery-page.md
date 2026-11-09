@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 topic: hosting
 description: "The gallery page carries Open Graph and X card tags naming its own address and a committed picture, src/social-card.jpg, so a shared link shows a preview; a copy's cleanup removes the picture and with it the tags, and no site carries them. Read before changing the gallery page's head, its picture, or giving a site link previews."
 date: 2026-11-04
@@ -158,7 +158,8 @@ on the address shows the picture, the title and the description.
   refused for differing builds; the picture could be a file in content/,
   or taken by the deploy in Chrome, which a copy's deploy does not run
   today. Its words would come from site.json's name and headline, as its
-  description tag's do now. It waits on the owner (Brief 16).
+  description tag's do now. Deferred until a user asks, the owner's
+  decision of 2026-11-06 (docs/deferred/link-previews-on-a-site.md).
 - The picture's sources stay outside the repository; the picture is the
   only part committed.
 
@@ -167,3 +168,4 @@ on the address shows the picture, the title and the description.
 | Date | Change | Why |
 |---|---|---|
 | 2026-11-05 | **Evidence; nothing decided moves.** A4 measured; the Live only clause seen: Post Inspector fetched the address (206), read the title, description and picture, and showed the preview; it labels the type Article and finds no author or date, which a site's page does not give. Still proposed, for the owner's word. | The owner's Post Inspector run, 2026-11-05, his screenshot; the live page's head read the same day: the eleven tags, social-card.jpg 200, image/jpeg, 365,061 bytes. |
+| 2026-11-06 | **Accepted** by the owner, unchanged. His acceptance confirms the reading in the Decision Outcome: Open Graph's absolute addresses lie outside ADR-0007. Link previews on a copy's own site are deferred until a user asks (docs/deferred/link-previews-on-a-site.md), as More Information recommended. | His decisions of 2026-11-06 UTC on Report 17, all as recommended, relayed in Brief 17 of 2026-11-07. |

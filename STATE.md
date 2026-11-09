@@ -6,12 +6,12 @@ status: current
 
 # STATE
 
-**Verified against main at 878f7f8 and the branch after-link-preview
-after it, 2026-11-05 UTC, by the Brief 1 implementing session's
-thirtieth round**: the live gallery's head and picture read; the weekly
-run of 2026-11-02 and pull request 56's scope run read from GitHub's API;
-the owner's Post Inspector screenshot (logs/2026-10-12-brief-1-build.md,
-Round 30). This is the only line in
+**Verified against main at 6d65e12 and the branch report-17-decisions
+after it, 2026-11-09 UTC, by the Brief 1 implementing session's
+thirty-first round, Brief 17**: ADR-0022 and the index read after the
+change; the deferred entry written; GitHub's job logs refused without a
+sign-in (403); the gates and the pre-publish search
+(logs/2026-10-12-brief-1-build.md, Round 31). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -67,10 +67,12 @@ No attempt to edit a post, which GitHub refuses the workflow (pull
 request 54). Brief 15's corrections to four records' form merged in pull
 request 55. A link preview on the gallery page, Open Graph and X card
 tags and a committed picture, merged in pull request 56 and shown by
-LinkedIn's Post Inspector (ADR-0022, proposed). The weekly run of every
-page passed on 2026-11-02, shared out in 21 jobs; step 5's policy is
-proven by a scope run after GitHub's block took effect. Waiting: his
-word on ADR-0022.
+LinkedIn's Post Inspector (ADR-0022, accepted by the owner on
+2026-11-06; previews on a copy's own site deferred until a user asks).
+The weekly run of every page passed on 2026-11-02, shared out in 21
+jobs; step 5's policy is proven by a scope run after GitHub's block took
+effect. Waiting: the weekly run's TBT medians, which only a signed-in
+user can read.
 
 ## Publishing
 
@@ -82,7 +84,7 @@ word on ADR-0022.
 
 | Task | Status | Evidence | Date | Proof |
 |---|---|---|---|---|
-| A link preview for the gallery page: its reading of ADR-0007, and whether a copy's own site carries one | PENDING | [VERIFIED] built, merged and shown by LinkedIn; [BELIEVED] the reading, until he accepts the record | 2026-11-05 | ADR-0022 |
+| None open | DONE | ADR-0022 accepted by the owner, its reading of ADR-0007 with it; previews on a copy's own site deferred | 2026-11-06 | ADR-0022, Changes |
 
 ## Built, not yet complete
 
