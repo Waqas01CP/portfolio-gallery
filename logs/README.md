@@ -44,6 +44,7 @@ subdirectories and leave this index at the top pointing into them.
 
 | Date (UTC) | Log file | Session | What was done | Outcome |
 |---|---|---|---|---|
+| 2026-11-10 | 2026-10-12-brief-1-build.md | The owner's paste, Round 32: the weekly run's speed tables | Every page within ADR-0009's goals on GitHub's runner: TBT 0 ms on all eighteen, LCP 1,376 to 2,103 ms, CLS 0 but Plain's 0.047; ADR-0012's 600 ms kept, more Mondays first | On the branch report-17-decisions, not pushed |
 | 2026-11-09 | 2026-10-12-brief-1-build.md | Brief 17, Round 31: the owner's decisions on Report 17 | ADR-0022 accepted; link previews on a copy's own site deferred, an entry in docs/deferred/; CLAUDE.md's line 19 reworded as he approved; the weekly run's TBT medians not readable without a sign-in | On the branch report-17-decisions, not pushed |
 | 2026-11-05 | 2026-10-12-brief-1-build.md | The owner's questions, Round 30: after pull request 56 | LinkedIn's Post Inspector shows the preview, ADR-0022's A4 measured; the weekly run of 2026-11-02 green in 21 jobs; step 5's policy proven by pull request 56's scope run, Test 1 not needed again | On the branch after-link-preview, not pushed |
 | 2026-11-04 | 2026-10-12-brief-1-build.md | Brief 16, Round 29: a link preview on the gallery page | Open Graph and X card tags and a committed picture on the gallery page, none in a copy or a site; the description corrected, its count the build's; check_built holds it, ten defeat cases and a control; ADR-0022 proposed | On the branch link-preview, not pushed |

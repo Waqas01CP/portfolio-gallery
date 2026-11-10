@@ -7,11 +7,10 @@ status: current
 # STATE
 
 **Verified against main at 6d65e12 and the branch report-17-decisions
-after it, 2026-11-09 UTC, by the Brief 1 implementing session's
-thirty-first round, Brief 17**: ADR-0022 and the index read after the
-change; the deferred entry written; GitHub's job logs refused without a
-sign-in (403); the gates and the pre-publish search
-(logs/2026-10-12-brief-1-build.md, Round 31). This is the only line in
+after it, 2026-11-10 UTC, by the Brief 1 implementing session's
+thirty-second round**: the weekly run's eighteen speed tables, as the
+owner copied them from GitHub, set against ADR-0009's goals; the gates
+and the pre-publish search (logs/2026-10-12-brief-1-build.md, Round 32). This is the only line in
 this file that names commits.
 
 This file is where to start, not where to stop. It outranks memory. It does
@@ -71,8 +70,8 @@ LinkedIn's Post Inspector (ADR-0022, accepted by the owner on
 2026-11-06; previews on a copy's own site deferred until a user asks).
 The weekly run of every page passed on 2026-11-02, shared out in 21
 jobs; step 5's policy is proven by a scope run after GitHub's block took
-effect. Waiting: the weekly run's TBT medians, which only a signed-in
-user can read.
+effect; its speed tables show TBT 0 ms on every page. Waiting: more
+Mondays' numbers before the owner decides on TBT's 600 ms ceiling.
 
 ## Publishing
 
@@ -94,7 +93,7 @@ DONE rows are in docs/reference/completed.md.
 |---|---|---|---|---|
 | Checks on what a change alters | PARTIAL | [VERIFIED] on GitHub, the six runs of pull requests 24 to 26 and their merges, each checking every page as designed, for a file then in CHECKING (tools/ci.py, tools/check_browser.py, build.py), replayed on the same commits; Phase 2 on GitHub, pull request 28's run checking every page side by side in 5 min 8 s against 76 min for pull request 27's on one runner, one design's job failing at Chrome's start and the verdict with it, as built, then green on a rerun; pull request 29, Chrome's start fixed, every page in 5.2 min with all eighteen starts within it; pull request 30 checked every page for a change to the gallery page's own stylesheet, the rule narrowed on lighthouse; the weekly run of 2026-11-02 shared out on GitHub, every page in 21 jobs, all passing, 6.4 minutes from 12:50Z, eight hours after its 04:41 schedule (GitHub's API, run 41447942168); [BELIEVED] a narrowed run on GitHub, not yet seen there | 2026-10-29 | 27db869, 40c9610; ADR-0019, Changes |
 | Profession tags | DONE | [VERIFIED] pull request 30 green on GitHub and merged; the gallery built with twelve labels; nine cases | 2026-10-29 | ADR-0020; pull request 30 |
-| Speed in CI | PARTIAL | [VERIFIED] on GitHub: pull request 32's run checked every page with Lighthouse in 6.4 min, green, and its merge's 6.2; here, every page measured and the speed cases; the weekly run of 2026-11-02 with Lighthouse on every page, passing, so no median over 600 ms TBT, LCP over 2.5 s or CLS over 0.1 (run 41447942168); [BELIEVED] its TBT medians, which are in the jobs' summaries behind a sign-in, and which over some weeks decide whether 600 ms can come down | 2026-10-30 | ADR-0012, Changes |
+| Speed in CI | PARTIAL | [VERIFIED] on GitHub: pull request 32's run checked every page with Lighthouse in 6.4 min, green, and its merge's 6.2; here, every page measured and the speed cases; the weekly run of 2026-11-02 with Lighthouse on every page, passing, so no median over 600 ms TBT, LCP over 2.5 s or CLS over 0.1 (run 41447942168); its medians, from the jobs' summaries as the owner copied them on 2026-11-10: LCP 1,376 to 2,103 ms (Console the lowest; Frost 2,103 and Default 2,102 the highest), CLS 0.000 on every page but Plain's 0.047, TBT 0 ms on all eighteen pages; [BELIEVED] whether TBT stays at 0 ms on the runner over more Mondays, which decides whether 600 ms can come down | 2026-11-10 | ADR-0012, Changes |
 | Like buttons | DONE | [VERIFIED] on GitHub: nineteen posts made by the workflow on 2026-10-29; after pull request 53, the owner's upvote on Frost's post counted, the live card showing 1 like; the rewrite of the first posts refused by GitHub, a warning each, removed in pull request 54; here, the like cases, and with the author rule or the upvotes removed each case fails | 2026-10-30 | ADR-0021, Changes |
 | CODEOWNERS and the issue templates | PARTIAL | [VERIFIED] CODEOWNERS asked the owner's review the moment pull request 22, the first from outside, opened, and its author filled the pull request template's showcase section (GitHub's API); [BELIEVED] the issue templates, which no one has used yet | 2026-10-28 | b798834; pull request 22 |
 | The showcase packed by its pictures' shapes | PARTIAL | [VERIFIED] the packing check at 390 and 1366 px, light and dark, by the script, by Chrome's grid-lanes and with scripts off, and its defeat cases, on a fresh clone, and on GitHub's runner in pull request 14's checks; [BELIEVED] in Safari 26.4's own grid-lanes, which the seat cannot run | 2026-10-22 | b17d883, ba93032; ADR-0016, Changes |
