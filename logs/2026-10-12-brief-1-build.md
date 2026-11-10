@@ -3960,3 +3960,105 @@ None in this round.
 
 - The weekly run's TBT medians: only the owner can read the summaries.
 - Nothing pushed.
+
+# Round 31, 2026-11-09 UTC: Brief 17, the owner's decisions on Report 17
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session. Work on the branch report-17-decisions, from main at 6d65e12,
+level with GitHub (fetched 2026-11-09). Mode: mutating, records only.
+Brief 17 from the portfolio architecture chat, via the owner, 2026-11-07
+UTC, stored word for word in briefs/implementation-seat.md, replacing
+Brief 16 (executed, ticked 2026-11-07) after it was read; it carries the
+owner's quality floor, his trade-off and his aim, as Brief 16 did.
+
+## What was asked
+
+His decisions of 2026-11-06 UTC, all as Report 17 recommended: ADR-0022
+accepted; link previews on a copy's own site deferred until a user asks;
+CLAUDE.md's line 19 reworded. And the weekly run's TBT medians, if
+GitHub's CLI is signed in here, changing nothing.
+
+## Errors this seat made
+
+None in this round.
+
+## What was done
+
+1. ADR-0022: status accepted; a Changes row of 2026-11-06, its third,
+   in date order; More Information points to the deferred entry. The
+   index: Accepted; its Pending list empty again [VERIFIED: read after].
+2. docs/deferred/link-previews-on-a-site.md: what was proposed, why not
+   built (ADR-0007's "We will configure no site URL and no base path"),
+   what it would take (Report 17, 6.2), the trigger (a user asks), and
+   what revisiting would have to produce. docs/deferred/ is on the
+   cleanup's list, so a copy does not receive it.
+3. CLAUDE.md, line 19: "for it, open to contribution by pull request,
+   checked automatically and", his approval of 2026-11-06 [VERIFIED:
+   the diff, one line].
+4. CAPABILITIES: 22 records, all accepted; a limit line, no link preview
+   on a site. STATE: the verified line, the headline, the decisions row.
+5. The weekly run's TBT medians: not read. GitHub's CLI is not installed
+   here (`which gh`, `where.exe gh`: none). Without a sign-in, GitHub's
+   API refuses a job's log ("Must have admin rights to Repository.",
+   403, job 125285708004, browser (bento)) and gives no summary in the
+   check run's output [VERIFIED]. The owner is given the clicks.
+
+## Not done
+
+- The TBT medians, and so no view on lowering ADR-0012's 600 ms: they
+  wait on the owner's copy of the speed tables.
+- Nothing pushed.
+
+# Round 32, 2026-11-10 UTC: the weekly run's speed tables
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session. A second commit on the branch report-17-decisions, which the
+owner had pushed with its first (12a6526) and not yet opened as a pull
+request. Mode: mutating, records only.
+
+## What was asked
+
+The owner copied the eighteen speed tables of the weekly run of
+2026-11-02 (run 41447942168) from GitHub's run summary, signed in, as
+Report 18, 7.1 asked. Read them against ADR-0009's goals and ADR-0012's
+600 ms ceiling; change nothing.
+
+## Errors this seat made
+
+None in this round.
+
+## What was done
+
+1. The medians, five runs each, as he copied them [VERIFIED against his
+   paste, page by page]: LCP Assert 1,502, Bento 1,651, Broadcast
+   1,804, Broadsheet 1,389, Console 1,376, Cyanotype 1,407, Default
+   2,102, Frost 2,103, Handbook 1,952, Latent 1,390, Pipeline 1,378,
+   Plain 1,377, Pocket 1,504, Poster 1,393, Savepoint 1,398, Sentinel
+   1,380, Signal 1,379, the gallery page 1,652 ms; CLS 0.000 on every page
+   but Plain's 0.047; TBT 0 ms on all eighteen. Every page within
+   ADR-0009's goals: LCP 2,500 ms, CLS 0.1, TBT 200 ms. The verdict's
+   summary: 17 designs and the gallery page planned, every part success.
+2. Against the seat's machine on 2026-10-29: LCP 1,459 to 2,105 there,
+   Default and Frost the highest in both; TBT 0 to 145 ms there, Bento
+   298 ms while the machine was busy, the reading that set option A's
+   600 ms ceiling; CLS 0 on every page there.
+3. Recorded: STATE's Speed row; a CAPABILITIES row for the runner beside
+   the machine's; ADR-0012, an evidence row, its third.
+
+## Findings and recommendations
+
+- Finding: on GitHub's runner TBT read 0 ms on every page, one run.
+  Recommendation: keep 600 ms until three or four Mondays agree, then
+  the owner may make TBT fail at its goal, 200 ms, as LCP and CLS do.
+- Finding: Plain's CLS read 0.047 on the runner, under its 0.1 goal,
+  where it read 0 here on 2026-10-29. Its cause is not tested; a
+  hypothesis only, not acted on. Recommendation: watch it on the next
+  Mondays; investigate if it grows or another page starts to shift.
+
+## Not done
+
+- GitHub's CLI: not installed by the seat. The owner may install it from
+  GitHub's own package (winget's GitHub.cli, publisher GitHub, Inc., its
+  installer github.com/cli/cli's MSI, read 2026-11-10); signing it in is
+  his, in his own terminal.
+- Nothing pushed.

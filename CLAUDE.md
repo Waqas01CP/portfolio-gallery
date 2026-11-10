@@ -16,7 +16,7 @@ changed here, never there (ADR-0017, Changes, 2026-10-23).
 
 portfolio-gallery: a portfolio-site template anyone can copy and publish
 with GitHub Pages without installing anything, and a gallery of designs
-for it, each contributed by pull request, checked automatically and
+for it, open to contribution by pull request, checked automatically and
 merged by the owner. How the repository is run is part of the product.
 
 Commands live in docs/reference/commands.md. Do not infer a command that

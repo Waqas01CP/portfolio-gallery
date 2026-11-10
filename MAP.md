@@ -59,13 +59,14 @@ Decision records have no `type`; their `topic` is shown.
 | `docs/decisions/0019-checks-on-what-a-change-alters.md` | decision (build) | accepted | The browser checks of a pull request or a push look only at the pages the change alters, found by building the gallery from the base too and comparing the built files; every page is checked when the checks themselves change, when the base cannot be read or built, by hand, and each Monday. Read before changing tools/ci.py's selection, checks.yml or checks-weekly.yml. |
 | `docs/decisions/0020-profession-tags.md` | decision (content) | accepted | Designs and showcase entries may name the professions they suit or work in, as ids from one list, src/professions.json; each gallery card shows them. Read before adding a profession, a filter, or a field to design.json or entry.json. |
 | `docs/decisions/0021-likes-from-github-discussions.md` | decision (build) | accepted | Each template and showcase site has a like button: a post in the repository's Discussions, category Likes, whose upvotes and thumbs up the deploy counts into the gallery's HTML. Read before changing the like button, the deploy's likes job, or what the gallery page loads. |
-| `docs/decisions/0022-a-link-preview-for-the-gallery-page.md` | decision (hosting) | proposed | The gallery page carries Open Graph and X card tags naming its own address and a committed picture, src/social-card.jpg, so a shared link shows a preview; a copy's cleanup removes the picture and with it the tags, and no site carries them. Read before changing the gallery page's head, its picture, or giving a site link previews. |
+| `docs/decisions/0022-a-link-preview-for-the-gallery-page.md` | decision (hosting) | accepted | The gallery page carries Open Graph and X card tags naming its own address and a committed picture, src/social-card.jpg, so a shared link shows a preview; a copy's cleanup removes the picture and with it the tags, and no site carries them. Read before changing the gallery page's head, its picture, or giving a site link previews. |
 | `docs/decisions/README.md` | index | current | The decision record index for portfolio-gallery, with the fixed topic list and the Pending list of decisions identified but not concluded. |
 
 ## docs/deferred
 
 | File | Type | Status | Description |
 |---|---|---|---|
+| `docs/deferred/link-previews-on-a-site.md` | deferred | open | Link previews (Open Graph and an X card) on a copy's own site, as the gallery page has them. Deferred 2026-11-06 by the owner; reopen when a user asks. |
 | `docs/deferred/more-than-one-degree.md` | deferred | open | More than one degree on a site: the timeline draws one degree band, and the build refuses a second. Deferred 2026-10-12; reopen when a user needs two degrees or a design needs them. |
 | `docs/deferred/showcase-of-users-sites.md` | deferred | closed | A showcase of users' own sites built with the template. Deferred 2026-10-12 by the brief; closed 2026-10-20, built as ADR-0016. |
 
