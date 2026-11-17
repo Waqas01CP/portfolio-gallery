@@ -4062,3 +4062,66 @@ None in this round.
   installer github.com/cli/cli's MSI, read 2026-11-10); signing it in is
   his, in his own terminal.
 - Nothing pushed.
+
+# Round 33, 2026-11-18 UTC: pull request 59, and three Mondays of speed
+
+Tool: Claude Code. Model: Claude Opus 5.5 (claude-opus-5-5). The same
+session. Work on the branch three-mondays, from main at fee2c4a, the
+owner's merge of pull request 59. Mode: mutating, records only.
+
+## What was asked
+
+The owner, after merging pull request 59: do what was waiting.
+
+## Errors this seat made
+
+1. **A speed reading recorded as the rule when it was the exception.**
+   Round 24 (2026-10-29) wrote "CLS 0 on every page"; Plain's 0 that day
+   came with the machine busy, and its usual reading is 0.047. Found by
+   this round's three Mondays and a measurement here; corrected in place
+   in CAPABILITIES with its date. It cost Round 32 a false "new reading"
+   finding, sent to the chat in Report 18's addendum.
+
+## What was done
+
+1. Recorded, as Round 31 left for this round: on 2026-11-10 the owner
+   closed pull request 58 (GitHub's default title and body) and deleted
+   its branch, then told the seat to "either push or do something". His
+   instruction ranks above CLAUDE.md's "Seats never push". The seat pushed
+   report-17-decisions, 12a6526 and 744b080 (gate E passed), and opened
+   pull request 59 with GitHub's CLI, which he had installed and signed
+   in. Its checks passed; he merged it (fee2c4a). The standing rule is
+   unchanged: the seat pushes again only when he says so.
+2. The weekly runs, read from their logs with `gh run view --log` on
+   2026-11-18 [VERIFIED]:
+   - 2026-11-02 (41447942168): line for line the tables he pasted.
+   - 2026-11-09 (42624400232; one 502 from GitHub, read on the retry) and
+     2026-11-16 (43872557795): TBT 0 ms on all eighteen pages; LCP
+     1,249 to 2,103 ms, Default and Frost 2,102 to 2,103 each week; CLS
+     0.000 on every page but Plain's 0.047.
+   - Every run green, every page within ADR-0009's goals.
+3. Plain's CLS: 0.047 on `tools/check_speed.py` here, 2026-11-18 (LCP
+   1,412, TBT 128 ms, median of five, 84 s) [VERIFIED]. Plain's built
+   page is byte for byte the same at b806cc4, the commit of Round 24's
+   measurement, and at fee2c4a (diff -rq) [VERIFIED]. The scratch output
+   of Round 24 reads Plain "LCP 1,649 ms, CLS 0.000, TBT 48 ms", and that
+   of 2026-10-13 "CLS 0.048". So 0.047 is Plain's usual reading; its
+   cause is not tested.
+4. Records: STATE (a decision row for the ceiling, the Speed row, the
+   headline); CAPABILITIES (the runner's row over three runs; the
+   machine's row corrected for Plain); ADR-0012, an evidence row, its
+   fourth.
+
+## Findings and recommendations
+
+- Finding: three Mondays agree, TBT 0 ms on every page on GitHub's
+  runner. Recommendation for the owner: TBT may now fail at its 200 ms
+  goal in CI, as LCP and CLS do, the 600 ms ceiling kept for local runs
+  only if he wants it; his decision, a Changes row in ADR-0012 and a
+  change to tools/check_speed.py with its defeat case.
+- Finding: Plain shifts by 0.047 on load, under the 0.1 goal. Not
+  investigated; it could be, if he wants Plain at 0.
+
+## Not done
+
+- Nothing pushed.
